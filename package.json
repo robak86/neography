@@ -1,0 +1,46 @@
+{
+  "name": "neography",
+  "version": "0.0.1",
+  "description": "TODO",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "dist": "npm run clear && npm run build && cp README.md dist/lib && cp package.json dist/lib",
+    "build": "tsc",
+    "test": "mocha --require dist/spec/SpecHelper.js dist/spec/**/*.js",
+    "clear": "rm -rf ./dist",
+    "build:dev": "tsc --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robak86/graphorm.git"
+  },
+  "author": "Tomasz Robaczewski",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/robak86/graphorm/issues"
+  },
+  "homepage": "https://github.com/robak86/graphorm#readme",
+  "devDependencies": {
+    "@types/chai": "^3.5.0",
+    "@types/faker": "^4.1.0",
+    "@types/lodash": "^4.14.62",
+    "@types/mocha": "^2.2.40",
+    "@types/node": "^7.0.12",
+    "@types/ramda": "^0.0.6",
+    "chai": "^3.5.0",
+    "faker": "^4.1.0",
+    "mocha": "^3.2.0",
+    "source-map-support": "^0.4.14",
+    "typescript": "^2.2.2"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "neo4j-driver": "^1.2.0",
+    "ramda": "^0.23.0",
+    "reflect-metadata": "^0.1.10",
+    "shortid": "^2.2.8",
+    "sinon": "^2.1.0",
+    "typeorm": "^0.0.11"
+  }
+}

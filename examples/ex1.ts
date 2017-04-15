@@ -1,26 +1,8 @@
-# Neography
-
-Thin opinionated mapping layer and queries builder for official neo4j driver. (https://github.com/neo4j/neo4j-javascript-driver)
-
-## Warning 
-This library is currently highly experimental and in many places the code is just a draft. Use it at your own risk.
-**All suggestion, opinions and ideas are gladly welcome.**
-
-
-### Installing
-
-```bash
-npm install neography
-```
-
-
-### Define Nodes and Relations
-
-```typescript
-import {AbstractNode, AbstractRelation, createFactoryMethod} from "neography/model";
+import {Connection, buildQuery} from "neography";
+import {AbstractNode, AbstractRelation, PersistedGraphEntity, createFactoryMethod} from "neography/model";
 import {node, attribute, relation} from 'neography/annotations';
 
-
+//Models definition
 @node('User')
 class User extends AbstractNode {
     static build = createFactoryMethod(User);
@@ -34,44 +16,37 @@ class HasFriendRelation extends AbstractRelation {
     since:number;
 }
 
-```
-
-### Define Queries
-
-```typescript
-import {buildQuery} from "neography";
+async function example() {
+    let connection:Connection = new Connection({username: 'neo4j', password: 'password', host: 'localhost'});
 
 
-const storeUserQuery = (user:User) => buildQuery()
-    .create(c => c.node(user).as('user'))
-    .returns('user');
+    //queries
+    const storeUserQuery = (user:User) => buildQuery()
+        .create(c => c.node(user).as('user'))
+        .returns('user');
 
 
-const addFriendToUserQuery = (fromId:string, hasFriendRelation:HasFriendRelation, toId:string) => buildQuery()
-    .match(m => [
-        m.node(User).params({id: fromId}).as('user'),
-        m.node(User).params({id: toId}).as('friend')
-    ])
-    .create(c => [
-        c.matchedNode('user'),
-        c.relation(hasFriendRelation).as('hasFriendRelation'),
-        c.matchedNode('friend')]
-    );
+    const addFriendToUserQuery = (fromId:string, hasFriendRelation:HasFriendRelation, toId:string) => buildQuery()
+        .match(m => [
+            m.node(User).params({id: fromId}).as('user'),
+            m.node(User).params({id: toId}).as('friend')
+        ])
+        .create(c => [
+            c.matchedNode('user'),
+            c.relation(hasFriendRelation).as('hasFriendRelation'),
+            c.matchedNode('friend')]
+        );
 
-const getFriendsQuery = (userId:string) => buildQuery()
-    .match(m => [
-        m.node(User).as('user').params({id: userId}),
-        m.relation(HasFriendRelation).as('relation'),
-        m.node(User).as('friend')
-    ])
-    .returns('user', 'relation', 'friend');
+    const getFriends = (userId:string) => buildQuery()
+        .match(m => [
+            m.node(User).as('user').params({id: userId}),
+            m.relation(HasFriendRelation).as('relation'),
+            m.node(User).as('friend')
+        ])
+        .returns('user', 'relation', 'friend');
 
-```
 
-### Execute Queries
-
-```typescript
- 
+    //model instances
     let user1 = User.build({firstName: 'Jane', lastName: 'Doe'});
     let user2 = User.build({firstName: 'John', lastName: 'Doe'});
     let hasFriend = HasFriendRelation.build({since: new Date().getTime()});
@@ -82,7 +57,8 @@ const getFriendsQuery = (userId:string) => buildQuery()
 
     await connection.runQuery(addFriendToUserQuery(user1Rows[0]['user'].id, hasFriend, user2Rows[0]['user'].id));
 
-    let friends:{ user:User, relation:HasFriendRelation, friend:User }[] = await connection.runQuery(getFriendsQuery(user1Rows[0]['user'].id));
+
+    let friends:{ user:User, relation:HasFriendRelation, friend:User }[] = await connection.runQuery(getFriends(user1Rows[0]['user'].id));
 
     console.log(friends);
 
@@ -106,4 +82,7 @@ const getFriendsQuery = (userId:string) => buildQuery()
     //         firstName: 'John',
     //         lastName: 'Doe' }
     // }]
-```
+
+}
+
+example();

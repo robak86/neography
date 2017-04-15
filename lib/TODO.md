@@ -1,0 +1,3 @@
+* Introduce ArrayLike structure for holding response data (in order to allow lazy mapping)
+* Choose one utility library instead of using both ramda and lodash 
+* Remove updatedAt and createdAt from abstract classes and allow user to declare it in his base class (with custom transform functions for mapper) 

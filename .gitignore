@@ -1,0 +1,7 @@
+node_modules
+.idea
+dist
+*.iml
+examples/dist
+examples/node_modules
+examples/**/*.js
