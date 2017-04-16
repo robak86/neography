@@ -71,7 +71,10 @@ const getFriendsQuery = (userId:string) => buildQuery()
 ### Execute Queries
 
 ```typescript
- 
+    import {Connection} from "neography";
+
+    let connection:Connection = new Connection({username: 'neo4j', password: 'password', host: 'localhost'});
+
     let user1 = User.build({firstName: 'Jane', lastName: 'Doe'});
     let user2 = User.build({firstName: 'John', lastName: 'Doe'});
     let hasFriend = HasFriendRelation.build({since: new Date().getTime()});
