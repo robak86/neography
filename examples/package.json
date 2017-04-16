@@ -1,22 +1,13 @@
 {
   "name": "neography-examples",
+  "private": true,
   "version": "0.0.1",
-  "description": "TODO",
-
   "scripts": {
     "build": "tsc -P ./tsconfig.json",
     "watch": "tsc -P ./tsconfig.json --watch"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/robak86/graphorm.git"
-  },
   "author": "Tomasz Robaczewski",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/robak86/graphorm/issues"
-  },
-  "homepage": "https://github.com/robak86/graphorm#readme",
   "devDependencies": {
     "@types/node": "^7.0.12",
     "typescript": "^2.2.2"
