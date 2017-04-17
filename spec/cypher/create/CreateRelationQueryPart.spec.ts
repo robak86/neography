@@ -35,10 +35,5 @@ describe("CreateRelationQueryPart", () => {
             let boundQuery:IBoundQueryPart = createRelationQueryPart.toCypher(ctx);
             expect(boundQuery.params.r1Params.id).to.be.an('string');
         });
-
-        it("registers class for mapping", () => {
-            createRelationQueryPart.toCypher(ctx);
-            expect(ctx.getNodeClass('r1')).to.eql(DummyGraphRelation);
-        });
     });
 });

@@ -25,7 +25,6 @@ export class CreateNodeQueryPart<N extends AbstractNode> implements IQueryPart {
 
     toCypher(context:QueryContext):IBoundQueryPart {
         let alias = this._alias || context.checkoutNodeAlias();
-        context.registerNodeClass(alias, this.nodeInstance.constructor as any);
         let paramsId = context.checkoutParamsAlias(alias);
 
         return {

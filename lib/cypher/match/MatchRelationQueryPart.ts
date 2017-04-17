@@ -34,7 +34,6 @@ export class MatchRelationQueryPart<G extends AbstractRelation> implements IRela
 
     toCypher(context:QueryContext):IBoundQueryPart {
         let alias = this._alias || context.checkoutRelationAlias();
-        context.registerRelationClass(alias, this.klass);
         let paramsId = context.checkoutParamsAlias(alias);
         let cypherParams:string = this._params ?
             ` {${generateMatchAssignments(paramsId, this._params)}}` :

@@ -30,7 +30,6 @@ export class MatchNodeQueryPart<N extends AbstractNode> implements INodeMatchQue
     //TODO: toCypher has side effects - find better name or give a try for visitor pattern
     toCypher(context:QueryContext):IBoundQueryPart {
         let alias = this._alias || context.checkoutNodeAlias();
-        context.registerNodeClass(alias, this.klass);
 
         let paramsId = context.checkoutParamsAlias(alias);
         let cypherParams:string = this._params ?

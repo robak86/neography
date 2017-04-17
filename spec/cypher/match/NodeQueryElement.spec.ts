@@ -50,10 +50,5 @@ describe("MatchNodeQueryPart", () => {
             expect(cypherPart.cypherString).to.eql('(n1:SpecNode1:SpecNode2 {attr1: {n1Params}.attr1, attr2: {n1Params}.attr2})');
             expect(cypherPart.params).to.eql({n1Params: params});
         });
-
-        it("registers class for mapping", () => {
-            nodeQueryPart.toCypher(ctx);
-            expect(ctx.getNodeClass('n1')).to.eql(SomeDummyNode)
-        });
     });
 });

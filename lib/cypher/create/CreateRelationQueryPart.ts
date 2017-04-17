@@ -37,7 +37,6 @@ export class CreateRelationQueryPart<R extends AbstractRelation> implements IQue
 
     toCypher(context:QueryContext):IBoundQueryPart {
         let alias = this._alias || context.checkoutRelationAlias();
-        context.registerNodeClass(alias, this.relationInstance.constructor as any);
         let paramsId = context.checkoutParamsAlias(alias);
 
         return {

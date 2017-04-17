@@ -4,13 +4,10 @@ import {IBoundQueryPart} from "../abstract/IBoundQueryPart";
 import {cloned} from "../../utils/core";
 
 
-
 export class WhereLiteralQueryPart implements IQueryPart {
     protected _params:any;
 
-    constructor(private whereLiteral:string) {
-
-    }
+    constructor(private whereLiteral:string) {}
 
     params(params:any):WhereLiteralQueryPart {
         return cloned(this, (el:WhereLiteralQueryPart) => el._params = params);

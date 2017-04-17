@@ -34,10 +34,5 @@ describe("CreateNodeQueryPart", () => {
             let boundQuery:IBoundQueryPart = nodeCreate.toCypher(ctx);
             expect(boundQuery.params.n1Params.id).to.be.an('string');
         });
-
-        it("registers class for mapping", () => {
-            nodeCreate.toCypher(ctx);
-            expect(ctx.getNodeClass('n1')).to.eql(DummyGraphNode)
-        });
     });
 });

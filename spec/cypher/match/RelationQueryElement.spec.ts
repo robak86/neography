@@ -37,10 +37,5 @@ describe("MatchRelationQueryPart", () => {
             expect(cypherPart.cypherString).to.eql('-[u:_RelationTypeForSpec {attr1: {uParams}.attr1, attr2: {uParams}.attr2}]->');
             expect(cypherPart.params).to.eql({uParams: params});
         });
-
-        it("registers class for mapping", () => {
-            relationQueryElement.toCypher(ctx);
-            expect(ctx.getRelationClass('r1')).to.eql(SomeDummyRelation);
-        });
     });
 });
