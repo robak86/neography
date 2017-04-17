@@ -1,9 +1,10 @@
 import * as _ from 'lodash';
 import {RelationMetadata} from "../metadata/RelationMetadata";
-import {GraphEntity} from "../model/GraphEntity";
+
 import {AttributesMapper} from "../mappers/AttributesMapper";
 import {isPresent} from "../utils/core";
 import {attributesMapperFactory} from "../mappers/AttributesMapperFactory";
+import {Peristable} from "../model/GraphEntity";
 
 
 
@@ -38,7 +39,7 @@ export class RelationsTypesRegistry {
         return isPresent(entry);
     }
 
-    getMapper<T extends GraphEntity>(type:string):AttributesMapper<T> {
+    getMapper<T extends Peristable>(type:string):AttributesMapper<T> {
         let entry:RelationsTypesRegistryEntry = this.getRegistryEntry(type);
         if (_.isUndefined(entry)) {
             throw new Error("Missing metadata for " + type);
@@ -51,7 +52,7 @@ export class RelationsTypesRegistry {
         return isPresent(relationMetadata) ? this.getMapper(relationMetadata.getId()) : null;
     }
 
-    private getRegistryEntry<T extends GraphEntity>(type:string):RelationsTypesRegistryEntry {
+    private getRegistryEntry<T extends Peristable>(type:string):RelationsTypesRegistryEntry {
         return this.mapping[type];
     }
 }

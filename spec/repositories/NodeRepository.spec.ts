@@ -127,7 +127,7 @@ describe("NodeRepository", () => {
 
         it("updates updatedAt property", async () => {
             let result = await nodeRepository.update(savedNode);
-            expect(result.updatedAt).to.be.greaterThan(savedNode.updatedAt);
+            expect(result.updatedAt).to.be.greaterThan(savedNode.updatedAt as number);
         });
     });
 });

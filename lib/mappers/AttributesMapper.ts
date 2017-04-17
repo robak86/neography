@@ -1,4 +1,4 @@
-import {GraphEntity, Persisted} from "../model/GraphEntity";
+import {Persisted, Peristable} from "../model/GraphEntity";
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
 import {Type} from "../utils/types";
 import {isPresent} from "../utils/core";
@@ -11,7 +11,7 @@ export interface TransformersRegistry {
     [context:string]:((obj) => any)[]
 }
 
-export class AttributesMapper<T extends GraphEntity> {
+export class AttributesMapper<T extends Peristable> {
 
     constructor(private klass:Type<T>, private transformers:TransformersRegistry) {}
 

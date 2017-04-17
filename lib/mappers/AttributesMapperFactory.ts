@@ -1,16 +1,15 @@
 import {AttributesMapper, MappingContext, TransformersRegistry} from "./AttributesMapper";
-import {GraphEntity} from "../model/GraphEntity";
 import {Type} from "../utils/types";
-import * as _ from 'lodash';
 import {int, Integer} from "../driver/Integer";
 import {isPresent} from "../utils/core";
 import {genId} from "../utils/uuid";
+import {Peristable} from "../model/GraphEntity";
 
 export class AttributesMapperFactory {
     private _transformers:TransformersRegistry = {};
 
 
-    getMapper<T extends GraphEntity>(klass:Type<T>):AttributesMapper<T> {
+    getMapper<T extends Peristable>(klass:Type<T>):AttributesMapper<T> {
         return new AttributesMapper(klass, this._transformers);
     }
 

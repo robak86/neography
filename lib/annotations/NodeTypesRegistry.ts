@@ -1,11 +1,12 @@
 import * as _ from 'lodash';
-import {GraphEntity} from "../model/GraphEntity";
+
 import {NodeMetadata} from "../metadata/NodeMetadata";
 import {AttributesMapper} from "../mappers/AttributesMapper";
 import {AbstractNode} from "../model/AbstractNode";
 import {isPresent} from "../utils/core";
 import {Type} from "../utils/types";
 import {attributesMapperFactory} from "../mappers/AttributesMapperFactory";
+import {Peristable} from "../model/GraphEntity";
 
 
 
@@ -27,7 +28,7 @@ export class NodesTypesRegistry {
         return isPresent(entry);
     }
 
-    getMapper<T extends GraphEntity>(labels:string[]):AttributesMapper<T> {
+    getMapper<T extends Peristable>(labels:string[]):AttributesMapper<T> {
         let entry:NodesTypesRegistryEntry = this.getRegistryEntry(labels.sort());
         if (_.isUndefined(entry)) {
             throw new Error("Missing metadata for " + labels);
@@ -43,7 +44,7 @@ export class NodesTypesRegistry {
             null;
     }
 
-    private getRegistryEntry<T extends GraphEntity>(labelOrLabels:string[]):NodesTypesRegistryEntry {
+    private getRegistryEntry<T extends Peristable>(labelOrLabels:string[]):NodesTypesRegistryEntry {
         let labels:string[] = _.isArray(labelOrLabels) ? labelOrLabels : [labelOrLabels];
         let labelsId = labels.join('_');
 
