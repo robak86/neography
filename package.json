@@ -16,7 +16,7 @@
     "url": "git+https://github.com/robak86/neography.git"
   },
   "author": "Tomasz Robaczewski",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/robak86/neography/issues"
   },
