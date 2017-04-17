@@ -13,7 +13,7 @@ export class Transaction {
 
     runQuery(query:string, params?:any):GraphResponse {
         if (this.hasError) {
-            return new GraphResponse(Promise.reject(this.lastError));
+            return GraphResponse.initWithAutoMapper(Promise.reject(this.lastError));
         } else {
             let queryPromise = this.transaction
                 .run(query, params)
@@ -21,7 +21,7 @@ export class Transaction {
                     this.rollback(err);
                     return Promise.reject(err);
                 });
-            return new GraphResponse(queryPromise);
+            return GraphResponse.initWithAutoMapper(queryPromise);
         }
     }
 

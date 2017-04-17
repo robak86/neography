@@ -26,15 +26,11 @@ export class Connection {
     runQuery(queryBuilder:QueryBuilder | ((builder:QueryBuilder) => QueryBuilder)):Promise<any[]> {
         if (_.isFunction(queryBuilder)) {
             let queryData = queryBuilder(new QueryBuilder()).toQuery().toCypher();
-            return this.execQuery(queryData.boundQuery.cypherString, queryData.boundQuery.params).toArray();
+            return this.execQuery(queryData.boundQuery.cypherString, queryData.boundQuery.params).toAsyncArray();
         } else {
             let queryData:BoundCypherQuery = queryBuilder.toQuery().toCypher();
-            return this.execQuery(queryData.boundQuery.cypherString, queryData.boundQuery.params).toArray();
+            return this.execQuery(queryData.boundQuery.cypherString, queryData.boundQuery.params).toAsyncArray();
         }
-    }
-
-    createQuery(query:((builder:QueryBuilder) => QueryBuilder)):BoundCypherQuery {
-        return  query(new QueryBuilder()).toQuery().toCypher();
     }
 
     withTransaction<T>(fn:() => Promise<T>):Promise<T> { //TODO: rename to runWithinCurrentTransaction??
@@ -73,7 +69,7 @@ export class Connection {
     private runQueryWithoutTransaction(query:string, params?:any):GraphResponse {
         let session = this.checkoutNewSession();
         let queryPromise = session.run(query, params);
-        return new GraphResponse(pfinally(() => session.close(), queryPromise));
+        return GraphResponse.initWithAutoMapper(pfinally(() => session.close(), queryPromise));
     }
 
     private checkoutNewSession() {
