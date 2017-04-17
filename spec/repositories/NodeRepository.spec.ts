@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import {NodeRepository} from "../../lib/repositories/NodeRepository";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {cleanDatabase, getConnection} from "../helpers/ConnectionHelpers";
-import {PersistedGraphEntity} from "../../lib/model/GraphEntity";
+import {Persisted} from "../../lib/model/GraphEntity";
 import {Connection} from "../../lib/connection/Connection";
 import {buildQuery} from "../../lib/cypher/index";
 
@@ -27,7 +27,7 @@ describe("NodeRepository", () => {
     });
 
     describe(".save", () => {
-        let createdGenericNode:PersistedGraphEntity<DummyGraphNode>;
+        let createdGenericNode:Persisted<DummyGraphNode>;
         beforeEach(async () => {
             createdGenericNode = await nodeRepository.save(dummyNode);
         });
@@ -38,7 +38,7 @@ describe("NodeRepository", () => {
 
         });
 
-        it("return created entity having PersistedEntityParams", () => {
+        it("return created entity having Persisted", () => {
             expect(createdGenericNode.id).to.be.a('string');
             expect(createdGenericNode.createdAt).to.be.a('number');
             expect(createdGenericNode.updatedAt).to.be.a('number');
@@ -63,7 +63,7 @@ describe("NodeRepository", () => {
     describe(".exists", () => {
         it("returns true if buildNode exists", async () => {
             let node = DummyGraphNode.build({attr1: 'Tomasz'});
-            let storedNode:PersistedGraphEntity<DummyGraphNode> = await nodeRepository.save(node);
+            let storedNode:Persisted<DummyGraphNode> = await nodeRepository.save(node);
             expect(await nodeRepository.exists(storedNode.id)).to.eq(true);
         });
 
@@ -75,7 +75,7 @@ describe("NodeRepository", () => {
     describe(".getNodeById", () => {
         it("returns fetched buildNode if exists", async () => {
             let createdGenericNode = await nodeRepository.save(dummyNode);
-            let retrievedGenericNodes:PersistedGraphEntity<DummyGraphNode>[] = await nodeRepository.where({id: createdGenericNode.id as string});
+            let retrievedGenericNodes:Persisted<DummyGraphNode>[] = await nodeRepository.where({id: createdGenericNode.id as string});
             expect(retrievedGenericNodes[0]).to.eql(createdGenericNode);
         });
 
@@ -111,14 +111,14 @@ describe("NodeRepository", () => {
     });
 
     describe(".update", () => {
-        let savedNode:PersistedGraphEntity<DummyGraphNode>;
+        let savedNode:Persisted<DummyGraphNode>;
 
         beforeEach(async () => {
             savedNode = await nodeRepository.save(DummyGraphNode.build({attr1: 'John'}));
         });
 
         it("updates with provided params", async () => {
-            let edited:PersistedGraphEntity<DummyGraphNode> = _.cloneDeep(savedNode);
+            let edited:Persisted<DummyGraphNode> = _.cloneDeep(savedNode);
             edited.attr1 = 'updateFirstName';
             (edited as any).attr2 = null;
             let result = await nodeRepository.update(edited);

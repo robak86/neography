@@ -72,7 +72,7 @@ const getFriendsQuery = (userId:string) => buildQuery()
 
 ```typescript
     import {Connection} from "neography";
-    import {PersistedGraphEntity} from "neography/model";
+    import {Persisted} from "neography/model";
 
     let connection:Connection = new Connection({username: 'neo4j', password: 'password', host: 'localhost'});
 
@@ -82,8 +82,8 @@ const getFriendsQuery = (userId:string) => buildQuery()
     let hasFriend = HasFriendRelation.build({since: new Date().getTime()});
 
     // run queries
-    let persistedUser1:PersistedGraphEntity<User> = await connection.runQuery(storeUserQuery(user1)).pickOne('user').first();
-    let persistedUser2:PersistedGraphEntity<User> = await connection.runQuery(storeUserQuery(user2)).pickOne('user').first();
+    let persistedUser1:Persisted<User> = await connection.runQuery(storeUserQuery(user1)).pickOne('user').first();
+    let persistedUser2:Persisted<User> = await connection.runQuery(storeUserQuery(user2)).pickOne('user').first();
 
     await connection.runQuery(addFriendToUserQuery(persistedUser1.id, hasFriend, persistedUser2.id));
 

@@ -1,4 +1,4 @@
-import {PersistedGraphEntity, assertPersisted} from "../model/GraphEntity";
+import {Persisted, assertPersisted} from "../model/GraphEntity";
 import {Connection} from "../connection/Connection";
 import {AbstractRelation} from "../model/AbstractRelation";
 import {AbstractNode} from "../model/AbstractNode";
@@ -26,7 +26,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
         return count.toNumber() !== 0;
     }
 
-    update(rel:PersistedGraphEntity<R>):Promise<R> {
+    update(rel:Persisted<R>):Promise<R> {
         assertPersisted(rel);
 
         let query = buildQuery()
@@ -41,7 +41,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
         return this.connection.runQuery(query).pickOne('rel').first();
     }
 
-    save(from:PersistedGraphEntity<FROM>, to:PersistedGraphEntity<TO>, relation:R):Promise<PersistedGraphEntity<R>> {
+    save(from:Persisted<FROM>, to:Persisted<TO>, relation:R):Promise<Persisted<R>> {
         assertPersisted(from);
         assertPersisted(to);
 

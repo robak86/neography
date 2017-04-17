@@ -1,4 +1,4 @@
-import {GraphEntity, PersistedGraphEntity} from "../model/GraphEntity";
+import {GraphEntity, Persisted} from "../model/GraphEntity";
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
 import {Type} from "../utils/types";
 import {isPresent} from "../utils/core";
@@ -19,7 +19,7 @@ export class AttributesMapper<T extends GraphEntity> {
         return AttributesMetadata.getForClass(this.klass);
     }
 
-    mapToInstance(record):PersistedGraphEntity<T> {
+    mapToInstance(record):Persisted<T> {
         if (!isPresent(record)) {
             return record;
         }
@@ -34,7 +34,7 @@ export class AttributesMapper<T extends GraphEntity> {
             }
         });
 
-        return instance as PersistedGraphEntity<T>;
+        return instance as Persisted<T>;
     }
 
     mapToRow(nodeInstance, type:'create' | 'update' | 'skip') {

@@ -6,7 +6,7 @@ import {Connection} from "../../lib/connection/Connection";
 import {cleanDatabase, getConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import {buildQuery} from "../../lib/cypher/index";
-import {PersistedGraphEntity} from "../../lib/model/GraphEntity";
+import {Persisted} from "../../lib/model/GraphEntity";
 import {RelationRepository} from "../../lib/repositories/RelationRepository";
 
 
@@ -60,8 +60,8 @@ describe("RelationRepository", () => {
     });
 
     describe(".update", () => {
-        let savedRelation:PersistedGraphEntity<DummyGraphRelation>,
-            editedRelation:PersistedGraphEntity<DummyGraphRelation>;
+        let savedRelation:Persisted<DummyGraphRelation>,
+            editedRelation:Persisted<DummyGraphRelation>;
 
         beforeEach(async () => {
             let u1 = await nodeRepository.save(DummyGraphNode.build({attr1: 'John'}));

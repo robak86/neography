@@ -1,4 +1,4 @@
-import {assertPersisted, PersistedGraphEntity} from "../model/GraphEntity";
+import {assertPersisted, Persisted} from "../model/GraphEntity";
 import {Connection} from "../connection/Connection";
 import {AbstractNode} from "../model/AbstractNode";
 import {cypher} from "../cypher/builders/QueryBuilder";
@@ -20,7 +20,7 @@ export class NodeRepository<T extends AbstractNode> {
         return count.toNumber() !== 0
     }
 
-    async save(node:T):Promise<PersistedGraphEntity<T>> {
+    async save(node:T):Promise<Persisted<T>> {
         let query = buildQuery()
             .create(c => c.node(node).as('n'))
             .returns('n');
@@ -28,7 +28,7 @@ export class NodeRepository<T extends AbstractNode> {
         return this.connection.runQuery(query).pickOne('n').first();
     };
 
-    update(node:T):Promise<PersistedGraphEntity<T>> {
+    update(node:T):Promise<Persisted<T>> {
         assertPersisted(node);
 
         let query = buildQuery()
@@ -49,7 +49,7 @@ export class NodeRepository<T extends AbstractNode> {
         return this.connection.runQuery(query).toArray();
     }
 
-    where(nodeParams:Partial<T>):Promise<(PersistedGraphEntity<T>)[]> {
+    where(nodeParams:Partial<T>):Promise<(Persisted<T>)[]> {
         let query = buildQuery()
             .match(m => m.node(this.klass).params(nodeParams).as('n'))
             .returns('n');
@@ -57,7 +57,7 @@ export class NodeRepository<T extends AbstractNode> {
         return this.connection.runQuery(query).pickOne('n').toArray();
     }
 
-    first(nodeParams:Partial<T>):Promise<PersistedGraphEntity<T> | null> {
+    first(nodeParams:Partial<T>):Promise<Persisted<T> | null> {
         let query = buildQuery()
             .match(m => m.node(this.klass).params(nodeParams).as('n'))
             .returns('n');

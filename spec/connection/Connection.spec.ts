@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 
 import {Partial} from "../../lib/utils/types";
 
-import {PersistedGraphEntity} from "../../lib/model/GraphEntity";
+import {Persisted} from "../../lib/model/GraphEntity";
 import {genId} from "../../lib/utils/uuid";
 import {int, isInt} from "../../lib/driver/Integer";
 import {cleanDatabase, getConnection} from "../helpers/ConnectionHelpers";
@@ -51,7 +51,7 @@ describe("Connection", () => {
         it("returns array of raw neo4j records", async () => {
             let rows = await createFakePerson(connection);
 
-            let p1:PersistedGraphEntity<any> = rows[0]['n'] as any;
+            let p1:Persisted<any> = rows[0]['n'] as any;
             expect(p1.labels).to.eql(['Person']);
 
             expect(p1.properties.id).to.be.a('string');
