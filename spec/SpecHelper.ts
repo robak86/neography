@@ -1,3 +1,2 @@
 import "reflect-metadata";
-
-require('source-map-support').install();
+import 'source-map-support/register';

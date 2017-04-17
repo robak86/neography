@@ -1,15 +1,18 @@
 {
   "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "dist",
+    "sourceMap": true,
+    "declaration": true,
     "lib": ["es6", "dom"],
     "types": ["reflect-metadata", "mocha", "chai", "node"],
     "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
     "experimentalDecorators": true,
-    "sourceMap": true,
-    "declaration": true,
-    "sourceRoot": "lib",
-    "outDir": "dist"
+    "emitDecoratorMetadata": true,
+    "noImplicitReturns": true,
+    "strictNullChecks": true
   },
   "include": [
     "lib/**/*.ts",
