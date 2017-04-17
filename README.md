@@ -72,20 +72,22 @@ const getFriendsQuery = (userId:string) => buildQuery()
 
 ```typescript
     import {Connection} from "neography";
+    import {PersistedGraphEntity} from "neography/model";
 
     let connection:Connection = new Connection({username: 'neo4j', password: 'password', host: 'localhost'});
 
+    // model instances
     let user1 = User.build({firstName: 'Jane', lastName: 'Doe'});
     let user2 = User.build({firstName: 'John', lastName: 'Doe'});
     let hasFriend = HasFriendRelation.build({since: new Date().getTime()});
 
-    // running queries
-    let user1Rows:{ user:PersistedGraphEntity<User> }[] = await connection.runQuery(storeUserQuery(user1));
-    let user2Rows:{ user:PersistedGraphEntity<User> }[] = await connection.runQuery(storeUserQuery(user2));
+    // run queries
+    let persistedUser1:PersistedGraphEntity<User> = await connection.runQuery(storeUserQuery(user1)).pickOne('user').first();
+    let persistedUser2:PersistedGraphEntity<User> = await connection.runQuery(storeUserQuery(user2)).pickOne('user').first();
 
-    await connection.runQuery(addFriendToUserQuery(user1Rows[0]['user'].id, hasFriend, user2Rows[0]['user'].id));
+    await connection.runQuery(addFriendToUserQuery(persistedUser1.id, hasFriend, persistedUser2.id));
 
-    let friends:{ user:User, relation:HasFriendRelation, friend:User }[] = await connection.runQuery(getFriendsQuery(user1Rows[0]['user'].id));
+    let friends:{ user:User, relation:HasFriendRelation, friend:User }[] = await connection.runQuery(getFriendsQuery(persistedUser1.id)).toArray();
 
     console.log(friends);
 

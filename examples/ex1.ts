@@ -17,8 +17,6 @@ class HasFriendRelation extends AbstractRelation {
 }
 
 async function example() {
-    let connection:Connection = new Connection({username: 'neo4j', password: 'password', host: 'localhost'});
-
 
     //queries
     const storeUserQuery = (user:User) => buildQuery()
@@ -37,7 +35,7 @@ async function example() {
             c.matchedNode('friend')]
         );
 
-    const getFriends = (userId:string) => buildQuery()
+    const getFriendsQuery = (userId:string) => buildQuery()
         .match(m => [
             m.node(User).as('user').params({id: userId}),
             m.relation(HasFriendRelation).as('relation'),
@@ -46,19 +44,20 @@ async function example() {
         .returns('user', 'relation', 'friend');
 
 
+    let connection:Connection = new Connection({username: 'neo4j', password: 'password', host: 'localhost'});
+
     //model instances
     let user1 = User.build({firstName: 'Jane', lastName: 'Doe'});
     let user2 = User.build({firstName: 'John', lastName: 'Doe'});
     let hasFriend = HasFriendRelation.build({since: new Date().getTime()});
 
     // running queries
-    let user1Rows:{ user:PersistedGraphEntity<User> }[] = await connection.runQuery(storeUserQuery(user1));
-    let user2Rows:{ user:PersistedGraphEntity<User> }[] = await connection.runQuery(storeUserQuery(user2));
+    let persistedUser1:PersistedGraphEntity<User> = await connection.runQuery(storeUserQuery(user1)).pickOne('user').first();
+    let persistedUser2:PersistedGraphEntity<User> = await connection.runQuery(storeUserQuery(user2)).pickOne('user').first();
 
-    await connection.runQuery(addFriendToUserQuery(user1Rows[0]['user'].id, hasFriend, user2Rows[0]['user'].id));
+    await connection.runQuery(addFriendToUserQuery(persistedUser1.id, hasFriend, persistedUser2.id));
 
-
-    let friends:{ user:User, relation:HasFriendRelation, friend:User }[] = await connection.runQuery(getFriends(user1Rows[0]['user'].id));
+    let friends:{ user:User, relation:HasFriendRelation, friend:User }[] = await connection.runQuery(getFriendsQuery(persistedUser1.id)).toArray();
 
     console.log(friends);
 
