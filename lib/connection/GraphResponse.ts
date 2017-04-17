@@ -8,8 +8,8 @@ export class GraphResponse {
 
     private constructor(private rows:Promise<any[]>) {}
 
-    select(properties:string | string[]):GraphResponse {
-        let rowsWithPickedProperties = this.rows.then(rows => rows.map(row => _.pick(row, _.castArray(properties))));
+    pickOne(prop:string):GraphResponse {
+        let rowsWithPickedProperties = this.rows.then(rows => rows.map(row => row[prop]));
         return new GraphResponse(rowsWithPickedProperties);
     }
 
@@ -26,7 +26,7 @@ export class GraphResponse {
         return this.rows.then(rows => _.last(rows));
     }
 
-    toAsyncArray():Promise<any[]> {
+    toArray():Promise<any[]> {
         return this.rows;
     }
 }

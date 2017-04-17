@@ -7,7 +7,7 @@ export const getConnection = _.memoize(():Connection => {
 });
 
 export const cleanDatabase = ():Promise<any> => {
-    return getConnection().runQuery(q => q.literal(`MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r`));
+    return getConnection().runQuery(q => q.literal(`MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r`)).toArray();
 };
 
 export const createConnectionFactory = ():() => Connection => {

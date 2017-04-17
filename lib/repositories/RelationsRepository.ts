@@ -5,6 +5,7 @@ import {AbstractRelation} from "../model/AbstractRelation";
 import {AbstractNode} from "../model/AbstractNode";
 import {Type} from "../utils/types";
 import {either} from "../utils/core";
+import {buildQuery} from "../cypher/index";
 
 export class RelationsRepository<FROM extends AbstractNode,R extends AbstractRelation,TO extends AbstractNode> extends BaseRepository {
 
@@ -46,14 +47,15 @@ export class RelationsRepository<FROM extends AbstractNode,R extends AbstractRel
     async getRelatedNodes(from:FROM, relationParams?:Partial<R>, connectedNodeParams?:Partial<TO>):Promise<{relation:R, node:TO}[]> {
         assertPersisted(from);
 
-        return this.connection.runQuery(cypher => cypher
+        let query = buildQuery()
             .match(m => [
                 m.node(this.fromClass).params({id: from.id} as any),
                 m.relation(this.relationClass).params(relationParams).as('relation'),
                 m.node(this.toClass).params(connectedNodeParams).as('node')
             ])
-            .returns('relation', 'node')
-        );
+            .returns('relation', 'node');
+
+        return this.connection.runQuery(query).toArray();
     }
 
     async saveRelation(from:PersistedGraphEntity<FROM>, to:PersistedGraphEntity<TO>, relation:R):Promise<PersistedGraphEntity<R>> {
@@ -86,15 +88,16 @@ export class RelationsRepository<FROM extends AbstractNode,R extends AbstractRel
         return either(() => rows[0].rel, null);
     }
 
-    //TODO: is it actually unsafe from relational point of view? because it leaves nodes untouched ?
+
     removeRelation(id:string):Promise<any> {
-        return this.connection.runQuery(cypher => cypher
+        let query = buildQuery()
             .match(m => [
                 m.node(),
                 m.relation(this.relationClass).params({id} as any).as('rel'),
                 m.node()
             ])
-            .append('DELETE rel')
-        );
+            .append('DELETE rel');
+
+        return this.connection.runQuery(query).first();
     }
 }

@@ -23,13 +23,13 @@ export class Connection {
         this.driver = neo4j.driver(`bolt://${config.host}`, neo4j.auth.basic(config.username, config.password));
     }
 
-    runQuery(queryBuilder:QueryBuilder | ((builder:QueryBuilder) => QueryBuilder)):Promise<any[]> {
+    runQuery(queryBuilder:QueryBuilder | ((builder:QueryBuilder) => QueryBuilder)):GraphResponse {
         if (_.isFunction(queryBuilder)) {
             let queryData = queryBuilder(new QueryBuilder()).toQuery().toCypher();
-            return this.execQuery(queryData.boundQuery.cypherString, queryData.boundQuery.params).toAsyncArray();
+            return this.execQuery(queryData.boundQuery.cypherString, queryData.boundQuery.params);
         } else {
             let queryData:BoundCypherQuery = queryBuilder.toQuery().toCypher();
-            return this.execQuery(queryData.boundQuery.cypherString, queryData.boundQuery.params).toAsyncArray();
+            return this.execQuery(queryData.boundQuery.cypherString, queryData.boundQuery.params);
         }
     }
 

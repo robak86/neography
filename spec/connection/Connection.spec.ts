@@ -11,7 +11,7 @@ import {int, isInt} from "../../lib/driver/Integer";
 import {cleanDatabase, getConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {Connection} from "../../lib/connection/Connection";
-
+import {buildQuery} from "../../lib/cypher/index";
 
 describe("Connection", () => {
     let connection:Connection;
@@ -32,20 +32,16 @@ describe("Connection", () => {
                     id: genId()
                 }
             }
-        ))
+        )).toArray()
     };
-
-    it("updates shit", async () => {
-        await connection.runQuery(q => q.literal(`MATCH (n), (u) SET n = {params}, u = {params}`, {params: {a: 1}}));
-    });
 
     describe("execQuery", () => {
         it("runs cypher queries", async () => {
-            let queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`));
+            let queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`)).toArray();
             expect(queryResponse.length).to.eq(0);
             await createFakePerson(connection);
 
-            queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`));
+            queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`)).toArray();
             expect(queryResponse.length).to.eq(1);
         });
     });
@@ -70,13 +66,11 @@ describe("Connection", () => {
             let u2Params = {firstName: "Glen", id: genId()};
             let r1Params = {since: int(12345)};
 
-            let result = await connection.runQuery(
-                q => q.literal(`
-                CREATE (u1:User {u1Params})-[r1:KNOWS {r1Params}]->(u2:User {u2Params})
-                RETURN u1,r1,u2;
-            `, {u1Params, u2Params, r1Params}));
+            let query = buildQuery().literal(`
+                    CREATE (u1:User {u1Params})-[r1:KNOWS {r1Params}]->(u2:User {u2Params})
+                    RETURN u1,r1,u2;`, {u1Params, u2Params, r1Params});
 
-            let knowsRel:PersistedGraphEntity<any> = result[0]['r1'] as PersistedGraphEntity<any>;
+            let knowsRel = await connection.runQuery(query).pickOne('r1').first();
 
             expect(knowsRel.type).to.eql('KNOWS');
             expect(isInt(knowsRel.properties.since)).to.eq(true);
@@ -92,7 +86,7 @@ describe("Connection", () => {
                 });
 
 
-                let queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`));
+                let queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`)).toArray();
                 expect(queryResponse.length).to.eq(2);
             });
 
@@ -102,7 +96,7 @@ describe("Connection", () => {
                     await connection.runQuery(q => q.literal(`I'm very bad cypher query!`))
                 }).catch(_.noop);
 
-                let queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`));
+                let queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`)).toArray();
                 expect(queryResponse.length).to.eq(0);
             });
 
@@ -112,7 +106,7 @@ describe("Connection", () => {
                     throw new Error("Rollback me");
                 }).catch(_.noop);
 
-                let queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`));
+                let queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`)).toArray();
                 expect(queryResponse.length).to.eq(0);
             });
 
@@ -129,7 +123,7 @@ describe("Connection", () => {
                 });
 
 
-                let queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`));
+                let queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`)).toArray();
                 expect(queryResponse.length).to.eq(2);
             });
         });
@@ -152,7 +146,7 @@ describe("Connection", () => {
                 let rows:any[] = await connection.runQuery(cypher => cypher
                     .match(m => m.node(DummyGraphNode).as('n'))
                     .returns('n')
-                );
+                ).toArray();
 
                 expect(rows.length).to.eq(0);
             });
@@ -169,7 +163,7 @@ describe("Connection", () => {
                 let rows:any[] = await connection.runQuery(cypher => cypher
                     .match(m => m.node(DummyGraphNode).as('n'))
                     .returns('n')
-                );
+                ).toArray();
 
                 expect(rows.length).to.eq(0);
             });

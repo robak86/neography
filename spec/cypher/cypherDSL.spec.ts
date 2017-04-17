@@ -14,14 +14,14 @@ describe("cypherDSL", () => {
     describe("Match", () => {
         describe("single node", () => {
             beforeEach(async() => {
-                await getConnection().runQuery(q => q.literal(`CREATE (n:DummyGraphNode {attr1: "abc"}) return n`));
+                await getConnection().runQuery(q => q.literal(`CREATE (n:DummyGraphNode {attr1: "abc"}) return n`)).toArray();
             });
 
             it("matches any node", async() => {
                 let rows = await getConnection().runQuery(c => c
                     .match(m => m.node().as('n1'))
                     .returns('n1')
-                );
+                ).toArray();
 
                 expect(rows.length).to.eql(1);
                 expect(rows[0].n1.attr1).to.eql('abc')
@@ -32,7 +32,7 @@ describe("cypherDSL", () => {
                     .match(m => m.node(DummyGraphNode).params({attr1: "abc"}).as('n1'))
                     .returns('n1');
 
-                let rows = await getConnection().runQuery(q);
+                let rows = await getConnection().runQuery(q).toArray();
                 expect(rows.length).to.eql(1);
                 expect(rows[0].n1.attr1).to.eql('abc')
             });
@@ -44,7 +44,7 @@ describe("cypherDSL", () => {
                     .returns('n1');
 
 
-                let rows = await getConnection().runQuery(q);
+                let rows = await getConnection().runQuery(q).toArray();
                 expect(rows.length).to.eql(1);
                 expect(rows[0].n1.attr1).to.eql('abc')
             });
@@ -56,7 +56,7 @@ describe("cypherDSL", () => {
                     .returns('n1');
 
 
-                let rows = await getConnection().runQuery(q);
+                let rows = await getConnection().runQuery(q).toArray();
                 expect(rows.length).to.eql(1);
                 expect(rows[0].n1.attr1).to.eql('abc')
             });
@@ -64,16 +64,16 @@ describe("cypherDSL", () => {
 
         describe("matching node with multiple labels(inheritance)", () => {
             beforeEach(async() => {
-                await getConnection().runQuery(q => q.literal(`CREATE (n:DummyGraphNode {attr1: "abc"}) return n`));
-                await getConnection().runQuery(q => q.literal(`CREATE (n:ChildDummyGraphNode:DummyGraphNode {attr1: "abc" }) return n`));
-                await getConnection().runQuery(q => q.literal(`CREATE (n:DummyGraphNode:ChildDummyGraphNode {attr1: "abc" }) return n`));
+                await getConnection().runQuery(q => q.literal(`CREATE (n:DummyGraphNode {attr1: "abc"}) return n`)).toArray();
+                await getConnection().runQuery(q => q.literal(`CREATE (n:ChildDummyGraphNode:DummyGraphNode {attr1: "abc" }) return n`)).toArray();
+                await getConnection().runQuery(q => q.literal(`CREATE (n:DummyGraphNode:ChildDummyGraphNode {attr1: "abc" }) return n`)).toArray();
             });
 
             it("matches also subclasses", async () => {
                 let rows:any[] = await getConnection().runQuery(q => q
                     .match(m => m.node(DummyGraphNode).as('n').params({attr1: "abc"}))
                     .returns('n')
-                );
+                ).toArray();
 
                 expect(rows.length).to.eq(3);
                 expect(rows[0].n).to.be.instanceOf(DummyGraphNode);
@@ -85,7 +85,7 @@ describe("cypherDSL", () => {
                 let rows:any[] = await getConnection().runQuery(q => q
                     .match(m => m.node(ChildDummyGraphNode).as('n').params({attr1: "abc"}))
                     .returns('n')
-                );
+                ).toArray();
 
                 expect(rows.length).to.eq(2);
                 expect(rows[0].n).to.be.instanceOf(ChildDummyGraphNode);
@@ -103,7 +103,7 @@ describe("cypherDSL", () => {
                         relParams: {attr1: 'relationAttr1'},
                         n2Params: {attr2: 123}
                     }
-                ));
+                )).toArray();
             });
 
             it("matches by starting node attribute", async() => {
@@ -115,7 +115,7 @@ describe("cypherDSL", () => {
                     ])
                     .returns('n1', 'rel1', 'n2');
 
-                let rows = await getConnection().runQuery(q);
+                let rows = await getConnection().runQuery(q).toArray();
                 expect(rows.length).to.eql(1);
 
                 expect(rows[0].n1.attr1).to.eql("abc");
@@ -134,7 +134,7 @@ describe("cypherDSL", () => {
                     .returns('n1');
 
 
-                let rows = await getConnection().runQuery(q);
+                let rows = await getConnection().runQuery(q).toArray();
                 expect(rows.length).to.eq(1);
                 expect(rows[0].n1.attr1).to.eq('attr1');
                 expect(rows[0].n1.attr2).to.eq(123);
@@ -153,7 +153,7 @@ describe("cypherDSL", () => {
                     .returns('n1');
 
 
-                let rows = await getConnection().runQuery(q);
+                let rows = await getConnection().runQuery(q).toArray();
                 expect(rows.length).to.eq(1);
                 expect(rows[0].n1).to.be.instanceOf(ChildDummyGraphNode);
                 expect(rows[0].n1.attr1).to.eq('attr1');
@@ -182,7 +182,7 @@ describe("cypherDSL", () => {
                     .create(c => c.node(n1).as('n1'))
                     .create(c => c.node(n2).as('n2'))
                     .returns('n1', 'n2')
-                );
+                ).toArray();
 
                 let n1Stored = created[0].n1;
                 let n2Stored = created[0].n2;
@@ -192,7 +192,7 @@ describe("cypherDSL", () => {
                     .match(m => m.node().params({id: created[0].n2.id}).as('n2'))
                     .create(c => [c.matchedNode('n1'), c.relation(rel1).as('rel1'), c.matchedNode('n2')])
                     .returns('n1', 'rel1', 'n2')
-                );
+                ).toArray();
 
                 expect(rows.length).to.eq(1);
                 expect(rows[0].n1).to.eql(n1Stored);
