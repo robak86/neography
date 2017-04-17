@@ -10,4 +10,5 @@ export class DummyGraphRelation extends AbstractRelation {
 
     @attribute() attr1?:string;
     @attribute() attr2?:number;
+    @attribute() attr3?:boolean;
 }

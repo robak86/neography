@@ -93,7 +93,7 @@ describe("Connection", () => {
             it("rollbacks transaction on wrong query", async () => {
                 await connection.withTransaction(async () => {
                     await createFakePerson(connection);
-                    await connection.runQuery(q => q.literal(`I'm very bad cypher query!`))
+                    await connection.runQuery(q => q.literal(`Wrong query`))
                 }).catch(_.noop);
 
                 let queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`)).toArray();
@@ -114,14 +114,13 @@ describe("Connection", () => {
                 //first transaction - it will be rolled back
                 await connection.withTransaction(async () => {
                     await createFakePerson(connection);
-                    await connection.runQuery(q => q.literal(`I'm very bad cypher query!`));
+                    await connection.runQuery(q => q.literal(`Wrong query`));
                 }).catch(_.noop);
 
                 //second transaction - it will be committed
                 await connection.withTransaction(async () => {
                     await Promise.all([createFakePerson(connection), createFakePerson(connection)]);
                 });
-
 
                 let queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`)).toArray();
                 expect(queryResponse.length).to.eq(2);
@@ -139,7 +138,7 @@ describe("Connection", () => {
                     await createNode({attr1: 'top transaction'});
                     await connection.withTransaction(async () => {
                         await createNode({attr1: 'nested transaction'});
-                        await connection.runQuery(q => q.literal(`I'm very bad cypher query!`));
+                        await connection.runQuery(q => q.literal(`Wrong query`));
                     });
                 }).catch(_.noop);
 

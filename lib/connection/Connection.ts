@@ -5,6 +5,11 @@ import {CypherQuery, BoundCypherQuery} from "../cypher/CypherQuery";
 import {QueryBuilder} from "../cypher/builders/QueryBuilder";
 import {Transaction} from "./Transaction";
 import {pfinally} from "../utils/promise";
+import {AbstractNode} from "../model/AbstractNode";
+import {Type} from "../utils/types";
+import {NodeRepository} from "../repositories/NodeRepository";
+import {AbstractRelation} from "../model/AbstractRelation";
+import {RelationRepository} from "../repositories/RelationRepository";
 
 const neo4j = require('neo4j-driver').v1;
 
@@ -56,6 +61,14 @@ export class Connection {
                 this.currentTransaction = null;
                 return Promise.reject(err);
             });
+    }
+
+    getNodeRepository<T extends AbstractNode>(nodeClass:Type<T>):NodeRepository<T> {
+        return new NodeRepository(nodeClass, this);
+    }
+
+    getRelationRepository<FROM extends AbstractNode, REL extends AbstractRelation, TO extends AbstractNode>(from:Type<FROM>, relationClass:Type<REL>, to:Type<TO>):RelationRepository<FROM, REL, TO> {
+        return new RelationRepository(from, relationClass, to, this);
     }
 
     private execQuery(cypherQuery:string, params?:any):GraphResponse {

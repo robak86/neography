@@ -1,4 +1,3 @@
-import {BaseRepository} from "./BaseRepository";
 import {PersistedGraphEntity} from "../model/GraphEntity";
 
 import {Connection} from "../connection/Connection";
@@ -7,15 +6,14 @@ import {AbstractNode} from "../model/AbstractNode";
 
 import {cypher} from "../cypher/builders/QueryBuilder";
 import {Type} from "../utils/types";
-import {either, someOrThrow} from "../utils/core";
+import {someOrThrow} from "../utils/core";
 import {buildQuery} from "../index";
 
 
-export class NodeRepository<T extends AbstractNode> extends BaseRepository {
+export class NodeRepository<T extends AbstractNode> {
 
     constructor(private klass:Type<T>,
-                public connection:Connection) {
-        super(connection);
+                private connection:Connection) {
     }
 
     async nodeExists(id:string):Promise<boolean> {
@@ -23,8 +21,8 @@ export class NodeRepository<T extends AbstractNode> extends BaseRepository {
             .match(m => m.node(this.klass as Type<AbstractNode>).params({id}).as('n'))
             .returns('count(n) as nodesCount');
 
-        let rows = await this.connection.runQuery(q);
-        return rows[0].nodesCount.toNumber() !== 0
+        let count = await this.connection.runQuery(q).pickOne('nodesCount').first();
+        return count.toNumber() !== 0
     }
 
     async saveNode(node:T):Promise<PersistedGraphEntity<T>> {
