@@ -11,7 +11,6 @@ import {RelationRepository} from "../../lib/repositories/RelationRepository";
 
 
 describe("RelationRepository", () => {
-
     let nodeRepository:NodeRepository<DummyGraphNode>,
         relationRepository:RelationRepository<DummyGraphNode, DummyGraphRelation, DummyGraphNode>,
         dummyNode:DummyGraphNode,
@@ -25,11 +24,11 @@ describe("RelationRepository", () => {
         dummyNode = DummyGraphNode.build({attr1: "John"});
     });
 
-    describe(".saveRelation", () => {
+    describe(".save", () => {
         it("creates relation", async () => {
-            let u1 = await nodeRepository.saveNode(DummyGraphNode.build({attr1: 'Tom'}));
-            let u2 = await nodeRepository.saveNode(DummyGraphNode.build({attr1: 'Glen'}));
-            let rel = await relationRepository.saveRelation(u1, u2, DummyGraphRelation.build({attr2: 123}));
+            let u1 = await nodeRepository.save(DummyGraphNode.build({attr1: 'Tom'}));
+            let u2 = await nodeRepository.save(DummyGraphNode.build({attr1: 'Glen'}));
+            let rel = await relationRepository.save(u1, u2, DummyGraphRelation.build({attr2: 123}));
 
             let query = buildQuery().literal(`MATCH ()-[rel:CONNECTED_BY_DUMMY {attr2: 123}]->() RETURN rel`);
             let results = await connection.runQuery(query).toArray();
@@ -38,9 +37,9 @@ describe("RelationRepository", () => {
         });
 
         it("adds params for persisted entity", async () => {
-            let u1 = await nodeRepository.saveNode(DummyGraphNode.build({attr1: 'Tom'}));
-            let u2 = await nodeRepository.saveNode(DummyGraphNode.build({attr1: 'Glen'}));
-            let rel = await relationRepository.saveRelation(u1, u2, DummyGraphRelation.build({attr2: 123}));
+            let u1 = await nodeRepository.save(DummyGraphNode.build({attr1: 'Tom'}));
+            let u2 = await nodeRepository.save(DummyGraphNode.build({attr1: 'Glen'}));
+            let rel = await relationRepository.save(u1, u2, DummyGraphRelation.build({attr2: 123}));
 
             expect(rel.id).to.be.a('string');
             expect(rel.createdAt).to.be.a('number');
@@ -48,27 +47,27 @@ describe("RelationRepository", () => {
         });
     });
 
-    describe(".removeRelation", () => {
+    describe(".remove", () => {
         it("removes relation", async () => {
-            let u1 = await nodeRepository.saveNode(DummyGraphNode.build({attr1: 'Tom'}));
-            let u2 = await nodeRepository.saveNode(DummyGraphNode.build({attr1: 'Glen'}));
-            let rel = await relationRepository.saveRelation(u1, u2, DummyGraphRelation.build({attr2: 123}));
+            let u1 = await nodeRepository.save(DummyGraphNode.build({attr1: 'Tom'}));
+            let u2 = await nodeRepository.save(DummyGraphNode.build({attr1: 'Glen'}));
+            let rel = await relationRepository.save(u1, u2, DummyGraphRelation.build({attr2: 123}));
 
-            expect(await relationRepository.relationExists(rel.id)).to.eq(true);
-            await relationRepository.removeRelation(rel.id);
-            expect(await relationRepository.relationExists(rel.id)).to.eq(false);
+            expect(await relationRepository.exists(rel.id)).to.eq(true);
+            await relationRepository.remove(rel.id);
+            expect(await relationRepository.exists(rel.id)).to.eq(false);
         });
     });
 
-    describe(".updateRelation", () => {
+    describe(".update", () => {
         let savedRelation:PersistedGraphEntity<DummyGraphRelation>,
             editedRelation:PersistedGraphEntity<DummyGraphRelation>;
 
         beforeEach(async () => {
-            let u1 = await nodeRepository.saveNode(DummyGraphNode.build({attr1: 'John'}));
-            let u2 = await nodeRepository.saveNode(DummyGraphNode.build({attr1: 'Glen'}));
+            let u1 = await nodeRepository.save(DummyGraphNode.build({attr1: 'John'}));
+            let u2 = await nodeRepository.save(DummyGraphNode.build({attr1: 'Glen'}));
 
-            savedRelation = await relationRepository.saveRelation(u1, u2, DummyGraphRelation.build({
+            savedRelation = await relationRepository.save(u1, u2, DummyGraphRelation.build({
                 attr1: "321",
                 attr2: 123,
                 attr3: true
@@ -78,18 +77,18 @@ describe("RelationRepository", () => {
 
         it("updates relation with provided params", async () => {
             editedRelation.attr2 = 321;
-            let updatedRelation = await relationRepository.updateRelation(editedRelation);
+            let updatedRelation = await relationRepository.update(editedRelation);
             expect(updatedRelation.attr1).to.eq("321");
         });
 
         it("does not change id", async () => {
-            let updatedRelation = await relationRepository.updateRelation(editedRelation);
+            let updatedRelation = await relationRepository.update(editedRelation);
             expect(updatedRelation.id).to.eq(savedRelation.id);
         });
 
         it("does not modify other parameters", async () => {
             editedRelation.attr1 = "321";
-            let updatedRelation = await relationRepository.updateRelation(editedRelation);
+            let updatedRelation = await relationRepository.update(editedRelation);
             expect(updatedRelation.attr2).to.eq(savedRelation.attr2);
             expect(updatedRelation.attr3).to.eq(savedRelation.attr3);
         });

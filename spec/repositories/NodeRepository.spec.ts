@@ -26,10 +26,10 @@ describe("NodeRepository", () => {
         dummyNode = DummyGraphNode.build({attr1: "John"});
     });
 
-    describe(".saveNode", () => {
+    describe(".save", () => {
         let createdGenericNode:PersistedGraphEntity<DummyGraphNode>;
         beforeEach(async () => {
-            createdGenericNode = await nodeRepository.saveNode(dummyNode);
+            createdGenericNode = await nodeRepository.save(dummyNode);
         });
 
         it("returns created entity having proper params", async () => {
@@ -60,21 +60,21 @@ describe("NodeRepository", () => {
         });
     });
 
-    describe(".nodeExists", () => {
+    describe(".exists", () => {
         it("returns true if buildNode exists", async () => {
             let node = DummyGraphNode.build({attr1: 'Tomasz'});
-            let storedNode:PersistedGraphEntity<DummyGraphNode> = await nodeRepository.saveNode(node);
-            expect(await nodeRepository.nodeExists(storedNode.id)).to.eq(true);
+            let storedNode:PersistedGraphEntity<DummyGraphNode> = await nodeRepository.save(node);
+            expect(await nodeRepository.exists(storedNode.id)).to.eq(true);
         });
 
         it("returns false if buildNode does not exists", async () => {
-            expect(await nodeRepository.nodeExists('WRONG NODE ID')).to.eq(false);
+            expect(await nodeRepository.exists('WRONG NODE ID')).to.eq(false);
         });
     });
 
     describe(".getNodeById", () => {
         it("returns fetched buildNode if exists", async () => {
-            let createdGenericNode = await nodeRepository.saveNode(dummyNode);
+            let createdGenericNode = await nodeRepository.save(dummyNode);
             let retrievedGenericNodes:PersistedGraphEntity<DummyGraphNode>[] = await nodeRepository.where({id: createdGenericNode.id as string});
             expect(retrievedGenericNodes[0]).to.eql(createdGenericNode);
         });
@@ -85,48 +85,48 @@ describe("NodeRepository", () => {
         });
     });
 
-    describe(".removeNode", () => {
+    describe(".remove", () => {
         it("removes node", async () => {
-            let createdNode = await nodeRepository.saveNode(dummyNode);
-            expect(await nodeRepository.nodeExists(createdNode.id)).to.eq(true);
-            await nodeRepository.removeNode(createdNode.id);
-            expect(await nodeRepository.nodeExists(createdNode.id)).to.eq(false);
+            let createdNode = await nodeRepository.save(dummyNode);
+            expect(await nodeRepository.exists(createdNode.id)).to.eq(true);
+            await nodeRepository.remove(createdNode.id);
+            expect(await nodeRepository.exists(createdNode.id)).to.eq(false);
         });
 
         it("removes all related relations", async () => {
-            let from = await nodeRepository.saveNode(dummyNode);
-            let to = await nodeRepository.saveNode(DummyGraphNode.build({attr1: 'Jane'}));
+            let from = await nodeRepository.save(dummyNode);
+            let to = await nodeRepository.save(DummyGraphNode.build({attr1: 'Jane'}));
 
-            let createdRelation = await relationRepository.saveRelation(from, to, DummyGraphRelation.build({}));
-            expect(await nodeRepository.nodeExists(from.id)).to.eq(true);
-            expect(await nodeRepository.nodeExists(to.id)).to.eq(true);
-            expect(await relationRepository.relationExists(createdRelation.id)).to.eq(true);
+            let createdRelation = await relationRepository.save(from, to, DummyGraphRelation.build({}));
+            expect(await nodeRepository.exists(from.id)).to.eq(true);
+            expect(await nodeRepository.exists(to.id)).to.eq(true);
+            expect(await relationRepository.exists(createdRelation.id)).to.eq(true);
 
-            await nodeRepository.removeNode(from.id);
+            await nodeRepository.remove(from.id);
 
-            expect(await nodeRepository.nodeExists(from.id)).to.eq(false);
-            expect(await nodeRepository.nodeExists(to.id)).to.eq(true);
-            expect(await relationRepository.relationExists(createdRelation.id)).to.eq(false);
+            expect(await nodeRepository.exists(from.id)).to.eq(false);
+            expect(await nodeRepository.exists(to.id)).to.eq(true);
+            expect(await relationRepository.exists(createdRelation.id)).to.eq(false);
         });
     });
 
-    describe(".updateNode", () => {
+    describe(".update", () => {
         let savedNode:PersistedGraphEntity<DummyGraphNode>;
 
         beforeEach(async () => {
-            savedNode = await nodeRepository.saveNode(DummyGraphNode.build({attr1: 'John'}));
+            savedNode = await nodeRepository.save(DummyGraphNode.build({attr1: 'John'}));
         });
 
         it("updates with provided params", async () => {
             let edited:PersistedGraphEntity<DummyGraphNode> = _.cloneDeep(savedNode);
             edited.attr1 = 'updateFirstName';
             (edited as any).attr2 = null;
-            let result = await nodeRepository.updateNode(edited);
+            let result = await nodeRepository.update(edited);
             expect(_.omit('updatedAt', result)).to.eql(_.omit('updatedAt', edited))
         });
 
         it("updates updatedAt property", async () => {
-            let result = await nodeRepository.updateNode(savedNode);
+            let result = await nodeRepository.update(savedNode);
             expect(result.updatedAt).to.be.greaterThan(savedNode.updatedAt);
         });
     });

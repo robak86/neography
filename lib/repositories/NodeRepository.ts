@@ -1,22 +1,17 @@
-import {PersistedGraphEntity} from "../model/GraphEntity";
-
+import {assertPersisted, PersistedGraphEntity} from "../model/GraphEntity";
 import {Connection} from "../connection/Connection";
 import {AbstractNode} from "../model/AbstractNode";
-
-
 import {cypher} from "../cypher/builders/QueryBuilder";
 import {Type} from "../utils/types";
-import {someOrThrow} from "../utils/core";
 import {buildQuery} from "../index";
 
 
 export class NodeRepository<T extends AbstractNode> {
-
     constructor(private klass:Type<T>,
                 private connection:Connection) {
     }
 
-    async nodeExists(id:string):Promise<boolean> {
+    async exists(id:string):Promise<boolean> {
         let q = cypher()
             .match(m => m.node(this.klass as Type<AbstractNode>).params({id}).as('n'))
             .returns('count(n) as nodesCount');
@@ -25,17 +20,17 @@ export class NodeRepository<T extends AbstractNode> {
         return count.toNumber() !== 0
     }
 
-    async saveNode(node:T):Promise<PersistedGraphEntity<T>> {
+    async save(node:T):Promise<PersistedGraphEntity<T>> {
         let query = buildQuery()
             .create(c => c.node(node).as('n'))
             .returns('n');
 
-        let n = await this.connection.runQuery(query).pickOne('n').first();
-
-        return someOrThrow(() => n, `Cannot create node: ${node}`);
+        return this.connection.runQuery(query).pickOne('n').first();
     };
 
-    async updateNode(node:T):Promise<PersistedGraphEntity<T>> {
+    update(node:T):Promise<PersistedGraphEntity<T>> {
+        assertPersisted(node);
+
         let query = buildQuery()
             .match(m => m.node(this.klass as Type<AbstractNode>).params({id: node.id}).as('n'))
             .set(s => s.update('n').typed(this.klass, node))
@@ -44,7 +39,7 @@ export class NodeRepository<T extends AbstractNode> {
         return this.connection.runQuery(query).pickOne('n').first();
     };
 
-    removeNode(id:string, detach:boolean = true):Promise<any> {
+    remove(id:string, detach:boolean = true):Promise<any> {
         let deletePrefix = detach ? 'DETACH DELETE' : 'DELETE';
 
         let query = buildQuery()
@@ -54,15 +49,7 @@ export class NodeRepository<T extends AbstractNode> {
         return this.connection.runQuery(query).toArray();
     }
 
-    async first(nodeParams:Partial<T>):Promise<PersistedGraphEntity<T> | null> {
-        let query = buildQuery()
-            .match(m => m.node(this.klass).params(nodeParams).as('user'))
-            .returns('user');
-
-        return this.connection.runQuery(query).pickOne('user').first();
-    }
-
-    async where(nodeParams:Partial<T>):Promise<(PersistedGraphEntity<T>)[]> {
+    where(nodeParams:Partial<T>):Promise<(PersistedGraphEntity<T>)[]> {
         let query = buildQuery()
             .match(m => m.node(this.klass).params(nodeParams).as('n'))
             .returns('n');
@@ -70,8 +57,11 @@ export class NodeRepository<T extends AbstractNode> {
         return this.connection.runQuery(query).pickOne('n').toArray();
     }
 
-    async getById(id:string):Promise<PersistedGraphEntity<T> | null> {
-        let results = await this.where({id} as any);
-        return results[0];
+    first(nodeParams:Partial<T>):Promise<PersistedGraphEntity<T> | null> {
+        let query = buildQuery()
+            .match(m => m.node(this.klass).params(nodeParams).as('n'))
+            .returns('n');
+
+        return this.connection.runQuery(query).pickOne('n').first();
     }
 }

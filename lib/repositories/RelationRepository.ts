@@ -13,7 +13,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
                 private toClass:Type<TO>,
                 private connection:Connection) {}
 
-    async relationExists(id:string):Promise<boolean> {
+    async exists(id:string):Promise<boolean> {
         let query = buildQuery()
             .match(m => [
                 m.node(),
@@ -26,14 +26,14 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
         return count.toNumber() !== 0;
     }
 
-    async updateRelation(rel:PersistedGraphEntity<R>):Promise<R> {
+    update(rel:PersistedGraphEntity<R>):Promise<R> {
         assertPersisted(rel);
 
         let query = buildQuery()
             .match(m => [
-                m.node(),
+                m.node(this.fromClass),
                 m.relation(this.relationClass).params({id: rel.id} as any).as('rel'),
-                m.node()
+                m.node(this.toClass)
             ])
             .set(s => s.update('rel').typed(this.relationClass, rel))
             .returns('rel');
@@ -41,21 +41,10 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
         return this.connection.runQuery(query).pickOne('rel').first();
     }
 
-    async getRelatedNodes(from:FROM, relationParams?:Partial<R>, connectedNodeParams?:Partial<TO>):Promise<{ relation:R, node:TO }[]> {
+    save(from:PersistedGraphEntity<FROM>, to:PersistedGraphEntity<TO>, relation:R):Promise<PersistedGraphEntity<R>> {
         assertPersisted(from);
+        assertPersisted(to);
 
-        let query = buildQuery()
-            .match(m => [
-                m.node(this.fromClass).params({id: from.id} as any),
-                m.relation(this.relationClass).params(relationParams).as('relation'),
-                m.node(this.toClass).params(connectedNodeParams).as('node')
-            ])
-            .returns('relation', 'node');
-
-        return this.connection.runQuery(query).toArray();
-    }
-
-    async saveRelation(from:PersistedGraphEntity<FROM>, to:PersistedGraphEntity<TO>, relation:R):Promise<PersistedGraphEntity<R>> {
         let query = buildQuery()
             .match(m => [
                 m.node<FROM>(this.fromClass).params({id: from.id} as any).as('from'),
@@ -71,21 +60,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
         return this.connection.runQuery(query).pickOne('rel').first();
     }
 
-    async getRelationById(id:string):Promise<R | null> {
-        let rows = await this.connection.runQuery(cypher => cypher
-            .match(m => [
-                m.node(),
-                m.relation(this.relationClass).params({id} as any).as('rel'),
-                m.node()
-            ])
-            .returns('rel')
-        );
-
-        return either(() => rows[0].rel, null);
-    }
-
-
-    removeRelation(id:string):Promise<any> {
+    remove(id:string):Promise<any> {
         let query = buildQuery()
             .match(m => [
                 m.node(),
@@ -95,5 +70,34 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
             .append('DELETE rel');
 
         return this.connection.runQuery(query).first();
+    }
+
+    //TODO: write specs
+    async getRelatedNodes(from:FROM, relationParams?:Partial<R>, connectedNodeParams?:Partial<TO>):Promise<{ relation:R, node:TO }[]> {
+        assertPersisted(from);
+
+        let query = buildQuery()
+            .match(m => [
+                m.node(this.fromClass).params({id: from.id} as any),
+                m.relation(this.relationClass).params(relationParams).as('relation'),
+                m.node(this.toClass).params(connectedNodeParams).as('node')
+            ])
+            .returns('relation', 'node');
+
+        return this.connection.runQuery(query).toArray();
+    }
+
+    //TODO: write specs
+    async getRelationById(id:string):Promise<R | null> {
+        let rows = await this.connection.runQuery(cypher => cypher
+            .match(m => [
+                m.node(this.fromClass),
+                m.relation(this.relationClass).params({id} as any).as('rel'),
+                m.node(this.toClass)
+            ])
+            .returns('rel')
+        );
+
+        return either(() => rows[0].rel, null);
     }
 }
