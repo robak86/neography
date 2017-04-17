@@ -5,12 +5,12 @@ import {CreateNodeQueryPart} from "./CreateNodeQueryPart";
 import {CreateRelationQueryPart} from "./CreateRelationQueryPart";
 import {NodeRelationConcatenator} from "../utils/NodeRelationConcatenator";
 import {MatchedNodeQueryPart} from "../common/MatchedNodeQueryPart";
-import {MatchedRelationQueryPart} from "../common/MatchedRelationQueryPart";
+
 
 export type PersistableElement =CreateNodeQueryPart<any>
     | CreateRelationQueryPart<any>
-    | MatchedNodeQueryPart
-    | MatchedRelationQueryPart;
+    | MatchedNodeQueryPart;
+
 
 export class CreateQueryPart implements IQueryPart {
 
@@ -44,11 +44,6 @@ export class CreateQueryPart implements IQueryPart {
             if (el instanceof MatchedNodeQueryPart) {
                 let matchedNodeQueryPart = el.toCypher(ctx);
                 concatenator.push({cypherString: matchedNodeQueryPart.cypherString, isRelation: false});
-            }
-
-            if (el instanceof MatchedRelationQueryPart) {
-                let matchedNodeQueryPart = el.toCypher(ctx);
-                concatenator.push({cypherString: matchedNodeQueryPart.cypherString, isRelation: true});
             }
         });
 

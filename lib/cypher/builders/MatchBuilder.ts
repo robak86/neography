@@ -32,9 +32,4 @@ export class MatchBuilder {
             return new MatchUntypedRelationQueryPart<R>();
         }
     };
-
-    //TODO: implement it
-    matchedRelation(){
-        throw new Error("Implement me")
-    }
 }
