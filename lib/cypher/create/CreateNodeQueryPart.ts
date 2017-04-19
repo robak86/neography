@@ -7,7 +7,6 @@ import {AbstractNode} from "../../model/AbstractNode";
 import {AttributesMapper} from "../../mappers/AttributesMapper";
 
 import {cloned, someOrThrow} from "../../utils/core";
-import {nodeTypesRegistry} from "../../annotations/NodeAnnotations";
 
 
 export class CreateNodeQueryPart<N extends AbstractNode> implements IQueryPart {
@@ -19,17 +18,14 @@ export class CreateNodeQueryPart<N extends AbstractNode> implements IQueryPart {
         return NodeMetadata.getForInstance(this.nodeInstance).getLabels().join(':');
     }
 
-    private get attributesMapper():AttributesMapper<AbstractNode> {
-        return someOrThrow(nodeTypesRegistry.getMapperForClass(this.nodeInstance.constructor as any), "Missing mapper");
-    }
-
     toCypher(context:QueryContext):IBoundQueryPart {
         let alias = this._alias || context.checkoutNodeAlias();
         let paramsId = context.checkoutParamsAlias(alias);
+        let attributesMapper = context.getMapperForNodeClass(this.nodeInstance.constructor as any);
 
         return {
             cypherString: `(${alias}:${this.nodeLabels} {${paramsId}})`,
-            params: {[paramsId]: this.attributesMapper.mapToRow(this.nodeInstance, 'create')}
+            params: {[paramsId]: attributesMapper.mapToRow(this.nodeInstance, 'create')}
         };
     }
 

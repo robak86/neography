@@ -7,6 +7,9 @@ import {ReturnQueryPart} from "./common/ReturnQueryPart";
 import {SetQueryPart} from "./update/SetQueryPart";
 import {WhereLiteralQueryPart} from "./match/WhereLiteralQueryPart";
 import {CypherLiteral} from "./common/CypherLiteral";
+import {NodeMapperFactory} from "../mappers/NodeMapperFactory";
+import {RelationMapperFactory} from "../mappers/RelationMapperFactory";
+import {AttributesMapperFactory} from "../mappers/AttributesMapperFactory";
 
 export type CypherQueryElement = MatchQueryPart
     | CreateQueryPart
@@ -23,21 +26,23 @@ export interface BoundCypherQuery {
 }
 
 export class CypherQuery {
-    private ctx = new QueryContext();
 
-    constructor(private elements:CypherQueryElement[]) {
+    constructor(private elements:CypherQueryElement[],
+                private attributesMapperFactory:AttributesMapperFactory) {
+
     }
 
 
     //TODO: return other type {boundQueryPart: ... , context: ctx} -> todo find better names for context, toCypher and consider using visitor pattern!
     toCypher():BoundCypherQuery {
         let out:IBoundQueryPart = {cypherString: '', params: {}};
+        let ctx = new QueryContext(this.attributesMapperFactory);
 
         this.elements.forEach((element:CypherQueryElement) => {
             if (_.isString(element)) {
                 out.cypherString += (' ' + element + ' ');
             } else {
-                let elementCypherPart = element.toCypher(this.ctx);
+                let elementCypherPart = element.toCypher(ctx);
                 out.cypherString += ` ${elementCypherPart.cypherString} `;
                 out.params = {
                     ...out.params,
@@ -47,7 +52,7 @@ export class CypherQuery {
         });
 
         return {
-            context: this.ctx,
+            context: ctx,
             boundQuery: out
         }
     }

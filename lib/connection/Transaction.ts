@@ -1,5 +1,6 @@
 import {GraphResponse} from "./GraphResponse";
 import {pfinally} from "../utils/promise";
+import {GraphResponseFactory} from "./GraphResponseFactory";
 
 
 export class Transaction {
@@ -7,13 +8,14 @@ export class Transaction {
     private hasError:boolean = false; //merge this two variables
     private lastError:any;
 
-    constructor(private session) {
+    constructor(private session,
+                private responseFactory:GraphResponseFactory) {
         this.transaction = session.beginTransaction();
     }
 
     runQuery(query:string, params?:any):GraphResponse {
         if (this.hasError) {
-            return GraphResponse.initWithAutoMapper(Promise.reject(this.lastError));
+            return this.responseFactory.build(Promise.reject(this.lastError));
         } else {
             let queryPromise = this.transaction
                 .run(query, params)
@@ -21,7 +23,7 @@ export class Transaction {
                     this.rollback(err);
                     return Promise.reject(err);
                 });
-            return GraphResponse.initWithAutoMapper(queryPromise);
+            return this.responseFactory.build(queryPromise);
         }
     }
 

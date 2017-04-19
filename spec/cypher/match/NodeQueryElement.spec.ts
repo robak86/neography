@@ -5,6 +5,7 @@ import {AbstractNode} from "../../../lib/model/AbstractNode";
 import {attribute} from "../../../lib/annotations/AttributesAnnotations";
 import {MatchNodeQueryPart} from "../../../lib/cypher/match/MatchNodeQueryPart";
 import {QueryContext} from "../../../lib/cypher/common/QueryContext";
+import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 
 
 describe("MatchNodeQueryPart", () => {
@@ -26,7 +27,7 @@ describe("MatchNodeQueryPart", () => {
 
     beforeEach(() => {
         nodeQueryPart = new MatchNodeQueryPart(SomeDummyNode);
-        ctx = new QueryContext();
+        ctx = getDefaultContext();
     });
 
     describe(".toCypher", () => {

@@ -1,10 +1,11 @@
 import {MatchedNodeQueryPart} from "../../../lib/cypher/common/MatchedNodeQueryPart";
 import {QueryContext} from "../../../lib/cypher/common/QueryContext";
 import {expect} from 'chai';
+import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 
 describe("MatchedNodeQueryPart", () => {
     let ctx:QueryContext;
-    beforeEach(() => ctx = new QueryContext());
+    beforeEach(() => ctx = getDefaultContext());
 
     describe(".toCypher", () => {
         describe("with alias", () => {

@@ -1,9 +1,11 @@
 import {AutoMapper} from "../mappers/AutoMapper";
 import * as _ from 'lodash';
+import {AttributesMapperFactory} from "../mappers/AttributesMapperFactory";
 
 export class GraphResponse {
-    static initWithAutoMapper(response:Promise<any>):GraphResponse {
-        return new GraphResponse(response.then(result => new AutoMapper(result.records).toMappedArray()));
+    static initWithAutoMapper(response:Promise<any>,
+                              attributesMapperFactory:AttributesMapperFactory):GraphResponse {
+        return new GraphResponse(response.then(result => new AutoMapper(attributesMapperFactory).toMappedArray(result.records)));
     }
 
     private constructor(private rows:Promise<any[]>) {}

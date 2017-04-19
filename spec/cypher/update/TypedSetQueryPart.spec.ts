@@ -5,12 +5,13 @@ import {DummyGraphNode} from "../../fixtures/DummyGraphNode";
 import {QueryContext} from "../../../lib/cypher/common/QueryContext";
 import {IBoundQueryPart} from "../../../lib/cypher/abstract/IBoundQueryPart";
 import {isInt} from "../../../lib/driver/Integer";
+import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 
 describe("TypedSetQueryPart", () => {
     let typedSetQueryPart:TypedSetQueryPart<DummyGraphNode>,
         context:QueryContext;
 
-    beforeEach(() => context = new QueryContext());
+    beforeEach(() => context = getDefaultContext());
 
     describe("update mode", () => {
         describe("params match type attributes", () => {

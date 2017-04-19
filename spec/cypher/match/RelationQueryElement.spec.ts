@@ -5,6 +5,7 @@ import {AbstractRelation} from "../../../lib/model/AbstractRelation";
 import {attribute} from "../../../lib/annotations/AttributesAnnotations";
 import {MatchRelationQueryPart} from "../../../lib/cypher/match/MatchRelationQueryPart";
 import {QueryContext} from "../../../lib/cypher/common/QueryContext";
+import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 
 
 describe("MatchRelationQueryPart", () => {
@@ -21,7 +22,7 @@ describe("MatchRelationQueryPart", () => {
 
     beforeEach(() => {
         relationQueryElement = new MatchRelationQueryPart(SomeDummyRelation);
-        ctx = new QueryContext();
+        ctx = getDefaultContext();
     });
 
     describe(".toCypher", () => {

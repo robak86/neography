@@ -3,12 +3,13 @@ import {QueryContext} from "../../../lib/cypher/common/QueryContext";
 import {CreateNodeQueryPart} from "../../../lib/cypher/create/CreateNodeQueryPart";
 import {DummyGraphNode} from "../../fixtures/DummyGraphNode";
 import {IBoundQueryPart} from "../../../lib/cypher/abstract/IBoundQueryPart";
+import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 
 
 describe("CreateNodeQueryPart", () => {
     let ctx:QueryContext;
     beforeEach(() => {
-        ctx = new QueryContext();
+        ctx = getDefaultContext();
     });
 
     describe("create node with parameters", () => {

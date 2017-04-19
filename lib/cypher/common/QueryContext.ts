@@ -1,10 +1,28 @@
+import {AttributesMapper} from "../../mappers/AttributesMapper";
+import {NodeMapperFactory} from "../../mappers/NodeMapperFactory";
+import {RelationMapperFactory} from "../../mappers/RelationMapperFactory";
+import {Type} from "../../utils/types";
+import {AbstractRelation} from "../../model/AbstractRelation";
+import {AbstractNode} from "../../model/AbstractNode";
+import {isPresent, someOrThrow} from "../../utils/core";
+import {AttributesMapperFactory} from "../../mappers/AttributesMapperFactory";
+import {nodeTypesRegistry} from "../../annotations/NodeAnnotations";
+import {relationsTypesRegistry} from "../../annotations/RelationAnnotations";
+
+
 export class QueryContext {
     private _nodesCounter:number = 0;
     private _relationsCounter:number = 0;
     private _literalCounter:number = 0;
-    // private _returnValues:{[alias:string]:string} = {};
     private _userDefinedAliases:{ [alias:string]:any } = {};
 
+    static buildDefault(attributesMapperFactory?:AttributesMapperFactory) {
+        return new QueryContext(attributesMapperFactory ? attributesMapperFactory
+            : new AttributesMapperFactory(nodeTypesRegistry.getEntries(),relationsTypesRegistry.getEntries()));
+    }
+
+    constructor(private attributesMapperFactory:AttributesMapperFactory) {
+    }
 
     //TODO: prefix with double underscore in order to prevent collisions with user speciefied fields
     checkoutNodeAlias():string {
@@ -23,5 +41,31 @@ export class QueryContext {
     //TODO: prefix with double underscore in order to prevent collisions with user speciefied fields
     checkoutRelationAlias():string {
         return `r${this._relationsCounter += 1}`;
+    }
+
+    hasMapperForNodeClass<T extends AbstractNode>(nodeClass:Type<T>):boolean {
+        let mapper = this.attributesMapperFactory.getNodeMapperForClass(nodeClass);
+        return isPresent(mapper);
+    }
+
+    hasMapperForRelationClass<T extends AbstractRelation>(relationClass:Type<T>):boolean {
+        let mapper =this.attributesMapperFactory.getRelationMapperForClass(relationClass);
+        return isPresent(mapper);
+    }
+
+    getMapperForNodeClass<T extends AbstractNode>(nodeClass:Type<T>):AttributesMapper<T> {
+        return someOrThrow(this.attributesMapperFactory.getNodeMapperForClass(nodeClass), `Cannot find node mapper for ${nodeClass}`);
+    }
+
+    getMapperForNodeLabels(labels:string[]):AttributesMapper<any> {
+        return this.attributesMapperFactory.getNodeMapper(labels)
+    }
+
+    getMapperForRelationClass<T extends AbstractRelation>(relationClass:Type<T>):AttributesMapper<T> {
+        return someOrThrow(this.attributesMapperFactory.getRelationMapperForClass(relationClass), `Cannot find relation mapper for ${relationClass}`)
+    }
+
+    getMapperForRelationType(type:string):AttributesMapper<any> {
+        return this.attributesMapperFactory.getRelationMapper(type);
     }
 }

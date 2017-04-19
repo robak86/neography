@@ -6,12 +6,13 @@ import {TypedSetQueryPart} from "../../../lib/cypher/update/TypedSetQueryPart";
 import {DummyGraphNode} from "../../fixtures/DummyGraphNode";
 import {IBoundQueryPart} from "../../../lib/cypher/abstract/IBoundQueryPart";
 import {expectIsNowTimeStamp} from "../../helpers/assertions";
+import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 
 
 describe("SetQueryPart", () => {
     let setQueryPart:SetQueryPart,
         context:QueryContext;
-    beforeEach(() => context = new QueryContext());
+    beforeEach(() => context = getDefaultContext());
 
     describe(".toCypher", () => {
         describe("with one TypedSetQueryPart child", () => {

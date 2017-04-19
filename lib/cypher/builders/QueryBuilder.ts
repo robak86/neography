@@ -10,6 +10,9 @@ import {SetQueryPartChildren, SetQueryPart} from "../update/SetQueryPart";
 import {WhereBuilder} from "./WhereBuilder";
 import {WhereLiteralQueryPart} from "../match/WhereLiteralQueryPart";
 import {CypherLiteral} from "../common/CypherLiteral";
+import {NodeMapperFactory} from "../../mappers/NodeMapperFactory";
+import {RelationMapperFactory} from "../../mappers/RelationMapperFactory";
+import {AttributesMapperFactory} from "../../mappers/AttributesMapperFactory";
 
 
 export type MatchBuilderCallback = (q:MatchBuilder) => MatchableElement[]|MatchableElement;
@@ -108,8 +111,8 @@ export class QueryBuilder {
         return new QueryBuilder(elements)
     }
 
-    toQuery():CypherQuery {
-        return new CypherQuery(this.elements);
+    toQuery(attributesMapperFactory:AttributesMapperFactory):CypherQuery {
+        return new CypherQuery(this.elements, attributesMapperFactory);
     }
 
     private cloneAndAppend(queryElement:CypherQueryElement[]):QueryBuilder{

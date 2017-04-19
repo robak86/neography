@@ -1,16 +1,11 @@
 import * as _ from 'lodash';
 
 import {NodeMetadata} from "../metadata/NodeMetadata";
-import {AttributesMapper} from "../mappers/AttributesMapper";
-import {AbstractNode} from "../model/AbstractNode";
-import {isPresent} from "../utils/core";
-import {Type} from "../utils/types";
-import {attributesMapperFactory} from "../mappers/AttributesMapperFactory";
-import {Peristable} from "../model/GraphEntity";
 
 
 
-type NodesTypesRegistryEntry = {klass:Function, metadata:NodeMetadata};
+
+export type NodesTypesRegistryEntry = {klass:Function, metadata:NodeMetadata};
 
 export class NodesTypesRegistry {
     private mapping:{[labels:string]:NodesTypesRegistryEntry} = {};
@@ -23,31 +18,7 @@ export class NodesTypesRegistry {
         this.mapping[metadata.getId()] = {klass, metadata};
     };
 
-    hasMapper(labels:string[]):boolean {
-        let entry:NodesTypesRegistryEntry = this.getRegistryEntry(labels.sort());
-        return isPresent(entry);
-    }
-
-    getMapper<T extends Peristable>(labels:string[]):AttributesMapper<T> {
-        let entry:NodesTypesRegistryEntry = this.getRegistryEntry(labels.sort());
-        if (_.isUndefined(entry)) {
-            throw new Error("Missing metadata for " + labels);
-        }
-        return attributesMapperFactory.getMapper<T>(entry.klass as any)
-    }
-
-    getMapperForClass<K extends AbstractNode>(klass:Type<K>):AttributesMapper<K>|null {
-        let nodeMetadata = NodeMetadata.getForClass(klass);
-
-        return isPresent(nodeMetadata) ?
-            this.getMapper(nodeMetadata.getLabels()) as any :
-            null;
-    }
-
-    private getRegistryEntry<T extends Peristable>(labelOrLabels:string[]):NodesTypesRegistryEntry {
-        let labels:string[] = _.isArray(labelOrLabels) ? labelOrLabels : [labelOrLabels];
-        let labelsId = labels.join('_');
-
-        return this.mapping[labelsId];
+    getEntries():{[labels:string]:NodesTypesRegistryEntry}{
+        return this.mapping;
     }
 }

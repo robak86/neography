@@ -7,6 +7,7 @@ import {DummyGraphRelation} from "../../fixtures/DummyGraphRelation";
 import {IBoundQueryPart} from "../../../lib/cypher/abstract/IBoundQueryPart";
 import {CreateQueryPart} from "../../../lib/cypher/create/CreateQueryPart";
 import {MatchedNodeQueryPart} from "../../../lib/cypher/common/MatchedNodeQueryPart";
+import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 
 
 
@@ -19,7 +20,7 @@ describe("CreateQueryPart", () => {
 
 
     beforeEach(() => {
-        ctx = new QueryContext();
+        ctx = getDefaultContext();
         createNodeQuery1 = new CreateNodeQueryPart(DummyGraphNode.build({attr1: 'val1', attr2: 1}));
         createNodeQuery2 = new CreateNodeQueryPart(DummyGraphNode.build({attr1: 'val2', attr2: 2}));
         createNodeQuery3 = new CreateNodeQueryPart(DummyGraphNode.build({attr1: 'val3', attr2: 3}));

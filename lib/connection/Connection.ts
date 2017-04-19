@@ -10,37 +10,32 @@ import {Type} from "../utils/types";
 import {NodeRepository} from "../repositories/NodeRepository";
 import {AbstractRelation} from "../model/AbstractRelation";
 import {RelationRepository} from "../repositories/RelationRepository";
+import {GraphResponseFactory} from "./GraphResponseFactory";
 
-const neo4j = require('neo4j-driver').v1;
-
-export interface ConnectionParams {
-    host:string;
-    username:string;
-    password:string;
-}
 
 export class Connection {
     private currentTransaction:Transaction | null;
     private ongoingTransactions:number = 0;
-    private driver;
 
-    constructor(private config:ConnectionParams) {
-        this.driver = neo4j.driver(`bolt://${config.host}`, neo4j.auth.basic(config.username, config.password));
+
+    constructor(private driver,
+                private responseFactory:GraphResponseFactory) {
+
     }
 
     runQuery(queryBuilder:QueryBuilder | ((builder:QueryBuilder) => QueryBuilder)):GraphResponse {
         if (_.isFunction(queryBuilder)) {
-            let queryData = queryBuilder(new QueryBuilder()).toQuery().toCypher();
+            let queryData = queryBuilder(new QueryBuilder()).toQuery(this.responseFactory.attributesMapperFactory).toCypher();
             return this.execQuery(queryData.boundQuery.cypherString, queryData.boundQuery.params);
         } else {
-            let queryData:BoundCypherQuery = queryBuilder.toQuery().toCypher();
+            let queryData:BoundCypherQuery = queryBuilder.toQuery(this.responseFactory.attributesMapperFactory).toCypher();
             return this.execQuery(queryData.boundQuery.cypherString, queryData.boundQuery.params);
         }
     }
 
     withTransaction<T>(fn:() => Promise<T>):Promise<T> { //TODO: rename to runWithinCurrentTransaction??
         if (!this.currentTransaction) {
-            this.currentTransaction = new Transaction(this.checkoutNewSession())
+            this.currentTransaction = new Transaction(this.checkoutNewSession(), this.responseFactory)
         }
 
         this.ongoingTransactions += 1;
@@ -82,7 +77,7 @@ export class Connection {
     private runQueryWithoutTransaction(query:string, params?:any):GraphResponse {
         let session = this.checkoutNewSession();
         let queryPromise = session.run(query, params);
-        return GraphResponse.initWithAutoMapper(pfinally(() => session.close(), queryPromise));
+        return this.responseFactory.build(pfinally(() => session.close(), queryPromise));
     }
 
     private checkoutNewSession() {

@@ -27,21 +27,15 @@ export class CreateRelationQueryPart<R extends AbstractRelation> implements IQue
     private get relationType():string {
         return RelationMetadata.getForInstance(this.relationInstance).getType();
     }
-
-    private get attributesMapper():AttributesMapper<AbstractRelation> {
-        return someOrThrow(
-            relationsTypesRegistry.getMapperForClass(this.relationInstance.constructor as any),
-            `Missing relation mapper for ${this.relationInstance}`
-        );
-    }
-
+    
     toCypher(context:QueryContext):IBoundQueryPart {
         let alias = this._alias || context.checkoutRelationAlias();
         let paramsId = context.checkoutParamsAlias(alias);
+        let attributesMapper = context.getMapperForRelationClass(this.relationInstance.constructor as any);
 
         return {
             cypherString: `${this.arrowPreSign}[${alias}:${this.relationType} {${paramsId}}]${this.arrowPostSign}`,
-            params: {[paramsId]: this.attributesMapper.mapToRow(this.relationInstance, 'create')}
+            params: {[paramsId]: attributesMapper.mapToRow(this.relationInstance, 'create')}
         };
     }
 

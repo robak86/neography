@@ -7,7 +7,7 @@ import {MatchQueryPart} from "../../../lib/cypher/match/MatchQueryPart";
 import {DummyGraphRelation} from "../../fixtures/DummyGraphRelation";
 import {QueryContext} from "../../../lib/cypher/common/QueryContext";
 import {ChildDummyGraphNode} from "../../fixtures/ChildDummyGraphNode";
-
+import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 
 
 describe('MatchQueryPart', () => {
@@ -20,7 +20,7 @@ describe('MatchQueryPart', () => {
         ctx:QueryContext;
 
     beforeEach(() => {
-        ctx = new QueryContext();
+        ctx = getDefaultContext();
         // sinon.stub(ctx, 'genId').returns('n2Params');
 
         // let counter = 0;
