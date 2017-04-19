@@ -1,11 +1,23 @@
 import {Connection, buildQuery} from "neography";
-import {AbstractNode, AbstractRelation, PersistedGraphEntity, createFactoryMethod} from "neography/model";
-import {node, attribute, relation} from 'neography/annotations';
+import {AbstractNode, AbstractRelation,  createFactoryMethod,Persisted} from "neography/model";
+import {node, attribute, relation, timestamp} from 'neography/annotations';
+
+import {Neography} from 'neography';
+import {TimestampsExtension} from 'neography/extensions';
+
+
+const neography = new Neography({host: 'localhost', username: 'neo4j', password: 'password'});
+neography.registerExtension(TimestampsExtension.getDefault());
+
 
 //Models definition
 @node('User')
 class User extends AbstractNode {
     static build = createFactoryMethod(User);
+
+    @timestamp() createdAt?:number;
+    @timestamp() updatedAt?:number;
+
     @attribute() firstName:string;
     @attribute() lastName:string;
 }
@@ -19,12 +31,12 @@ class HasFriendRelation extends AbstractRelation {
 async function example() {
 
     //queries
-    const storeUserQuery = (user:User) => buildQuery()
+    const storeUserQuery = (user:User) => neography.query()
         .create(c => c.node(user).as('user'))
         .returns('user');
 
 
-    const addFriendToUserQuery = (fromId:string, hasFriendRelation:HasFriendRelation, toId:string) => buildQuery()
+    const addFriendToUserQuery = (fromId:string, hasFriendRelation:HasFriendRelation, toId:string) => neography.query()
         .match(m => [
             m.node(User).params({id: fromId}).as('user'),
             m.node(User).params({id: toId}).as('friend')
@@ -35,7 +47,7 @@ async function example() {
             c.matchedNode('friend')]
         );
 
-    const getFriendsQuery = (userId:string) => buildQuery()
+    const getFriendsQuery = (userId:string) => neography.query()
         .match(m => [
             m.node(User).as('user').params({id: userId}),
             m.relation(HasFriendRelation).as('relation'),
@@ -44,7 +56,7 @@ async function example() {
         .returns('user', 'relation', 'friend');
 
 
-    let connection:Connection = new Connection({username: 'neo4j', password: 'password', host: 'localhost'});
+    let connection:Connection = neography.checkoutConnection();
 
     //model instances
     let user1 = User.build({firstName: 'Jane', lastName: 'Doe'});
@@ -52,8 +64,8 @@ async function example() {
     let hasFriend = HasFriendRelation.build({since: new Date().getTime()});
 
     // running queries
-    let persistedUser1:PersistedGraphEntity<User> = await connection.runQuery(storeUserQuery(user1)).pickOne('user').first();
-    let persistedUser2:PersistedGraphEntity<User> = await connection.runQuery(storeUserQuery(user2)).pickOne('user').first();
+    let persistedUser1:Persisted<User> = await connection.runQuery(storeUserQuery(user1)).pickOne('user').first();
+    let persistedUser2:Persisted<User> = await connection.runQuery(storeUserQuery(user2)).pickOne('user').first();
 
     await connection.runQuery(addFriendToUserQuery(persistedUser1.id, hasFriend, persistedUser2.id));
 

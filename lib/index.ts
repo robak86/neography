@@ -50,7 +50,7 @@ export class Neography {
         return new Connection(this.driver, this.responseFactory);
     }
 
-    get query():QueryBuilder {
+    query():QueryBuilder {
         return new QueryBuilder();
     }
 

@@ -14,16 +14,31 @@ npm install neography
 ```
 
 
+### Configure neography instance
+```typescript
+import {Neography} from 'neography';
+import {TimestampsExtension} from 'neography/extensions';
+
+const neography = new Neography({host: 'localhost', username: 'neo4j', password: 'password'});
+neography.registerExtension(TimestampsExtension.getDefault());
+
+```
+
+
 ### Define Nodes and Relations
 
 ```typescript
 import {AbstractNode, AbstractRelation, createFactoryMethod} from "neography/model";
-import {node, attribute, relation} from 'neography/annotations';
+import {node, attribute, relation, timestamp} from 'neography/annotations';
 
 
 @node('User')
 class User extends AbstractNode {
     static build = createFactoryMethod(User);
+    
+    @timestamp() createdAt?:number;
+    @timestamp() updatedAt?:number;
+    
     @attribute() firstName:string;
     @attribute() lastName:string;
 }
@@ -31,7 +46,11 @@ class User extends AbstractNode {
 @relation('HAS_FRIEND')
 class HasFriendRelation extends AbstractRelation {
     static build = createFactoryMethod(HasFriendRelation);
-    since:number;
+    
+    @timestamp() createdAt?:number;
+    @timestamp() updatedAt?:number;
+    
+    @attribute() since:number;
 }
 
 ```
@@ -39,15 +58,15 @@ class HasFriendRelation extends AbstractRelation {
 ### Define Queries
 
 ```typescript
-import {buildQuery} from "neography";
 
 
-const storeUserQuery = (user:User) => buildQuery()
+
+const storeUserQuery = (user:User) => neography.query()
     .create(c => c.node(user).as('user'))
     .returns('user');
 
 
-const addFriendToUserQuery = (fromId:string, hasFriendRelation:HasFriendRelation, toId:string) => buildQuery()
+const addFriendToUserQuery = (fromId:string, hasFriendRelation:HasFriendRelation, toId:string) => neography.query()
     .match(m => [
         m.node(User).params({id: fromId}).as('user'),
         m.node(User).params({id: toId}).as('friend')
@@ -58,7 +77,7 @@ const addFriendToUserQuery = (fromId:string, hasFriendRelation:HasFriendRelation
         c.matchedNode('friend')]
     );
 
-const getFriendsQuery = (userId:string) => buildQuery()
+const getFriendsQuery = (userId:string) => neography.query()
     .match(m => [
         m.node(User).as('user').params({id: userId}),
         m.relation(HasFriendRelation).as('relation'),
@@ -71,10 +90,9 @@ const getFriendsQuery = (userId:string) => buildQuery()
 ### Execute Queries
 
 ```typescript
-    import {Connection} from "neography";
     import {Persisted} from "neography/model";
 
-    let connection:Connection = new Connection({username: 'neo4j', password: 'password', host: 'localhost'});
+    const connection = neography.checkoutConnection();
 
     // model instances
     let user1 = User.build({firstName: 'Jane', lastName: 'Doe'});
