@@ -25,6 +25,10 @@ class ExampleRelation extends AbstractRelation {
 
 ```
 
+## Connection
+
+TODO
+
 ## Query Builder
 
 Query builder provides simple dsl for building cypher queries.
@@ -60,7 +64,7 @@ import {Persisted} from 'neography/model';
 let response:{someAlias: Persisted<ExampleNode>}[] = await neography.checkoutConnection().runQuery(insertQuery).toArray();
 ```
 
-It will be same as running following query
+It will be the same as running following query
 
 ```cypher
 CREATE(someAlias:ExampleNodeLabel {attr1: "attribute1Value", attr2: ["attr2"]})
