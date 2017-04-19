@@ -20,7 +20,10 @@ import {Neography} from 'neography';
 import {TimestampsExtension} from 'neography/extensions';
 
 const neography = new Neography({host: 'localhost', username: 'neo4j', password: 'password'});
-neography.registerExtension(TimestampsExtension.getDefault());
+
+//register extensions for managing createdAt and updatedAt properties. 
+//Timestamps are stored as integer values
+neography.registerExtension(TimestampsExtension.getDefault()); 
 
 ```
 
@@ -58,9 +61,6 @@ class HasFriendRelation extends AbstractRelation {
 ### Define Queries
 
 ```typescript
-
-
-
 const storeUserQuery = (user:User) => neography.query()
     .create(c => c.node(user).as('user'))
     .returns('user');
