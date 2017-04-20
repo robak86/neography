@@ -201,3 +201,42 @@ let matchWhere = neography.query()
 type Response = {user: Persisted<UserNode>, relation: Persisted<KnowsRelation>, friend: Persisted<UserNode>};
 let usersOptionallyHavingFriends:Response = await connection.runQuery(matchWhere).toArray();
 ```
+
+### Creating Relations For Existing Nodes
+
+```typescript
+let createRelation = neography.query()
+                         .match(m => [
+                             m.node(UserNode).params({id: 'someExistingId'}).as('user'),
+                             m.node(UserNode).params({id: 'someOtherExistingId'}).as('friend')
+                         ])
+                         .create(c => [
+                             c.matchedNode('user'),
+                             c.relation(hasFriendRelation).as('hasFriendRelation'),
+                             c.matchedNode('friend')]
+                         );
+
+type Response = {user: Persisted<UserNode>, relation: Persisted<KnowsRelation>, friend: Persisted<UserNode>};
+let userWithFriend:Response = await connection.runQuery(createRelation).toArray();
+```
+
+### Creating Relations and New Node
+
+```typescript
+let friend = User.build({firstName: 'Aaron', lastName: 'Smith'});
+
+let createRelation = neography.query()
+                         .match(m => m.node(UserNode).params({id: 'someExistingId'}).as('user'))
+                         .create(c => [
+                             c.matchedNode('user'),
+                             c.relation(hasFriendRelation).as('hasFriendRelation'),
+                             c.node(friend).as('friend')]
+                         );
+
+type Response = {user: Persisted<UserNode>, relation: Persisted<KnowsRelation>, friend: Persisted<UserNode>};
+let userWithFriend:Response = await connection.runQuery(createRelation).toArray();
+```
+
+### Update Entities Using SET Clause
+
+TODO
