@@ -1,17 +1,15 @@
-# TODO
-
 ## Defining Model Classes
 
 Neography provides mapping layer over persisted neo4j data and classes defined by UserNode. In order to create mappable class 
-you have to decorate it with ```@node('NodeLabel')``` or ```@relation('RELATION_NAME')``` decorators. Additionally each 
+you have to decorate it with ```@node('NodeLabel')``` or ```@relation('RELATION_TYPE')``` decorators. Additionally each 
 entity class have to inherit consequently from ```AbstractNode``` or ```AbstractRelation``` class. Abstract classes provide optional ```id``` 
 string property. By default neography generates uuid string for identifying entities.
-Abstract classes were also introduced for making most of query builder's and repositories' methods type safe.
+Abstract classes were introduced for making most of query builder's and repositories' methods type safe.
 
  
 ```typescript
 import {AbstractNode, AbstractRelation, Integer, int, createFactoryMethod} from 'neography/model';
-import {node, relation} from 'neographyAnnotations';
+import {node, relation} from 'neography/annotations';
 
 @node('User') //node label
 class UserNode extends AbstractNode {
@@ -29,7 +27,7 @@ class AddressNode {
     @attribute() city:string;
 }
 
-@relation('KNOWS')
+@relation('KNOWS') //relation type
 class KnowsRelation extends AbstractRelation {
     build = createFactoryMethod(KnowsRelation);
     
@@ -53,11 +51,13 @@ import {Neography} from 'neography';
 const neography = new Neography({host: 'localhost', username: 'neo4j', password: 'password'});
 const connection = neography.checkoutConnection()
 
+//Create repository for given node class
 const usersRepository = connection.getNodeRepository(UserNode);
 const addressesRepository = connection.getNodeRepository(AddressNode);
 
+//Create repository for given node classes and it's relation
 const knowsRelationsRepository = connection.getRelationRepository(UserNode, KnowsRelation, UserNode);
-const hasHomeAddressRelationsRepository = connection.getRelationRepository(UserNode, HasHomeAddressRelation,AddressNode);
+const hasHomeAddressRelationsRepository = connection.getRelationRepository(UserNode, HasHomeAddressRelation, AddressNode);
 ```
 
 ### Managing Nodes 
@@ -68,7 +68,7 @@ let user1: Persisted<UserNode> = await usersRepository.save(User.build({firstNam
 
 user1.firstName = 'John';
 user1 = await usersRepository.update(user1);
-//  User { id: 'BJ-_f8-Al', createdAt: 1492374120811, updatedAt: 1492374120811, firstName: 'John', lastName: 'Doe'}
+//  User { id: 'BJ-_f8-Al', createdAt: 1492374120811, updatedAt: 1492375654349, firstName: 'John', lastName: 'Doe'}
 
 let user2:Persisted<User>[] = await usersRepository.where({id: user1.id})
 // user2[0] and user1 points to the same persisted entity
@@ -120,11 +120,9 @@ neography.query();
 ```
 
 ### Inserting Nodes
-
 ```typescript
 //create instance of UserNode and assign properties values
 let userNode = UserNode.build({firstName: 'Jane', lastName: 'Doe'});
-
 
 //create query
 let insertQuery = neography.query()
@@ -138,9 +136,7 @@ Query can be executed by calling ```runQuery``` method on ```Connection``` insta
 import {Persisted} from 'neography/model';
 let response:{user: Persisted<UserNode>}[] = await connection.runQuery(insertQuery).toArray();
 ```
-
-It will be the same as running following query
-
+It equals to following cypher query
 ```cypher
 CREATE(user:UserNode { firstName: "Jane", lastName: "Doe" })
 RETURN user
@@ -161,7 +157,7 @@ let matchQuery = neography.query()
     .match(m => m.node(UserNode).params({firstName: 'Jane'}).as('user'))
     .returns('user');
 
-let matchedUsers:Persisted<UserNode> = await connection.runQuery(matchQuery).pickOne('user').toArray();
+let users:Persisted<UserNode>[] = await connection.runQuery(matchQuery).pickOne('user').toArray();
 ```
 
 ### Matching Nodes Using Where
@@ -172,10 +168,10 @@ let matchWhere = neography.query()
     .where(w => w.literal(`user.createdAt < {userCreateDate}`).params({userCreateDate: int(new Date('2016-12-31').getTime())}))
     .returns('user');
 
-let users:Persisted<UserNode> = await connection.runQuery(matchWhere).pickOne('user').toArray();
+let users:Persisted<UserNode>[] = await connection.runQuery(matchWhere).pickOne('user').toArray();
 ```
 
-### Match nodes connected by relation
+### Match Nodes Connected by Relation
 
 ```typescript
 let matchWhere = neography.query()
@@ -184,14 +180,13 @@ let matchWhere = neography.query()
         m.relation(KnowsRelation).as('relation'),
         m.node(UserNode).as('friend')
         ])
- 
     .returns('user', 'relation', 'friend');
 
 type Response = {user: Persisted<UserNode>, relation: Persisted<KnowsRelation>, friend: Persisted<UserNode>};
 let friends:Response = await connection.runQuery(matchWhere).toArray();
 ```
 
-### Match nodes using optional match
+### Match Nodes Using Optional Match
 
 ```typescript
 let matchWhere = neography.query()
@@ -206,6 +201,3 @@ let matchWhere = neography.query()
 type Response = {user: Persisted<UserNode>, relation: Persisted<KnowsRelation>, friend: Persisted<UserNode>};
 let usersOptionallyHavingFriends:Response = await connection.runQuery(matchWhere).toArray();
 ```
-
-
-
