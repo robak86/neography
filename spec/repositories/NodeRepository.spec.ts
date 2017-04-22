@@ -72,14 +72,14 @@ describe("NodeRepository", () => {
         });
     });
 
-    describe(".getNodeById", () => {
-        it("returns fetched buildNode if exists", async () => {
+    describe(".first", () => {
+        it("returns fetched dummyNode if exists", async () => {
             let createdGenericNode = await nodeRepository.save(dummyNode);
-            let retrievedGenericNodes:Persisted<DummyGraphNode>[] = await nodeRepository.where({id: createdGenericNode.id as string});
-            expect(retrievedGenericNodes[0]).to.eql(createdGenericNode);
+            let retrievedGenericNodes:Persisted<DummyGraphNode>|null = await nodeRepository.first({id: createdGenericNode.id as string});
+            expect(retrievedGenericNodes).to.eql(createdGenericNode);
         });
 
-        it("returns null if buildNode does not exist", async () => {
+        it("returns null if dummyNode does not exist", async () => {
             let retrievedGenericNode = await nodeRepository.where({id: 'non existing id :D'});
             expect(retrievedGenericNode[0]).to.eq(undefined);
         });

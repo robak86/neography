@@ -10,7 +10,7 @@ import {expectIsNowTimeStamp} from "../helpers/assertions";
 import {ChildDummyGraphNode} from "../fixtures/ChildDummyGraphNode";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 
-describe("queries", () => {
+describe("Queries", () => {
     let neography:Neography,
         connection:Connection;
 
