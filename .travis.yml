@@ -9,3 +9,4 @@ services:
 before_script:
   - npm run dist
   - docker-compose up -d
+  - sleep 20
