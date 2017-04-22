@@ -9,4 +9,5 @@ services:
 before_script:
   - npm run dist
   - docker-compose up -d
-  - sleep 20
+  - chmod +x ./scripts/wait_for_neo.sh
+  - ./scripts/wait_for_neo.sh
