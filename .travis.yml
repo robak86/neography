@@ -9,5 +9,4 @@ services:
 before_script:
   - npm run dist
   - docker-compose up -d
-  - chmod +x ./scripts/wait_for_neo.sh
-  - ./scripts/wait_for_neo.sh
+  - npm run neo4j:wait

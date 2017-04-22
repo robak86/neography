@@ -12,7 +12,8 @@
     "build:dev": "tsc --watch",
     "docker:start": "docker-compose up -d",
     "docker:stop": "docker-compose down",
-    "coverage": "nyc --reporter=text mocha -- -- spec dist/spec/**/*.spec.js"
+    "coverage": "nyc --reporter=text mocha -- -- spec dist/spec/**/*.spec.js",
+    "neo4j:wait": "while ! curl --silent http://localhost:7474/; do sleep 0.1; done"
   },
   "repository": {
     "type": "git",
