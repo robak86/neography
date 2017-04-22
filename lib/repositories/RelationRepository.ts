@@ -73,7 +73,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
     }
 
     //TODO: write specs
-    async getRelatedNodes(from:FROM, relationParams?:Partial<R>, connectedNodeParams?:Partial<TO>):Promise<{ relation:R, node:TO }[]> {
+    async getRelatedNodes(from:FROM, relationParams:Partial<R> = {}, connectedNodeParams:Partial<TO> = {}):Promise<{ relation:R, node:TO }[]> {
         assertPersisted(from);
 
         let query = buildQuery()
