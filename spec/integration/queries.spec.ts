@@ -83,6 +83,7 @@ describe("queries", () => {
     });
 
     describe("Creating node inheriting from another node", () => {
+        //TODO split expectations in more granular test cases and investigate if adding inheritance is good idea
         it("creates single node", async () => {
             let node = ChildDummyGraphNode.build({attr1: 'attr1', attr2: 123, attr3: 'inheritance is bad, mkay'});
             let q = neography.query()
@@ -265,6 +266,39 @@ describe("queries", () => {
                     expect(matchedNodes[0].properties).to.eql({someAttr: int(1)})
                 });
             });
+        });
+
+        describe("Matching node with multiple labels(inheritance)", () => {
+            //TODO: split expectations in more granular test cases. Add test cases where nodes using inheritance are created using query builder
+            beforeEach(async() => {
+                await connection.runQuery(q => q.literal(`CREATE (n:DummyGraphNode {attr1: "abc"}) return n`)).toArray();
+                await connection.runQuery(q => q.literal(`CREATE (n:ChildDummyGraphNode:DummyGraphNode {attr1: "abc" }) return n`)).toArray();
+                await connection.runQuery(q => q.literal(`CREATE (n:DummyGraphNode:ChildDummyGraphNode {attr1: "abc" }) return n`)).toArray();
+            });
+
+            it("matches also subclasses", async () => {
+                let rows:any[] = await connection.runQuery(q => q
+                    .match(m => m.node(DummyGraphNode).as('n').params({attr1: "abc"}))
+                    .returns('n')
+                ).toArray();
+
+                expect(rows.length).to.eq(3);
+                expect(rows[0].n).to.be.instanceOf(DummyGraphNode);
+                expect(rows[1].n).to.be.instanceOf(ChildDummyGraphNode);
+                expect(rows[2].n).to.be.instanceOf(ChildDummyGraphNode);
+            });
+
+            it("does not returns parent classes", async () => {
+                let rows:any[] = await connection.runQuery(q => q
+                    .match(m => m.node(ChildDummyGraphNode).as('n').params({attr1: "abc"}))
+                    .returns('n')
+                ).toArray();
+
+                expect(rows.length).to.eq(2);
+                expect(rows[0].n).to.be.instanceOf(ChildDummyGraphNode);
+                expect(rows[1].n).to.be.instanceOf(ChildDummyGraphNode);
+            });
+
         });
 
         describe("Matching relations", () => {
