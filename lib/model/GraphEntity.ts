@@ -1,6 +1,11 @@
 import {isPresent} from "../utils/core";
 
 export type Persisted<T> = T & { id:string };
+export type PersistedAggregate<T> = {
+    [P in keyof T]: Persisted<T[P]>;
+};
+
+
 export type Peristable = { id?:string };
 
 export function isPersisted<T extends Peristable>(entity:T | Persisted<T>):entity is Persisted<T> {
