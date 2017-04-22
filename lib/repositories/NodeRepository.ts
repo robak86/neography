@@ -12,12 +12,14 @@ export class NodeRepository<T extends AbstractNode> {
     }
 
     async exists(id:string):Promise<boolean> {
-        let q = cypher()
+        let query = cypher()
             .match(m => m.node(this.klass as Type<AbstractNode>).params({id}).as('n'))
             .returns('count(n) as nodesCount');
 
-        let count = await this.connection.runQuery(q).pickOne('nodesCount').first();
-        return count.toNumber() !== 0
+        return this.connection.runQuery(query)
+            .pickOne('nodesCount')
+            .map(integer => integer.toNumber() > 0)
+            .first();
     }
 
     async save(node:T):Promise<Persisted<T>> {
@@ -60,7 +62,8 @@ export class NodeRepository<T extends AbstractNode> {
     first(nodeParams:Partial<T>):Promise<Persisted<T> | null> {
         let query = buildQuery()
             .match(m => m.node(this.klass).params(nodeParams).as('n'))
-            .returns('n');
+            .returns('n')
+            .literal('LIMIT 1');
 
         return this.connection.runQuery(query).pickOne('n').first();
     }

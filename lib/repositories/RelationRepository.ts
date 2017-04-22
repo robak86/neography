@@ -13,7 +13,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
                 private toClass:Type<TO>,
                 private connection:Connection) {}
 
-    async exists(id:string):Promise<boolean> {
+    exists(id:string):Promise<boolean> {
         let query = buildQuery()
             .match(m => [
                 m.node(),
@@ -22,8 +22,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
             ])
             .returns('count(rel) as relCount');
 
-        let count = await this.connection.runQuery(query).pickOne('relCount').first();
-        return count.toNumber() !== 0;
+        return this.connection.runQuery(query).pickOne('relCount').map(integer => integer.toNumber() > 0).first();
     }
 
     update(rel:Persisted<R>):Promise<R> {
