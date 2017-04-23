@@ -1,6 +1,6 @@
 {
   "name": "neography",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Thin opinionated mapping layer and queries builder for official neo4j driver.",
   "main": "index.js",
   "types": "index.d.ts",
