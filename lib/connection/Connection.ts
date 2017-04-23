@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import {GraphResponse} from "./GraphResponse";
-import {CypherQuery, BoundCypherQuery} from "../cypher/CypherQuery";
+import {BoundCypherQuery} from "../cypher/CypherQuery";
 import {QueryBuilder} from "../cypher/builders/QueryBuilder";
 import {Transaction} from "./Transaction";
 import {pfinally} from "../utils/promise";
@@ -11,6 +11,8 @@ import {NodeRepository} from "../repositories/NodeRepository";
 import {AbstractRelation} from "../model/AbstractRelation";
 import {RelationRepository} from "../repositories/RelationRepository";
 import {GraphResponseFactory} from "./GraphResponseFactory";
+import {NodeRelationsRepository} from "../repositories/NodeRelationsRepository";
+import {Persisted} from "../model/GraphEntity";
 
 
 export class Connection {
@@ -64,6 +66,10 @@ export class Connection {
 
     getRelationRepository<FROM extends AbstractNode, REL extends AbstractRelation, TO extends AbstractNode>(from:Type<FROM>, relationClass:Type<REL>, to:Type<TO>):RelationRepository<FROM, REL, TO> {
         return new RelationRepository(from, relationClass, to, this);
+    }
+
+    getNodeRelationsRepository<N extends AbstractNode>(node:Persisted<N>):NodeRelationsRepository {
+        return new NodeRelationsRepository(node, this);
     }
 
     private execQuery(cypherQuery:string, params?:any):GraphResponse {
