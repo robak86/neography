@@ -21,8 +21,8 @@ export class NodeMetadata {
             Reflect.defineMetadata(NodeMetadata.NODE_METADATA_KEY, nodeMetadata, klass);
 
             let superClass = getSuperClass(klass);
-            if (superClass && superClass.name !== 'AbstractNode'){ //TODO: We don't wanna decorate base class but we should implement it somehow cleaner
-                nodeMetadata.setParent(NodeMetadata.getOrCreateForClass(superClass));
+            if (superClass && NodeMetadata.getForClass(superClass)){ //TODO: We don't wanna decorate base class but we should implement it somehow cleaner
+                nodeMetadata.setParent(NodeMetadata.getForClass(superClass));
             }
         }
 
