@@ -6,3 +6,5 @@
 * Investigate if ```Persisted``` is really needed. Probably this functionality should be implemented by base classes defined by user.
 * Validate user input in query building and throw Errors before query hits database
     * validate if all strings passed to ```returns()``` method were registered using ```.as()```
+* Optimize management of driver's sessions
+* Add performance specs for transactions
