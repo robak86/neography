@@ -18,11 +18,20 @@ import {Persisted} from "../model/GraphEntity";
 export class Connection {
     private currentTransaction:Transaction | null;
     private ongoingTransactions:number = 0;
-
+    private ongoingQueries:number = 0;
+    private _currentSession;
 
     constructor(private driver,
                 private responseFactory:GraphResponseFactory) {
+    }
 
+    private get session() {
+        return this._currentSession || ( this._currentSession = this.driver.session());
+    }
+
+    private closeSession() {
+        this._currentSession && this._currentSession.close();
+        this._currentSession = null;
     }
 
     runQuery(queryBuilder:QueryBuilder | ((builder:QueryBuilder) => QueryBuilder)):GraphResponse {
@@ -81,9 +90,18 @@ export class Connection {
     }
 
     private runQueryWithoutTransaction(query:string, params?:any):GraphResponse {
-        let session = this.checkoutNewSession();
-        let queryPromise = session.run(query, params);
-        return this.responseFactory.build(pfinally(() => session.close(), queryPromise));
+        this.ongoingQueries += 1;
+        let queryPromise = this.session.run(query, params);
+        return this.responseFactory.build(pfinally(
+            () => {
+                this.ongoingQueries -= 1;
+                if (this.ongoingQueries == 0) {
+                    this.closeSession();
+                }
+            }
+            ,
+            queryPromise
+        ));
     }
 
     private checkoutNewSession() {
