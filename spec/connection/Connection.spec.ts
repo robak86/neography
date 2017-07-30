@@ -1,10 +1,7 @@
 import {expect} from 'chai';
-
 import * as faker from 'faker';
 import * as _ from 'lodash';
-
 import {Partial} from "../../lib/utils/types";
-
 import {Persisted} from "../../lib/model/GraphEntity";
 import {genId} from "../../lib/utils/uuid";
 import {int, isInt} from "../../lib/driver/Integer";
@@ -13,7 +10,7 @@ import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {Connection} from "../../lib/connection/Connection";
 import {buildQuery} from "../../lib/cypher/index";
 
-describe.only("Connection", () => {
+describe("Connection", () => {
     let connection:Connection;
 
     beforeEach(async () => {

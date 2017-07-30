@@ -25,6 +25,7 @@ export class NeographyConfig {
     host:string;
     username:string;
     password:string;
+    sessionsPoolSize?:number;
 }
 
 export class Neography {
@@ -34,12 +35,15 @@ export class Neography {
     private queryRunner:QueryRunner;
 
     constructor(private config:NeographyConfig) {
-        let withDefaults:NeographyConfig = _.merge({objectTransform: [], uidGenerator: genId}, config);
+        let withDefaults:NeographyConfig = _.merge({
+            objectTransform: [],
+            uidGenerator: genId,
+            poolSize: 10
+        }, config);
         this.driver = neo4j.driver(`bolt://${withDefaults.host}`, neo4j.auth.basic(withDefaults.username, withDefaults.password));
 
         this.uuidGenerator = withDefaults.uidGenerator as any;
-
-        this.queryRunner = new QueryRunner(this.driver);
+        this.queryRunner = new QueryRunner(this.driver, withDefaults.sessionsPoolSize);
     }
 
     setUidGenerator(fn:() => string) {

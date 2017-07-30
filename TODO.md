@@ -2,11 +2,12 @@
 * Add integration specs
 * Add missing unit tests
 * Add missing methods for repositories
-* Choose one utility library instead of using both ramda and lodash 
+* ~~Choose one utility library instead of using both ramda and lodash~~ 
 * Investigate if ```Persisted``` is really needed. Probably this functionality should be implemented by base classes defined by user.
 * Validate user input in query building and throw Errors before query hits database
     * validate if all strings passed to ```returns()``` method were registered using ```.as()```
-* Optimize management of driver's sessions
+* ~~Optimize management of driver's sessions~~
 * Add performance specs for transactions
-
 * use typescript definitions provided by neo4j-driver
+* implement nodes/relationships id generation as plugin and make it optional 
+* investigate different api/dsl for repositories
