@@ -26,7 +26,7 @@ export function timestamp():PropertyDecorator {
         toRowMapper: (val) => int(val),
         fromRowMapper: (val) => val.toNumber(),
         beforeSaveTransform: (val, context:'create' | 'update') => {
-            if (context ==='create'){
+            if (context === 'create') {
                 return new Date().getTime();
             } else {
                 return val;
