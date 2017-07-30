@@ -11,6 +11,7 @@ import {IExtension} from "./extensions/IExtension";
 
 import neo4j from "neo4j-driver";
 import {QueryRunner} from "./connection/QueryRunner";
+import {TransactionRunner} from "./connection/TransactionRunner";
 
 export * from './connection/Connection';
 
@@ -50,7 +51,11 @@ export class Neography {
     }
 
     checkoutConnection():Connection {
-        return new Connection(this.queryRunner, this.driver, this.responseFactory);
+        return new Connection(
+            this.queryRunner,
+            new TransactionRunner(this.driver),
+            this.responseFactory
+        );
     }
 
     query():QueryBuilder {

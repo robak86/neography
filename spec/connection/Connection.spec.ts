@@ -8,12 +8,7 @@ import {Partial} from "../../lib/utils/types";
 import {Persisted} from "../../lib/model/GraphEntity";
 import {genId} from "../../lib/utils/uuid";
 import {int, isInt} from "../../lib/driver/Integer";
-import {
-    cleanDatabase,
-    getSharedConnection,
-    getDefaultNeography,
-    checkoutConnection
-} from "../helpers/ConnectionHelpers";
+import {checkoutConnection, cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {Connection} from "../../lib/connection/Connection";
 import {buildQuery} from "../../lib/cypher/index";
@@ -131,7 +126,7 @@ describe.only("Connection", () => {
                 expect(queryResponse.length).to.eq(2);
             });
 
-            it.only("makes transaction changes immediately available for connection instance", async () => {
+            it("makes transaction changes immediately available for connection instance", async () => {
                 let connection2 = checkoutConnection();
 
                 let responseWithinTransaction, responseOutsideTransaction;

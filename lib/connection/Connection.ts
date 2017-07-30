@@ -12,16 +12,12 @@ import {RelationRepository} from "../repositories/RelationRepository";
 import {GraphResponseFactory} from "../response/GraphResponseFactory";
 import {NodeRelationsRepository} from "../repositories/NodeRelationsRepository";
 import {Persisted} from "../model/GraphEntity";
-import {Driver} from "neo4j-driver/types/v1/driver";
 import {QueryRunner} from "./QueryRunner";
 
-
 export class Connection {
-    private inTransactionRunner:TransactionRunner | null;
-    private ongoingTransactions:number = 0;
 
     constructor(private queryRunner:QueryRunner,
-                private driver:Driver,
+                private transactionRunner:TransactionRunner,
                 private responseFactory:GraphResponseFactory) {
     }
 
@@ -36,29 +32,7 @@ export class Connection {
     }
 
     withTransaction<T>(fn:() => Promise<T>):Promise<T> { //TODO: rename to runWithinCurrentTransaction??
-        if (!this.inTransactionRunner) {
-            this.inTransactionRunner = new TransactionRunner(this.driver)
-        }
-
-        this.ongoingTransactions += 1;
-        return fn()
-            .then((result) => {
-                this.ongoingTransactions -= 1;
-                if (this.ongoingTransactions === 0) {
-                    console.log('commit transaction');
-                    let transactionResult = (this.inTransactionRunner as TransactionRunner).commit().then(() => result);
-                    this.inTransactionRunner = null;
-                    return transactionResult
-                } else {
-                    return result;
-                }
-            })
-            .catch(err => {
-                this.inTransactionRunner && this.inTransactionRunner.rollback();
-                this.ongoingTransactions = 0;
-                this.inTransactionRunner = null;
-                return Promise.reject(err);
-            });
+        return this.transactionRunner.withTransaction(fn)
     }
 
     getNodeRepository<T extends AbstractNode>(nodeClass:Type<T>):NodeRepository<T> {
@@ -74,8 +48,8 @@ export class Connection {
     }
 
     private execQuery(cypherQuery:string, params?:any):GraphResponse {
-        let resultStatementQuery = this.inTransactionRunner ?
-            this.inTransactionRunner.run(cypherQuery, params) :
+        let resultStatementQuery = this.transactionRunner.isTransactionOpened() ?
+            this.transactionRunner.run(cypherQuery, params) :
             this.queryRunner.run(cypherQuery, params);
 
         return this.responseFactory.build(resultStatementQuery);
