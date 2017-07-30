@@ -2,6 +2,7 @@ node_modules
 .idea
 dist
 *.iml
+.nyc_output
 examples/dist
 examples/node_modules
 examples/**/*.js
