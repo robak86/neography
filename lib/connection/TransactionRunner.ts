@@ -1,29 +1,31 @@
-import {GraphResponse} from "./GraphResponse";
 import {pfinally} from "../utils/promise";
-import {GraphResponseFactory} from "./GraphResponseFactory";
+import {StatementResult} from "neo4j-driver/types/v1/result";
+import {Driver} from "neo4j-driver/types/v1/driver";
+import Session from "neo4j-driver/types/v1/session";
 
 
-export class Transaction {
+export class TransactionRunner {
     private transaction;
     private hasError:boolean = false; //merge this two variables
     private lastError:any;
+    private session:Session;
 
-    constructor(private session,
-                private responseFactory:GraphResponseFactory) {
-        this.transaction = session.beginTransaction();
+    constructor(private driver:Driver) {
+        this.session = driver.session();
+        this.transaction = this.session.beginTransaction();
     }
 
-    runQuery(query:string, params?:any):GraphResponse {
+    async run(statement:string, parameters?:any):Promise<StatementResult> {
         if (this.hasError) {
-            return this.responseFactory.build(Promise.reject(this.lastError));
+            return Promise.reject(this.lastError);
         } else {
             let queryPromise = this.transaction
-                .run(query, params)
+                .run(statement, parameters)
                 .catch(err => {
                     this.rollback(err);
                     return Promise.reject(err);
                 });
-            return this.responseFactory.build(queryPromise);
+            return queryPromise;
         }
     }
 

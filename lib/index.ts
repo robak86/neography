@@ -1,17 +1,16 @@
 import {QueryBuilder} from "./cypher/builders/QueryBuilder";
 import {Connection} from "./connection/Connection";
-import {NodeMapperFactory} from "./mappers/NodeMapperFactory";
 import {nodeTypesRegistry} from "./annotations/NodeAnnotations";
 import {AttributesMapperFactory} from "./mappers/AttributesMapperFactory";
-import {RelationMapperFactory} from "./mappers/RelationMapperFactory";
 import {relationsTypesRegistry} from "./annotations/RelationAnnotations";
-import {GraphResponseFactory} from "./connection/GraphResponseFactory";
+import {GraphResponseFactory} from "./response/GraphResponseFactory";
 import {genId} from "./utils/uuid";
 import * as _ from 'lodash';
 import {isPresent} from "./utils/core";
 import {IExtension} from "./extensions/IExtension";
 
 import neo4j from "neo4j-driver";
+import {QueryRunner} from "./connection/QueryRunner";
 
 export * from './connection/Connection';
 
@@ -31,12 +30,15 @@ export class Neography {
     private driver;
     private uuidGenerator:() => string;
     private extensions:IExtension[] = [];
+    private queryRunner:QueryRunner;
 
     constructor(private config:NeographyConfig) {
         let withDefaults:NeographyConfig = _.merge({objectTransform: [], uidGenerator: genId}, config);
         this.driver = neo4j.driver(`bolt://${withDefaults.host}`, neo4j.auth.basic(withDefaults.username, withDefaults.password));
 
         this.uuidGenerator = withDefaults.uidGenerator as any;
+
+        this.queryRunner = new QueryRunner(this.driver);
     }
 
     setUidGenerator(fn:() => string) {
@@ -48,7 +50,7 @@ export class Neography {
     }
 
     checkoutConnection():Connection {
-        return new Connection(this.driver, this.responseFactory);
+        return new Connection(this.queryRunner, this.driver, this.responseFactory);
     }
 
     query():QueryBuilder {

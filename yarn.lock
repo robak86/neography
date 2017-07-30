@@ -22,6 +22,10 @@
   version "7.0.13"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.13.tgz#1b0a53fe9ef9c3a5d061b126cc9b915bca43a3f5"
 
+"@types/p-queue@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@types/p-queue/-/p-queue-1.1.0.tgz#7c8ddac385ca9e1ae8bb3f7a8814fccaae61b60e"
+
 align-text@^0.1.1, align-text@^0.1.3:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/align-text/-/align-text-0.1.4.tgz#0cd90a561093f35d0a99256c22b7069433fad117"
@@ -908,6 +912,10 @@ os-locale@^1.4.0:
   resolved "https://registry.yarnpkg.com/os-locale/-/os-locale-1.4.0.tgz#20f9f17ae29ed345e8bde583b13d2009803c14d9"
   dependencies:
     lcid "^1.0.0"
+
+p-queue@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/p-queue/-/p-queue-1.1.0.tgz#c4246f170782f48d49557ee6634658f6b1dacc5f"
 
 parse-glob@^3.0.4:
   version "3.0.4"

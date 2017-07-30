@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import {NodeRepository} from "../../lib/repositories/NodeRepository";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {Connection} from "../../lib/connection/Connection";
-import {cleanDatabase, getConnection} from "../helpers/ConnectionHelpers";
+import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import {buildQuery} from "../../lib/cypher/index";
 import {Persisted} from "../../lib/model/GraphEntity";
@@ -18,7 +18,7 @@ describe("RelationRepository", () => {
 
     beforeEach(async () => {
         await cleanDatabase();
-        connection = getConnection();
+        connection = getSharedConnection();
         nodeRepository = connection.getNodeRepository(DummyGraphNode);
         relationRepository = connection.getRelationRepository(DummyGraphNode, DummyGraphRelation, DummyGraphNode);
         dummyNode = DummyGraphNode.build({attr1: "John"});

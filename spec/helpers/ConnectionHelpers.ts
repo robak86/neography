@@ -11,9 +11,13 @@ export const getDefaultNeography = ():Neography => {
     return neography;
 };
 
-export const getConnection = _.memoize(():Connection => {
+export const getSharedConnection = _.memoize(():Connection => {
     return getDefaultNeography().checkoutConnection();
 });
+
+export const checkoutConnection = ():Connection => {
+    return getDefaultNeography().checkoutConnection();
+};
 
 export const getDefaultContext = () => {
     let neography = getDefaultNeography();
@@ -21,14 +25,14 @@ export const getDefaultContext = () => {
 };
 
 export const cleanDatabase = ():Promise<any> => {
-    return getConnection().runQuery(q => q.literal(`MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r`)).toArray();
+    return getSharedConnection().runQuery(q => q.literal(`MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r`)).toArray();
 };
 
 export const createConnectionFactory = ():() => Connection => {
     let connection;
     beforeEach(async () => {
         await cleanDatabase();
-        connection = getConnection();
+        connection = getSharedConnection();
     });
 
     return () => someOrThrow(connection, 'Connection is not yet created.')
