@@ -1,14 +1,10 @@
-import * as _ from 'lodash';
-
 import {NodeMetadata} from "../metadata/NodeMetadata";
 
 
-
-
-export type NodesTypesRegistryEntry = {klass:Function, metadata:NodeMetadata};
+export type NodesTypesRegistryEntry = { klass:Function, metadata:NodeMetadata };
 
 export class NodesTypesRegistry {
-    private mapping:{[labels:string]:NodesTypesRegistryEntry} = {};
+    private mapping:{ [labels:string]:NodesTypesRegistryEntry } = {};
 
     registerNode(klass, metadata:NodeMetadata) {
         if (this.mapping[metadata.getId()]) {
@@ -18,7 +14,7 @@ export class NodesTypesRegistry {
         this.mapping[metadata.getId()] = {klass, metadata};
     };
 
-    getEntries():{[labels:string]:NodesTypesRegistryEntry}{
+    getEntries():{ [labels:string]:NodesTypesRegistryEntry } {
         return this.mapping;
     }
 }

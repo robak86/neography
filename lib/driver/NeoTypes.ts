@@ -1,4 +1,13 @@
-let neoV1 = require('neo4j-driver').v1;
+import neo4j from "neo4j-driver";
+import {Node, Relationship} from "neo4j-driver/types/v1/graph-types";
 
-export const Neo4jNode = neoV1.types.Node;
-export const Neo4jRelationship = neoV1.types.Relationship;
+const Neo4jNode = neo4j.types.Node;
+const Neo4jRelationship = neo4j.types.Relationship;
+
+export function isNode(node: any): node is Node {
+    return node instanceof Neo4jNode;
+}
+
+export function isRelationship(rel: any): rel is Relationship {
+    return rel instanceof Neo4jRelationship;
+}

@@ -8,3 +8,5 @@
     * validate if all strings passed to ```returns()``` method were registered using ```.as()```
 * Optimize management of driver's sessions
 * Add performance specs for transactions
+
+* use typescript definitions provided by neo4j-driver

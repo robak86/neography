@@ -1,4 +1,4 @@
-import * as _ from 'ramda'
+import * as _ from 'lodash'
 
 export const pfinally = _.curry(<T>(finallyCallback:() => void, prom:Promise<T>):Promise<T> => {
     return prom

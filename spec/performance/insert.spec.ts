@@ -3,7 +3,7 @@ import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {expect} from 'chai';
 import * as _ from 'lodash';
 
-describe("Inserting nodes", () => {
+describe.skip("Inserting nodes", () => {
     beforeEach(async () => await cleanDatabase());
 
     const sharedConnection = getConnection();

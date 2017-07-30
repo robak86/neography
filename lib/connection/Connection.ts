@@ -13,6 +13,7 @@ import {RelationRepository} from "../repositories/RelationRepository";
 import {GraphResponseFactory} from "./GraphResponseFactory";
 import {NodeRelationsRepository} from "../repositories/NodeRelationsRepository";
 import {Persisted} from "../model/GraphEntity";
+import {Driver} from "neo4j-driver/types/v1/driver";
 
 
 export class Connection {
@@ -21,7 +22,7 @@ export class Connection {
     private ongoingQueries:number = 0;
     private _currentSession;
 
-    constructor(private driver,
+    constructor(private driver:Driver,
                 private responseFactory:GraphResponseFactory) {
     }
 

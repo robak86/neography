@@ -1,6 +1,8 @@
 import {IExtension} from "./IExtension";
 import {TransformersRegistry} from "../mappers/AttributesMapper";
-import {int, Integer} from "../driver/Integer";
+import neo4j from "neo4j-driver";
+import Integer from "neo4j-driver/types/v1/integer";
+
 
 export class TimestampsExtension implements IExtension {
     static getDefault():TimestampsExtension {
@@ -10,7 +12,7 @@ export class TimestampsExtension implements IExtension {
     transforms:TransformersRegistry = {
         create: [
             (row) => {
-                let now:Integer = int(new Date().getTime());
+                let now:Integer = neo4j.int(new Date().getTime());
                 row.createdAt = now;
                 row.updatedAt = now;
                 return row;
@@ -18,7 +20,7 @@ export class TimestampsExtension implements IExtension {
         ],
         update: [
             (row) => {
-                let now:Integer = int(new Date().getTime());
+                let now:Integer = neo4j.int(new Date().getTime());
                 row.updatedAt = now;
                 return row;
             }
