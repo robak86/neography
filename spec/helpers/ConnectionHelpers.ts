@@ -2,11 +2,10 @@ import {Connection} from "../../lib/connection/Connection";
 import * as _ from 'lodash';
 import {someOrThrow} from "../../lib/utils/core";
 import {Neography} from "../../lib/index";
-import {genId} from "../../lib/utils/uuid";
 import {QueryContext} from "../../lib/cypher/common/QueryContext";
 import {TimestampsExtension} from "../../lib/extensions/TimestampsExtension";
 
-export const getDefaultNeography= ():Neography => {
+export const getDefaultNeography = ():Neography => {
     let neography = new Neography({host: 'localhost', username: 'neo4j', password: 'password'});
     neography.registerExtension(TimestampsExtension.getDefault());
     return neography;

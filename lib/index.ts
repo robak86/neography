@@ -8,14 +8,15 @@ import {relationsTypesRegistry} from "./annotations/RelationAnnotations";
 import {GraphResponseFactory} from "./connection/GraphResponseFactory";
 import {genId} from "./utils/uuid";
 import * as _ from 'lodash';
-import {isPresent, someOrThrow} from "./utils/core";
+import {isPresent} from "./utils/core";
 import {IExtension} from "./extensions/IExtension";
+
+import neo4j from "neo4j-driver";
 
 export * from './connection/Connection';
 
 
 export const buildQuery = () => new QueryBuilder();
-const neo4j = require('neo4j-driver').v1;
 
 
 export class NeographyConfig {
