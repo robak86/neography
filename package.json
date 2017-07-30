@@ -46,8 +46,10 @@
     "typescript": "^2.4.2"
   },
   "dependencies": {
+    "@types/p-queue": "^1.1.0",
     "lodash": "^4.17.4",
     "neo4j-driver": "^1.4.0",
+    "p-queue": "^1.1.0",
     "reflect-metadata": "^0.1.10",
     "shortid": "^2.2.8"
   }

@@ -1,14 +1,11 @@
 import {expect} from 'chai';
-
 import * as faker from 'faker';
 import * as _ from 'lodash';
-
 import {Partial} from "../../lib/utils/types";
-
 import {Persisted} from "../../lib/model/GraphEntity";
 import {genId} from "../../lib/utils/uuid";
 import {int, isInt} from "../../lib/driver/Integer";
-import {cleanDatabase, getConnection} from "../helpers/ConnectionHelpers";
+import {checkoutConnection, cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {Connection} from "../../lib/connection/Connection";
 import {buildQuery} from "../../lib/cypher/index";
@@ -17,7 +14,7 @@ describe("Connection", () => {
     let connection:Connection;
 
     beforeEach(async () => {
-        connection = getConnection();
+        connection = getSharedConnection();
         await cleanDatabase();
     });
 
@@ -125,6 +122,20 @@ describe("Connection", () => {
                 let queryResponse = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`)).toArray();
                 expect(queryResponse.length).to.eq(2);
             });
+
+            it("makes transaction changes immediately available for connection instance", async () => {
+                let connection2 = checkoutConnection();
+
+                let responseWithinTransaction, responseOutsideTransaction;
+                await connection.withTransaction(async () => {
+                    await Promise.all([createFakePerson(connection), createFakePerson(connection)]);
+                    responseWithinTransaction = await connection.runQuery(q => q.literal(`MATCH (n:Person) return n`)).toArray();
+                    responseOutsideTransaction = await connection2.runQuery(q => q.literal(`MATCH (n:Person) return n`)).toArray();
+                });
+
+                expect(responseOutsideTransaction.length).to.eq(0);
+                expect(responseWithinTransaction.length).to.eq(2);
+            }).timeout(3000);
         });
 
         describe("with nesting", () => {

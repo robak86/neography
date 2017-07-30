@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import * as _ from 'lodash';
 import {NodeRepository} from "../../lib/repositories/NodeRepository";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
-import {cleanDatabase, getConnection} from "../helpers/ConnectionHelpers";
+import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {Persisted} from "../../lib/model/GraphEntity";
 import {Connection} from "../../lib/connection/Connection";
 import {buildQuery} from "../../lib/cypher/index";
@@ -20,7 +20,7 @@ describe("NodeRepository", () => {
 
     beforeEach(async () => {
         await cleanDatabase();
-        connection = getConnection();
+        connection = getSharedConnection();
         nodeRepository = connection.getNodeRepository(DummyGraphNode);
         relationRepository = connection.getRelationRepository(DummyGraphNode, DummyGraphRelation, DummyGraphNode);
         dummyNode = DummyGraphNode.build({attr1: "John"});

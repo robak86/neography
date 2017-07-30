@@ -4,7 +4,7 @@ import {Persisted} from "../../lib/model/GraphEntity";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {buildQuery} from "../../lib/index";
 import {Connection} from "../../lib/connection/Connection";
-import {cleanDatabase, getConnection} from "../helpers/ConnectionHelpers";
+import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import * as _ from 'lodash';
 
@@ -18,7 +18,7 @@ describe("NodeRelationsRepository", () => {
     beforeEach(async () => {
         await cleanDatabase();
 
-        connection = getConnection();
+        connection = getSharedConnection();
         let newNode1 = DummyGraphNode.build({attr1: 'a'});
         node1 = await connection.runQuery(q => q.create(c => c.node(newNode1).as('n')).returns('n')).pickOne('n').first();
 

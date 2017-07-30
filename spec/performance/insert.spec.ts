@@ -1,12 +1,12 @@
-import {cleanDatabase, getConnection} from "../helpers/ConnectionHelpers";
+import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {expect} from 'chai';
 import * as _ from 'lodash';
 
-describe.skip("Inserting nodes", () => {
+describe("Inserting nodes", () => {
     beforeEach(async () => await cleanDatabase());
 
-    const sharedConnection = getConnection();
+    const sharedConnection = getSharedConnection();
     const insertNode = (connection = sharedConnection) => {
         let node = DummyGraphNode.build({attr1: 'someAttr'});
         return connection.getNodeRepository(DummyGraphNode).save(node);
@@ -39,7 +39,7 @@ describe.skip("Inserting nodes", () => {
 
     it("1000 inserts using separate connection instances @slow", async () => {
         console.time('multiple connections inserts');
-        await Promise.all(_.times(1000).map(() => insertNode(getConnection())));
+        await Promise.all(_.times(1000).map(() => insertNode(getSharedConnection())));
         console.timeEnd('multiple connections inserts');
 
         expect(await countNodes()).to.eq(1000);
