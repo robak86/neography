@@ -23,7 +23,7 @@ export class NodeRelationsRepository {
             ])
             .returns('count(rel) as relCount');
 
-        return this.connection.runQuery(query).pickOne('relCount').map(integer => integer.toNumber() > 0).first();
+        return this.connection.runQuery(query).pluck('relCount').map(integer => integer.toNumber() > 0).first();
     }
 
     where<R extends AbstractRelation>(relClass:Type<R>, params:Partial<R>):Promise<R[]> {
@@ -35,7 +35,7 @@ export class NodeRelationsRepository {
             ])
             .returns('relation');
 
-        return this.connection.runQuery(query).pickOne('relation').toArray();
+        return this.connection.runQuery(query).pluck('relation').toArray();
     }
 
     first<R extends AbstractRelation>(relClass:Type<R>, params:Partial<R>):Promise<R> {
@@ -48,7 +48,7 @@ export class NodeRelationsRepository {
             .returns('relation')
             .literal('LIMIT 1');
 
-        return this.connection.runQuery(query).pickOne('relation').first();
+        return this.connection.runQuery(query).pluck('relation').first();
     }
 
     create<R extends AbstractRelation, TO extends AbstractNode>(relation:R, to:TO):Promise<R> {
@@ -66,7 +66,7 @@ export class NodeRelationsRepository {
             ])
             .returns('rel');
 
-        return this.connection.runQuery(query).pickOne('rel').first();
+        return this.connection.runQuery(query).pluck('rel').first();
     }
 
     update<R extends AbstractRelation>(rel:R):Promise<R> {
@@ -81,7 +81,7 @@ export class NodeRelationsRepository {
             .set(s => s.update('rel').typed(getClassFromInstance(rel), rel as any))
             .returns('rel');
 
-        return this.connection.runQuery(query).pickOne('rel').first();
+        return this.connection.runQuery(query).pluck('rel').first();
     }
 
     remove<R extends AbstractRelation>(klass:Type<R>, params:Partial<R>):Promise<void> {

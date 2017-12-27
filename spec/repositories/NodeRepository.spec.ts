@@ -51,7 +51,7 @@ describe("NodeRepository", () => {
 
         it("creates new buildNode", async () => {
             let query = buildQuery().literal(`MATCH(n {id: {id}}) return n`, {id: createdGenericNode.id});
-            let nodes = await connection.runQuery(query).pickOne('n').toArray();
+            let nodes = await connection.runQuery(query).pluck('n').toArray();
 
             expect(nodes[0].id).to.eql(createdGenericNode.id);
             expect(nodes[0].createdAt).to.eql(createdGenericNode.createdAt);

@@ -18,10 +18,10 @@ describe("NodeRelationsRepository", () => {
 
         connection = getSharedConnection();
         let newNode1 = new DummyGraphNode({attr1: 'a'});
-        node1 = await connection.runQuery(q => q.create(c => c.node(newNode1).as('n')).returns('n')).pickOne('n').first();
+        node1 = await connection.runQuery(q => q.create(c => c.node(newNode1).as('n')).returns('n')).pluck('n').first();
 
         let newNode2 = new DummyGraphNode({attr1: 'b'});
-        node2 = await connection.runQuery(q => q.create(c => c.node(newNode2).as('n')).returns('n')).pickOne('n').first();
+        node2 = await connection.runQuery(q => q.create(c => c.node(newNode2).as('n')).returns('n')).pluck('n').first();
         node1RelationsRepo = new NodeRelationsRepository(node1, connection);
     });
 

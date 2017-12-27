@@ -66,7 +66,7 @@ describe("Connection", () => {
                     CREATE (u1:User {u1Params})-[r1:KNOWS {r1Params}]->(u2:User {u2Params})
                     RETURN u1,r1,u2;`, {u1Params, u2Params, r1Params});
 
-            let knowsRel = await connection.runQuery(query).pickOne('r1').first();
+            let knowsRel = await connection.runQuery(query).pluck('r1').first();
 
             expect(knowsRel.type).to.eql('KNOWS');
             expect(isInt(knowsRel.properties.since)).to.eq(true);

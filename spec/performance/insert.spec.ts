@@ -17,7 +17,7 @@ describe("Inserting nodes", () => {
             .match(m => m.node().as('n'))
             .returns('count(n) as nodesCount')
     )
-        .pickOne('nodesCount')
+        .pluck('nodesCount')
         .map(integer => integer.toNumber())
         .first();
 
