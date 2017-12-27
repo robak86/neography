@@ -1,8 +1,6 @@
 import {expect} from 'chai';
-import * as sinon from 'sinon';
-import {relation} from "../../../lib/annotations/RelationAnnotations";
-import {AbstractRelation} from "../../../lib/model/AbstractRelation";
-import {attribute} from "../../../lib/annotations/AttributesAnnotations";
+import {attribute, relation} from "../../../lib/annotations";
+import {AbstractRelation} from "../../../lib/model";
 import {MatchRelationQueryPart} from "../../../lib/cypher/match/MatchRelationQueryPart";
 import {QueryContext} from "../../../lib/cypher/common/QueryContext";
 import {getDefaultContext} from "../../helpers/ConnectionHelpers";
@@ -12,7 +10,7 @@ describe("MatchRelationQueryPart", () => {
     const relationType:string = '_RelationTypeForSpec';
 
     @relation(relationType)
-    class SomeDummyRelation extends AbstractRelation {
+    class SomeDummyRelation extends AbstractRelation<SomeDummyRelation> {
         @attribute() attr1:string;
         @attribute() attr2:number;
     }

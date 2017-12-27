@@ -8,7 +8,7 @@ describe("Inserting nodes", () => {
 
     const sharedConnection = getSharedConnection();
     const insertNode = (connection = sharedConnection) => {
-        let node = DummyGraphNode.build({attr1: 'someAttr'});
+        let node = new DummyGraphNode({attr1: 'someAttr'});
         return connection.getNodeRepository(DummyGraphNode).save(node);
     };
 

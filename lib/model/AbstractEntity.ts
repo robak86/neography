@@ -2,7 +2,7 @@ import {isPresent} from "../utils/core";
 import {attribute} from "../annotations";
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
 
-export abstract class AbstractEntity<T = void> {
+export abstract class AbstractEntity<T> {
     @attribute() id?:string;
 
     constructor(params:Partial<T> = {}) {

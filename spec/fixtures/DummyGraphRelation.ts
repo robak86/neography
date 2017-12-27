@@ -1,13 +1,9 @@
-import {relation} from "../../lib/annotations/RelationAnnotations";
-import {AbstractRelation} from "../../lib/model/AbstractRelation";
-import {createFactoryMethod} from "../../lib/model/createFactoryMethod";
-import {attribute, timestamp} from "../../lib/annotations/AttributesAnnotations";
+import {attribute, relation, timestamp} from "../../lib/annotations";
+import {AbstractRelation} from "../../lib/model";
 
 
 @relation('CONNECTED_BY_DUMMY')
-export class DummyGraphRelation extends AbstractRelation {
-    static build = createFactoryMethod(DummyGraphRelation);
-
+export class DummyGraphRelation extends AbstractRelation<DummyGraphRelation> {
     @timestamp() createdAt?:number;
     @timestamp() updatedAt?:number;
 

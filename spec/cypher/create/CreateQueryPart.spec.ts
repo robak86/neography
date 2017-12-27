@@ -21,10 +21,10 @@ describe("CreateQueryPart", () => {
 
     beforeEach(() => {
         ctx = getDefaultContext();
-        createNodeQuery1 = new CreateNodeQueryPart(DummyGraphNode.build({attr1: 'val1', attr2: 1}));
-        createNodeQuery2 = new CreateNodeQueryPart(DummyGraphNode.build({attr1: 'val2', attr2: 2}));
-        createNodeQuery3 = new CreateNodeQueryPart(DummyGraphNode.build({attr1: 'val3', attr2: 3}));
-        createRelationQuery1 = new CreateRelationQueryPart(DummyGraphRelation.build({attr1: 'rVal1', attr2: 21}))
+        createNodeQuery1 = new CreateNodeQueryPart(new DummyGraphNode({attr1: 'val1', attr2: 1}));
+        createNodeQuery2 = new CreateNodeQueryPart(new DummyGraphNode({attr1: 'val2', attr2: 2}));
+        createNodeQuery3 = new CreateNodeQueryPart(new DummyGraphNode({attr1: 'val3', attr2: 3}));
+        createRelationQuery1 = new CreateRelationQueryPart(new DummyGraphRelation({attr1: 'rVal1', attr2: 21}))
     });
 
     describe("create query for single node", () => {

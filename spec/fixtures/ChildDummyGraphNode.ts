@@ -1,13 +1,7 @@
-import {node} from "../../lib/annotations/NodeAnnotations";
+import {attribute, node} from "../../lib/annotations";
 import {DummyGraphNode} from "./DummyGraphNode";
-import {createFactoryMethod} from "../../lib/model/createFactoryMethod";
-import {attribute} from "../../lib/annotations/AttributesAnnotations";
-
 
 @node('ChildDummyGraphNode')
-export class ChildDummyGraphNode extends DummyGraphNode {
-    static build = createFactoryMethod(ChildDummyGraphNode);
-
-
+export class ChildDummyGraphNode extends DummyGraphNode<ChildDummyGraphNode> {
     @attribute() attr3:string;
 }
