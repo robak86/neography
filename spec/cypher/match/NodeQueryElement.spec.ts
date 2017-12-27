@@ -1,16 +1,12 @@
 import {expect} from 'chai';
-import * as sinon from 'sinon';
-import {node} from "../../../lib/annotations/NodeAnnotations";
-import {AbstractNode} from "../../../lib/model/AbstractNode";
-import {attribute} from "../../../lib/annotations/AttributesAnnotations";
+import {attribute, node} from "../../../lib/annotations";
+import {AbstractNode} from "../../../lib/model";
 import {MatchNodeQueryPart} from "../../../lib/cypher/match/MatchNodeQueryPart";
 import {QueryContext} from "../../../lib/cypher/common/QueryContext";
 import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 
 
 describe("MatchNodeQueryPart", () => {
-    const nodeLabels:string[] = ['SpecNode1', 'SpecNode2'];
-
     @node('SpecNode1')
     class SomeDummyNodeParent extends AbstractNode {
     }
