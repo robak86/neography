@@ -33,7 +33,7 @@ describe("Queries", () => {
         it("creates new node in database", async () => {
             const getNodesCount = () => connection
                 .runQuery(q => q.literal('MATCH(n) RETURN count(n) as nodesCount'))
-                .pickOne('nodesCount')
+                .pluck('nodesCount')
                 .map(integer => integer.toNumber())
                 .first();
 
@@ -47,8 +47,8 @@ describe("Queries", () => {
                 matchedNode:DummyGraphNode; //model instance fetched from database using match
 
             beforeEach(async () => {
-                savedNode = await connection.runQuery(q).pickOne('n').first();
-                matchedNode = await connection.runQuery(q => q.literal('MATCH(n {id: {params}.id}) RETURN n', {params: {id: savedNode.id}})).pickOne('n').first();
+                savedNode = await connection.runQuery(q).pluck('n').first();
+                matchedNode = await connection.runQuery(q => q.literal('MATCH(n {id: {params}.id}) RETURN n', {params: {id: savedNode.id}})).pluck('n').first();
             });
 
             it("maps data to proper class", () => {
@@ -89,7 +89,7 @@ describe("Queries", () => {
                 .create(c => c.node(node).as('n'))
                 .returns('n');
 
-            let savedNode = await connection.runQuery(q).pickOne('n').first();
+            let savedNode = await connection.runQuery(q).pluck('n').first();
             expect(savedNode).to.be.instanceOf(ChildDummyGraphNode);
             expect(savedNode.attr1).to.eq('attr1');
             expect(savedNode.attr2).to.eq(123);
@@ -136,7 +136,7 @@ describe("Queries", () => {
             it("saves new relation into database", async () => {
                 const getRelationsCount = () => connection
                     .runQuery(q => q.literal('MATCH(n1)-[rel]->(n2) RETURN count(rel) as relationsCount'))
-                    .pickOne('relationsCount')
+                    .pluck('relationsCount')
                     .map(integer => integer.toNumber())
                     .first();
 
@@ -150,14 +150,14 @@ describe("Queries", () => {
                     matchedRelation:DummyGraphRelation;
 
                 beforeEach(async () => {
-                    savedRelation = await connection.runQuery(createRelationQuery).pickOne('rel1').first();
+                    savedRelation = await connection.runQuery(createRelationQuery).pluck('rel1').first();
 
                     let matchRelationQuery = neography.query()
                         .literal(
                             'MATCH (n1 {id: {params}.node1Id})-[rel]->(n2 {id: {params}.node2Id}) RETURN rel',
                             {params: {node1Id: node1.id, node2Id: node2.id}});
 
-                    matchedRelation = await connection.runQuery(matchRelationQuery).pickOne('rel').first();
+                    matchedRelation = await connection.runQuery(matchRelationQuery).pluck('rel').first();
                 });
 
                 it("maps relation data to proper class", () => {
@@ -196,7 +196,7 @@ describe("Queries", () => {
             let storeNodeQuery = neography.query()
                 .create(c => c.node(node).as('n'))
                 .returns('n');
-            return connection.runQuery(storeNodeQuery).pickOne('n').first();
+            return connection.runQuery(storeNodeQuery).pluck('n').first();
         };
 
         type CreatedRelation = { from:DummyGraphNode, rel:DummyGraphRelation, to:DummyGraphNode };
@@ -227,13 +227,13 @@ describe("Queries", () => {
                 node1 = await saveNode(new DummyGraphNode({attr1: 'a', attr2: 0}));
                 node2 = await saveNode(new DummyGraphNode({attr1: 'b', attr2: 1}));
                 node3 = await saveNode(new DummyGraphNode({attr1: 'c', attr2: 2}));
-                node4 = await connection.runQuery(q => q.literal(`CREATE (n {someAttr: 1}) RETURN n`)).pickOne('n').toArray();
+                node4 = await connection.runQuery(q => q.literal(`CREATE (n {someAttr: 1}) RETURN n`)).pluck('n').toArray();
             });
 
             describe("by exact attribute value", () => {
                 it("matches nodes where given attributes are equal to provided params", async () => {
                     let matchQuery = neography.query().match(m => m.node(DummyGraphNode).params({attr1: 'a'}).as('n')).returns('n');
-                    let matchedNodes:DummyGraphNode[] = await connection.runQuery(matchQuery).pickOne('n').toArray();
+                    let matchedNodes:DummyGraphNode[] = await connection.runQuery(matchQuery).pluck('n').toArray();
                     expect(matchedNodes.length).to.eq(1);
                     expect(matchedNodes[0]).to.eql(node1);
                 });
@@ -246,7 +246,7 @@ describe("Queries", () => {
                         .where(w => w.literal('n.attr2 >= {val1}').params({val1: 1}))
                         .returns('n');
 
-                    let matchedNodes:DummyGraphNode[] = await connection.runQuery(matchQuery).pickOne('n').toArray();
+                    let matchedNodes:DummyGraphNode[] = await connection.runQuery(matchQuery).pluck('n').toArray();
                     expect(matchedNodes.length).to.eq(2);
                     expect(matchedNodes[0]).to.eql(node2);
                     expect(matchedNodes[1]).to.eql(node3);
@@ -259,7 +259,7 @@ describe("Queries", () => {
                         .match(m => m.node().params({someAttr: 1}).as('n'))
                         .returns('n');
 
-                    let matchedNodes:any[] = await connection.runQuery(matchQuery).pickOne('n').toArray();
+                    let matchedNodes:any[] = await connection.runQuery(matchQuery).pluck('n').toArray();
                     expect(matchedNodes.length).to.eq(1);
                     //matchedNodes[0] contains raw response from neo4j driver
                     expect(matchedNodes[0].properties).to.eql({someAttr: int(1)})

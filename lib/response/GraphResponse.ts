@@ -11,7 +11,7 @@ export class GraphResponse {
 
     private constructor(private rows:Promise<any[]>) {}
 
-    pickOne(prop:string):GraphResponse {
+    pluck(prop:string):GraphResponse {
         let rowsWithPickedProperties = this.rows.then(rows => rows.map(row => row[prop]));
         return new GraphResponse(rowsWithPickedProperties);
     }

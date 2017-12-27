@@ -169,7 +169,7 @@ RETURN user
 Response object provides convenient helper methods for queries like the previous one.
 
 ```typescript
-let response:UserNode = await connection.runQuery(insertQuery).pickOne('user').first();
+let response:UserNode = await connection.runQuery(insertQuery).pluck('user').first();
 ```
 
 ### Matching Nodes
@@ -179,7 +179,7 @@ let matchQuery = neography.query()
     .match(m => m.node(UserNode).params({firstName: 'Jane'}).as('user'))
     .returns('user');
 
-let users:UserNode[] = await connection.runQuery(matchQuery).pickOne('user').toArray();
+let users:UserNode[] = await connection.runQuery(matchQuery).pluck('user').toArray();
 ```
 
 ### Matching Nodes Using Where
@@ -190,7 +190,7 @@ let matchWhere = neography.query()
     .where(w => w.literal(`user.createdAt < {userCreateDate}`).params({userCreateDate: int(new Date('2016-12-31').getTime())}))
     .returns('user');
 
-let users:UserNode[] = await connection.runQuery(matchWhere).pickOne('user').toArray();
+let users:UserNode[] = await connection.runQuery(matchWhere).pluck('user').toArray();
 ```
 
 ### Matching Nodes Connected by Relation

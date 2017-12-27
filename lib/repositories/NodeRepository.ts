@@ -18,7 +18,7 @@ export class NodeRepository<T extends AbstractNode> {
             .returns('count(n) as nodesCount');
 
         return this.connection.runQuery(query)
-            .pickOne('nodesCount')
+            .pluck('nodesCount')
             .map(integer => integer.toNumber() > 0)
             .first();
     }
@@ -28,7 +28,7 @@ export class NodeRepository<T extends AbstractNode> {
             .create(c => c.node(node).as('n'))
             .returns('n');
 
-        return this.connection.runQuery(query).pickOne('n').first();
+        return this.connection.runQuery(query).pluck('n').first();
     };
 
     update(node:T):Promise<T> {
@@ -39,7 +39,7 @@ export class NodeRepository<T extends AbstractNode> {
             .set(s => s.update('n').typed(this.klass, node))
             .returns('n');
 
-        return this.connection.runQuery(query).pickOne('n').first();
+        return this.connection.runQuery(query).pluck('n').first();
     };
 
     remove(id:string | undefined, detach:boolean = true):Promise<any> {
@@ -59,7 +59,7 @@ export class NodeRepository<T extends AbstractNode> {
             .match(m => m.node(this.klass).params(nodeParams).as('n'))
             .returns('n');
 
-        return this.connection.runQuery(query).pickOne('n').toArray();
+        return this.connection.runQuery(query).pluck('n').toArray();
     }
 
     first(nodeParams:Partial<T>):Promise<T | null> {
@@ -68,6 +68,6 @@ export class NodeRepository<T extends AbstractNode> {
             .returns('n')
             .literal('LIMIT 1');
 
-        return this.connection.runQuery(query).pickOne('n').first();
+        return this.connection.runQuery(query).pluck('n').first();
     }
 }

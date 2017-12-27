@@ -22,7 +22,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
             ])
             .returns('count(rel) as relCount');
 
-        return this.connection.runQuery(query).pickOne('relCount').map(integer => integer.toNumber() > 0).first();
+        return this.connection.runQuery(query).pluck('relCount').map(integer => integer.toNumber() > 0).first();
     }
 
     update(rel:R):Promise<R> {
@@ -37,7 +37,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
             .set(s => s.update('rel').typed(this.relationClass, rel))
             .returns('rel');
 
-        return this.connection.runQuery(query).pickOne('rel').first();
+        return this.connection.runQuery(query).pluck('rel').first();
     }
 
     save(from:FROM, to:TO, relation:R):Promise<R> {
@@ -56,7 +56,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
             ])
             .returns('rel');
 
-        return this.connection.runQuery(query).pickOne('rel').first();
+        return this.connection.runQuery(query).pluck('rel').first();
     }
 
     remove(id:string | undefined):Promise<any> {
