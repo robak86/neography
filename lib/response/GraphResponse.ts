@@ -1,9 +1,10 @@
 import {AutoMapper} from "../mappers/AutoMapper";
 import * as _ from 'lodash';
 import {AttributesMapperFactory} from "../mappers/AttributesMapperFactory";
+import {StatementResult} from "neo4j-driver/types/v1";
 
 export class GraphResponse {
-    static initWithAutoMapper(response:Promise<any>,
+    static initWithAutoMapper(response:Promise<StatementResult>,
                               attributesMapperFactory:AttributesMapperFactory):GraphResponse {
         return new GraphResponse(response.then(result => new AutoMapper(attributesMapperFactory).toMappedArray(result.records)));
     }

@@ -5,9 +5,7 @@ import {isNode, isRelationship} from "../driver/NeoTypes";
 
 
 export class AutoMapper {
-    constructor(private attributesMapperFactory:AttributesMapperFactory) {
-
-    }
+    constructor(private attributesMapperFactory:AttributesMapperFactory) {}
 
     toMappedArray(records:Record[]):any[] {
         return records.map((record:Record) => {

@@ -1,8 +1,7 @@
 import {QueryBuilder} from "./cypher/builders/QueryBuilder";
 import {Connection} from "./connection/Connection";
-import {nodeTypesRegistry} from "./annotations/NodeAnnotations";
+import {nodeTypesRegistry, relationsTypesRegistry} from "./annotations";
 import {AttributesMapperFactory} from "./mappers/AttributesMapperFactory";
-import {relationsTypesRegistry} from "./annotations/RelationAnnotations";
 import {GraphResponseFactory} from "./response/GraphResponseFactory";
 import {genId} from "./utils/uuid";
 import * as _ from 'lodash';

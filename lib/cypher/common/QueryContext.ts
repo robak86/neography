@@ -1,6 +1,4 @@
 import {AttributesMapper} from "../../mappers/AttributesMapper";
-import {NodeMapperFactory} from "../../mappers/NodeMapperFactory";
-import {RelationMapperFactory} from "../../mappers/RelationMapperFactory";
 import {Type} from "../../utils/types";
 import {AbstractRelation} from "../../model/AbstractRelation";
 import {AbstractNode} from "../../model/AbstractNode";
