@@ -5,10 +5,13 @@ import {isPresent} from "../utils/core";
 import * as _ from 'lodash';
 
 
-export type MappingContext = 'create' | 'update';
+export type MappingContext = 'create' | 'update' | 'read';
 
+//TODO: add support for read
 export interface TransformersRegistry {
-    [context:string]:((obj) => any)[]
+    create?:((obj) => any)[]
+    update?:((obj) => any)[]
+    read?:((obj) => any)[]
 }
 
 export class AttributesMapper<T extends Peristable> {

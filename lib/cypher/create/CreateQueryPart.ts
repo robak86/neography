@@ -7,7 +7,7 @@ import {NodeRelationConcatenator} from "../utils/NodeRelationConcatenator";
 import {MatchedNodeQueryPart} from "../common/MatchedNodeQueryPart";
 
 
-export type PersistableElement =CreateNodeQueryPart<any>
+export type PersistableElement = CreateNodeQueryPart<any>
     | CreateRelationQueryPart<any>
     | MatchedNodeQueryPart;
 

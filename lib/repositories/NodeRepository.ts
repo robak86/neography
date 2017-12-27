@@ -30,7 +30,7 @@ export class NodeRepository<T extends AbstractNode> {
         return this.connection.runQuery(query).pickOne('n').first();
     };
 
-    update(node:T):Promise<Persisted<T>> {
+    update(node:Persisted<T>):Promise<Persisted<T>> {
         assertPersisted(node);
 
         let query = buildQuery()

@@ -26,7 +26,7 @@ export class NodeRelationsRepository {
         return this.connection.runQuery(query).pickOne('relCount').map(integer => integer.toNumber() > 0).first();
     }
 
-    where<R extends AbstractRelation>(relClass:Type<R>, params:Partial<R>):Promise<R[]>{
+    where<R extends AbstractRelation>(relClass:Type<R>, params:Partial<R>):Promise<R[]> {
         let query = buildQuery()
             .match(m => [
                 m.node(getClassFromInstance(this.fromNode)).params({id: this.fromNode.id} as any),
@@ -38,7 +38,7 @@ export class NodeRelationsRepository {
         return this.connection.runQuery(query).pickOne('relation').toArray();
     }
 
-    first<R extends AbstractRelation>(relClass:Type<R>, params:Partial<R>):Promise<R>{
+    first<R extends AbstractRelation>(relClass:Type<R>, params:Partial<R>):Promise<R> {
         let query = buildQuery()
             .match(m => [
                 m.node(getClassFromInstance(this.fromNode)).params({id: this.fromNode.id} as any),
