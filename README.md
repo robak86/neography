@@ -5,7 +5,7 @@
 Thin opinionated mapping layer and queries builder for official neo4j driver. (https://github.com/neo4j/neo4j-javascript-driver)
 
 ## Warning 
-This library is **highly experimental** and in many places the code is just a draft. Use it at your own risk.
+This library is at early stage of development. The API is most likely will change over time.
 **All suggestion, opinions and ideas are gladly welcome.**
 
 

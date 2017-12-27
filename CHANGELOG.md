@@ -4,4 +4,9 @@
 - Add ```NodeRelationsRepository``` accessible by ```getNodeRelationsRepository```
 
  ## 0.0.4 
- - limit Connection instance to using only one neo4j session at the time (Solves Error: read ECONNRESET error ) 
+ - limit Connection instance to using only one neo4j session at the time (Solves Error: read ECONNRESET error )
+ 
+ ## 0.0.9
+ - remove ```Persisted``` type. Repositories accept now entities with optional ```id``` property
+  and throw error if ```id``` is missing
+ - rename ```pickOne``` method of GraphResponse to more intuitive ```pluck```

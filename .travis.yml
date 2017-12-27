@@ -10,3 +10,6 @@ before_script:
   - npm run build:dist
   - docker-compose up -d
   - npm run neo4j:wait
+
+after_script:
+  - npm run build:coverage:publish
