@@ -44,15 +44,15 @@ import {node, relation} from 'neography/annotations';
 
 @node('User') //node label
 class UserNode extends AbstractNode {
-    build = createFactoryMethod(UserNode);
+    static build = createFactoryMethod(UserNode);
     
     @attribute() firstName:string;
     @attribute() lastName:string;
 }
 
 @node('Address')
-class AddressNode {
-    build = createFactoryMethod(AddressNode);
+class AddressNode extends AbstractNode {
+    static build = createFactoryMethod(AddressNode);
     
     @attribute() street:string;
     @attribute() city:string;
@@ -60,14 +60,14 @@ class AddressNode {
 
 @relation('KNOWS') //relation type
 class KnowsRelation extends AbstractRelation {
-    build = createFactoryMethod(KnowsRelation);
+    static build = createFactoryMethod(KnowsRelation);
     
     @attribute() since:Integer;
 }
 
 @relation('HAS_HOME_ADDRESS')
 class HasHomeAddressRelation extends AbstractRelation{
-    build = createFactoryMethod(HasHomeAddressRelation);
+    static build = createFactoryMethod(HasHomeAddressRelation);
 }
 
 ```
