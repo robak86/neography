@@ -1,7 +1,6 @@
 import {expect} from 'chai';
 import * as faker from 'faker';
 import * as _ from 'lodash';
-import {Partial} from "../../lib/utils/types";
 import {genId} from "../../lib/utils/uuid";
 import {int, isInt} from "../../lib/driver/Integer";
 import {checkoutConnection, cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";

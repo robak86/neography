@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import * as _ from 'lodash';
-
-import {AbstractNode} from "../model/AbstractNode";
+import {AbstractNode} from "../model";
 import {getSuperClass} from "../utils/core";
 import {Type} from "../utils/types";
 

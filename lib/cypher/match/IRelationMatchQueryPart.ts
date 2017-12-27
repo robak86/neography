@@ -1,5 +1,5 @@
 import {INodeMatchQueryPart} from "./INodeMatchQueryPart";
-import {AbstractRelation} from "../../model/AbstractRelation";
+import {AbstractRelation} from "../../model";
 
 export type RelationDirectionType = '->' | '<-' | '<->';
 

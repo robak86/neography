@@ -1,9 +1,7 @@
 import {CreateNodeQueryPart} from "../create/CreateNodeQueryPart";
-import {AbstractNode} from "../../model/AbstractNode";
+import {AbstractNode, AbstractRelation} from "../../model";
 import {CreateRelationQueryPart} from "../create/CreateRelationQueryPart";
-import {AbstractRelation} from "../../model/AbstractRelation";
 import {MatchedNodeQueryPart} from "../common/MatchedNodeQueryPart";
-
 
 
 export class CreateBuilder {

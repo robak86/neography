@@ -1,12 +1,8 @@
 import {TypedSetQueryPart} from "../update/TypedSetQueryPart";
-
-import {AbstractRelation} from "../../model/AbstractRelation";
-import {AbstractNode} from "../../model/AbstractNode";
-
+import {AbstractNode, AbstractRelation} from "../../model";
 import {UntypedSetQueryPart} from "../update/UntypedSetQueryPart";
 import {LiteralSetQueryPart} from "../update/LiteralSetQueryPart";
 import {Type} from "../../utils/types";
-
 
 
 export class SetQueryBuilder {

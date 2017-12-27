@@ -1,11 +1,9 @@
 import {AttributesMapper} from "../../mappers/AttributesMapper";
 import {Type} from "../../utils/types";
-import {AbstractRelation} from "../../model/AbstractRelation";
-import {AbstractNode} from "../../model/AbstractNode";
+import {AbstractNode, AbstractRelation} from "../../model";
 import {isPresent, someOrThrow} from "../../utils/core";
 import {AttributesMapperFactory} from "../../mappers/AttributesMapperFactory";
-import {nodeTypesRegistry} from "../../annotations/NodeAnnotations";
-import {relationsTypesRegistry} from "../../annotations/RelationAnnotations";
+import {nodeTypesRegistry, relationsTypesRegistry} from "../../annotations";
 
 
 export class QueryContext {

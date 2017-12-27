@@ -1,5 +1,5 @@
-import {Partial, Type} from "../../utils/types";
-import {AbstractRelation} from "../../model/AbstractRelation";
+import {Type} from "../../utils/types";
+import {AbstractRelation} from "../../model";
 import {RelationMetadata} from "../../metadata/RelationMetadata";
 import {IBoundQueryPart} from "../abstract/IBoundQueryPart";
 import {QueryContext} from "../common/QueryContext";

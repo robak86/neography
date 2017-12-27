@@ -1,7 +1,5 @@
-import {AbstractNode} from "../../model/AbstractNode";
-
+import {AbstractNode, AbstractRelation} from "../../model";
 import {MatchNodeQueryPart} from "../match/MatchNodeQueryPart";
-import {AbstractRelation} from "../../model/AbstractRelation";
 import {MatchRelationQueryPart} from "../match/MatchRelationQueryPart";
 import {MatchUntypedNodeQueryPart} from "../match/MatchUntypedNodeQueryPart";
 import {MatchUntypedRelationQueryPart} from "../match/MatchUntypedRelationQueryPart";

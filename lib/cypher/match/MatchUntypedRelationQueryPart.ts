@@ -3,7 +3,7 @@ import {QueryContext} from "../common/QueryContext";
 import {generateMatchAssignments} from "../utils/QueryHelpers";
 import {IRelationMatchQueryPart, RelationDirectionType} from "./IRelationMatchQueryPart";
 import {IQueryPart} from "../abstract/IQueryPart";
-import {AbstractRelation} from "../../model/AbstractRelation";
+import {AbstractRelation} from "../../model";
 import {cloned} from "../../utils/core";
 
 
