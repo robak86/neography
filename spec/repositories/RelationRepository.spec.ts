@@ -2,11 +2,10 @@ import {expect} from 'chai';
 import * as _ from 'lodash';
 import {NodeRepository} from "../../lib/repositories/NodeRepository";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
-import {Connection} from "../../lib/connection/Connection";
+import {Connection} from "../../lib";
 import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
-import {buildQuery} from "../../lib/cypher/index";
-import {Persisted} from "../../lib/model/GraphEntity";
+import {buildQuery} from "../../lib/cypher";
 import {RelationRepository} from "../../lib/repositories/RelationRepository";
 
 
@@ -60,8 +59,8 @@ describe("RelationRepository", () => {
     });
 
     describe(".update", () => {
-        let savedRelation:Persisted<DummyGraphRelation>,
-            editedRelation:Persisted<DummyGraphRelation>;
+        let savedRelation:DummyGraphRelation,
+            editedRelation:DummyGraphRelation;
 
         beforeEach(async () => {
             let u1 = await nodeRepository.save(DummyGraphNode.build({attr1: 'John'}));

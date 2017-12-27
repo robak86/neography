@@ -1,17 +1,15 @@
-import {MatchQueryPart, MatchableElement} from "../match/MatchQueryPart";
-import {PersistableElement, CreateQueryPart} from "../create/CreateQueryPart";
-import {CypherQueryElement, CypherQuery} from "../CypherQuery";
+import {MatchableElement, MatchQueryPart} from "../match/MatchQueryPart";
+import {CreateQueryPart, PersistableElement} from "../create/CreateQueryPart";
+import {CypherQuery, CypherQueryElement} from "../CypherQuery";
 import * as _ from 'lodash';
 import {ReturnQueryPart} from "../common/ReturnQueryPart";
 import {MatchBuilder} from "./MatchBuilder";
 import {CreateBuilder} from "./CreateBuilder";
 import {SetQueryBuilder} from "./SetQueryBuilder";
-import {SetQueryPartChildren, SetQueryPart} from "../update/SetQueryPart";
+import {SetQueryPart, SetQueryPartChildren} from "../update/SetQueryPart";
 import {WhereBuilder} from "./WhereBuilder";
 import {WhereLiteralQueryPart} from "../match/WhereLiteralQueryPart";
 import {CypherLiteral} from "../common/CypherLiteral";
-import {NodeMapperFactory} from "../../mappers/NodeMapperFactory";
-import {RelationMapperFactory} from "../../mappers/RelationMapperFactory";
 import {AttributesMapperFactory} from "../../mappers/AttributesMapperFactory";
 
 

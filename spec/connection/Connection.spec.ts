@@ -2,13 +2,12 @@ import {expect} from 'chai';
 import * as faker from 'faker';
 import * as _ from 'lodash';
 import {Partial} from "../../lib/utils/types";
-import {Persisted} from "../../lib/model/GraphEntity";
 import {genId} from "../../lib/utils/uuid";
 import {int, isInt} from "../../lib/driver/Integer";
 import {checkoutConnection, cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
-import {Connection} from "../../lib/connection/Connection";
-import {buildQuery} from "../../lib/cypher/index";
+import {Connection} from "../../lib";
+import {buildQuery} from "../../lib/cypher";
 
 describe("Connection", () => {
     let connection:Connection;
@@ -48,7 +47,7 @@ describe("Connection", () => {
         it("returns array of raw neo4j records", async () => {
             let rows = await createFakePerson(connection);
 
-            let p1:Persisted<any> = rows[0]['n'] as any;
+            let p1:any = rows[0]['n'] as any;
             expect(p1.labels).to.eql(['Person']);
 
             expect(p1.properties.id).to.be.a('string');

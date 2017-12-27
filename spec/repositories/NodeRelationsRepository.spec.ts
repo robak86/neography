@@ -1,17 +1,15 @@
 import {expect} from 'chai';
 import {NodeRelationsRepository} from "../../lib/repositories/NodeRelationsRepository";
-import {Persisted} from "../../lib/model/GraphEntity";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
-import {buildQuery} from "../../lib/index";
-import {Connection} from "../../lib/connection/Connection";
+import {buildQuery, Connection} from "../../lib";
 import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import * as _ from 'lodash';
 
 describe("NodeRelationsRepository", () => {
     let node1RelationsRepo:NodeRelationsRepository;
-    let node1:Persisted<DummyGraphNode>;
-    let node2:Persisted<DummyGraphNode>;
+    let node1:DummyGraphNode;
+    let node2:DummyGraphNode;
     let connection:Connection;
 
 
@@ -72,8 +70,8 @@ describe("NodeRelationsRepository", () => {
     });
 
     describe(".update", () => {
-        let savedRelation:Persisted<DummyGraphRelation>,
-            editedRelation:Persisted<DummyGraphRelation>;
+        let savedRelation:DummyGraphRelation,
+            editedRelation:DummyGraphRelation;
 
         beforeEach(async () => {
             let newRelation = DummyGraphRelation.build({

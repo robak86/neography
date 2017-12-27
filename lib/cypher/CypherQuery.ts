@@ -7,8 +7,6 @@ import {ReturnQueryPart} from "./common/ReturnQueryPart";
 import {SetQueryPart} from "./update/SetQueryPart";
 import {WhereLiteralQueryPart} from "./match/WhereLiteralQueryPart";
 import {CypherLiteral} from "./common/CypherLiteral";
-import {NodeMapperFactory} from "../mappers/NodeMapperFactory";
-import {RelationMapperFactory} from "../mappers/RelationMapperFactory";
 import {AttributesMapperFactory} from "../mappers/AttributesMapperFactory";
 
 export type CypherQueryElement = MatchQueryPart

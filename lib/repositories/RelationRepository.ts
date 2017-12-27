@@ -1,10 +1,10 @@
-import {Persisted, assertPersisted} from "../model/GraphEntity";
+import {assertPersisted} from "../model";
 import {Connection} from "../connection/Connection";
-import {AbstractRelation} from "../model/AbstractRelation";
-import {AbstractNode} from "../model/AbstractNode";
+import {AbstractRelation} from "../model";
+import {AbstractNode} from "../model";
 import {Type} from "../utils/types";
 import {either} from "../utils/core";
-import {buildQuery} from "../cypher/index";
+import {buildQuery} from "../cypher";
 
 export class RelationRepository<FROM extends AbstractNode, R extends AbstractRelation, TO extends AbstractNode> {
 
@@ -13,7 +13,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
                 private toClass:Type<TO>,
                 private connection:Connection) {}
 
-    exists(id:string):Promise<boolean> {
+    exists(id:string | undefined):Promise<boolean> {
         let query = buildQuery()
             .match(m => [
                 m.node(),
@@ -25,7 +25,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
         return this.connection.runQuery(query).pickOne('relCount').map(integer => integer.toNumber() > 0).first();
     }
 
-    update(rel:Persisted<R>):Promise<R> {
+    update(rel:R):Promise<R> {
         assertPersisted(rel);
 
         let query = buildQuery()
@@ -40,7 +40,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
         return this.connection.runQuery(query).pickOne('rel').first();
     }
 
-    save(from:Persisted<FROM>, to:Persisted<TO>, relation:R):Promise<Persisted<R>> {
+    save(from:FROM, to:TO, relation:R):Promise<R> {
         assertPersisted(from);
         assertPersisted(to);
 
@@ -59,7 +59,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
         return this.connection.runQuery(query).pickOne('rel').first();
     }
 
-    remove(id:string):Promise<any> {
+    remove(id:string | undefined):Promise<any> {
         let query = buildQuery()
             .match(m => [
                 m.node(),

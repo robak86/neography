@@ -1,7 +1,5 @@
-import {attribute} from "../annotations/AttributesAnnotations";
+import {AbstractEntity} from "./AbstractEntity";
 
-export abstract class AbstractNode {
+export abstract class AbstractNode extends AbstractEntity{
     private _entityType:'Node';
-
-    @attribute() id?:string;
 }

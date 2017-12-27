@@ -4,14 +4,12 @@ import {GraphResponse} from "../response/GraphResponse";
 import {BoundCypherQuery} from "../cypher/CypherQuery";
 import {QueryBuilder} from "../cypher/builders/QueryBuilder";
 import {TransactionRunner} from "./TransactionRunner";
-import {AbstractNode} from "../model/AbstractNode";
+import {AbstractNode, AbstractRelation} from "../model";
 import {Type} from "../utils/types";
 import {NodeRepository} from "../repositories/NodeRepository";
-import {AbstractRelation} from "../model/AbstractRelation";
 import {RelationRepository} from "../repositories/RelationRepository";
 import {GraphResponseFactory} from "../response/GraphResponseFactory";
 import {NodeRelationsRepository} from "../repositories/NodeRelationsRepository";
-import {Persisted} from "../model/GraphEntity";
 import {QueryRunner} from "./QueryRunner";
 
 export class Connection {
@@ -43,7 +41,7 @@ export class Connection {
         return new RelationRepository(from, relationClass, to, this);
     }
 
-    getNodeRelationsRepository<N extends AbstractNode>(node:Persisted<N>):NodeRelationsRepository {
+    getNodeRelationsRepository<N extends AbstractNode>(node:N):NodeRelationsRepository {
         return new NodeRelationsRepository(node, this);
     }
 

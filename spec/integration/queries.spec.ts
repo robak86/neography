@@ -1,9 +1,8 @@
 import {expect} from 'chai';
-import {Neography} from "../../lib/index";
+import {Connection, Neography} from "../../lib";
 import {cleanDatabase, getDefaultNeography} from "../helpers/ConnectionHelpers";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
-import {Connection} from "../../lib/connection/Connection";
-import {Persisted, PersistedAggregate} from "../../lib/model/GraphEntity";
+
 import {QueryBuilder} from "../../lib/cypher/builders/QueryBuilder";
 import {int} from "../../lib/driver/Integer";
 import {expectIsNowTimeStamp} from "../helpers/assertions";
@@ -44,8 +43,8 @@ describe("Queries", () => {
         });
 
         describe("attributes", () => {
-            let savedNode:Persisted<DummyGraphNode>,   //model instance returned by method which had inserted new node
-                matchedNode:Persisted<DummyGraphNode>; //model instance fetched from database using match
+            let savedNode:DummyGraphNode,   //model instance returned by method which had inserted new node
+                matchedNode:DummyGraphNode; //model instance fetched from database using match
 
             beforeEach(async () => {
                 savedNode = await connection.runQuery(q).pickOne('n').first();
@@ -102,8 +101,8 @@ describe("Queries", () => {
     });
 
     describe("Creating relations", () => {
-        let node1:Persisted<DummyGraphNode>,
-            node2:Persisted<DummyGraphNode>,
+        let node1:DummyGraphNode,
+            node2:DummyGraphNode,
             newNode1 = DummyGraphNode.build({attr1: 'n1Attr'}),
             newNode2 = DummyGraphNode.build({attr1: 'n2Attr'});
 
@@ -147,8 +146,8 @@ describe("Queries", () => {
             });
 
             describe("attributes", () => {
-                let savedRelation:Persisted<DummyGraphRelation>,
-                    matchedRelation:Persisted<DummyGraphRelation>;
+                let savedRelation:DummyGraphRelation,
+                    matchedRelation:DummyGraphRelation;
 
                 beforeEach(async () => {
                     savedRelation = await connection.runQuery(createRelationQuery).pickOne('rel1').first();
@@ -193,14 +192,14 @@ describe("Queries", () => {
 
 
     describe("Matching", () => {
-        const saveNode = (node:DummyGraphNode):Promise<Persisted<DummyGraphNode>> => {
+        const saveNode = (node:DummyGraphNode):Promise<DummyGraphNode> => {
             let storeNodeQuery = neography.query()
                 .create(c => c.node(node).as('n'))
                 .returns('n');
             return connection.runQuery(storeNodeQuery).pickOne('n').first();
         };
 
-        type CreatedRelation = PersistedAggregate<{ from:DummyGraphNode, rel:DummyGraphRelation, to:DummyGraphNode }>;
+        type CreatedRelation = { from:DummyGraphNode, rel:DummyGraphRelation, to:DummyGraphNode };
 
         const saveRelation = (n1:DummyGraphNode, rel:DummyGraphRelation, n2:DummyGraphNode):Promise<CreatedRelation> => {
             let createRelationQuery = neography.query()
@@ -219,9 +218,9 @@ describe("Queries", () => {
         };
 
         describe("Matching nodes", () => {
-            let node1:Persisted<DummyGraphNode>,
-                node2:Persisted<DummyGraphNode>,
-                node3:Persisted<DummyGraphNode>,
+            let node1:DummyGraphNode,
+                node2:DummyGraphNode,
+                node3:DummyGraphNode,
                 node4:any;
 
             beforeEach(async () => {
@@ -234,7 +233,7 @@ describe("Queries", () => {
             describe("by exact attribute value", () => {
                 it("matches nodes where given attributes are equal to provided params", async () => {
                     let matchQuery = neography.query().match(m => m.node(DummyGraphNode).params({attr1: 'a'}).as('n')).returns('n');
-                    let matchedNodes:Persisted<DummyGraphNode>[] = await connection.runQuery(matchQuery).pickOne('n').toArray();
+                    let matchedNodes:DummyGraphNode[] = await connection.runQuery(matchQuery).pickOne('n').toArray();
                     expect(matchedNodes.length).to.eq(1);
                     expect(matchedNodes[0]).to.eql(node1);
                 });
@@ -247,7 +246,7 @@ describe("Queries", () => {
                         .where(w => w.literal('n.attr2 >= {val1}').params({val1: 1}))
                         .returns('n');
 
-                    let matchedNodes:Persisted<DummyGraphNode>[] = await connection.runQuery(matchQuery).pickOne('n').toArray();
+                    let matchedNodes:DummyGraphNode[] = await connection.runQuery(matchQuery).pickOne('n').toArray();
                     expect(matchedNodes.length).to.eq(2);
                     expect(matchedNodes[0]).to.eql(node2);
                     expect(matchedNodes[1]).to.eql(node3);
@@ -270,7 +269,7 @@ describe("Queries", () => {
 
         describe("Matching node with multiple labels(inheritance)", () => {
             //TODO: split expectations in more granular test cases. Add test cases where nodes using inheritance are created using query builder
-            beforeEach(async() => {
+            beforeEach(async () => {
                 await connection.runQuery(q => q.literal(`CREATE (n:DummyGraphNode {attr1: "abc"}) return n`)).toArray();
                 await connection.runQuery(q => q.literal(`CREATE (n:ChildDummyGraphNode:DummyGraphNode {attr1: "abc" }) return n`)).toArray();
                 await connection.runQuery(q => q.literal(`CREATE (n:DummyGraphNode:ChildDummyGraphNode {attr1: "abc" }) return n`)).toArray();
@@ -302,9 +301,9 @@ describe("Queries", () => {
         });
 
         describe("Matching relations", () => {
-            let a:Persisted<DummyGraphNode>,
-                b:Persisted<DummyGraphNode>,
-                c:Persisted<DummyGraphNode>,
+            let a:DummyGraphNode,
+                b:DummyGraphNode,
+                c:DummyGraphNode,
                 a_rel_b:CreatedRelation,
                 a_rel_c:CreatedRelation;
 

@@ -1,8 +1,8 @@
-import {Persisted, Peristable} from "../model/GraphEntity";
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
 import {Type} from "../utils/types";
 import {isPresent} from "../utils/core";
 import * as _ from 'lodash';
+import {GraphEntity} from "../model";
 
 
 export type MappingContext = 'create' | 'update' | 'read';
@@ -14,7 +14,7 @@ export interface TransformersRegistry {
     read?:((obj) => any)[]
 }
 
-export class AttributesMapper<T extends Peristable> {
+export class AttributesMapper<T extends GraphEntity> {
 
     constructor(private klass:Type<T>, private transformers:TransformersRegistry) {}
 
@@ -22,7 +22,7 @@ export class AttributesMapper<T extends Peristable> {
         return AttributesMetadata.getForClass(this.klass);
     }
 
-    mapToInstance(record):Persisted<T> {
+    mapToInstance(record):T {
         if (!isPresent(record)) {
             return record;
         }
@@ -37,7 +37,7 @@ export class AttributesMapper<T extends Peristable> {
             }
         });
 
-        return instance as Persisted<T>;
+        return instance as T;
     }
 
     mapToRow(nodeInstance, type:'create' | 'update' | 'skip') {

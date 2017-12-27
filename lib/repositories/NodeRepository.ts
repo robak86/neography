@@ -1,6 +1,5 @@
-import {assertPersisted, Persisted} from "../model/GraphEntity";
+import {AbstractNode, assertIdExists, assertPersisted} from "../model";
 import {Connection} from "../connection/Connection";
-import {AbstractNode} from "../model/AbstractNode";
 import {cypher} from "../cypher/builders/QueryBuilder";
 import {Type} from "../utils/types";
 import {buildQuery} from "../index";
@@ -11,7 +10,9 @@ export class NodeRepository<T extends AbstractNode> {
                 private connection:Connection) {
     }
 
-    async exists(id:string):Promise<boolean> {
+    async exists(id:string | undefined):Promise<boolean> {
+        assertIdExists(id);
+
         let query = cypher()
             .match(m => m.node(this.klass as Type<AbstractNode>).params({id}).as('n'))
             .returns('count(n) as nodesCount');
@@ -22,7 +23,7 @@ export class NodeRepository<T extends AbstractNode> {
             .first();
     }
 
-    async save(node:T):Promise<Persisted<T>> {
+    async save(node:T):Promise<T> {
         let query = buildQuery()
             .create(c => c.node(node).as('n'))
             .returns('n');
@@ -30,7 +31,7 @@ export class NodeRepository<T extends AbstractNode> {
         return this.connection.runQuery(query).pickOne('n').first();
     };
 
-    update(node:Persisted<T>):Promise<Persisted<T>> {
+    update(node:T):Promise<T> {
         assertPersisted(node);
 
         let query = buildQuery()
@@ -41,7 +42,9 @@ export class NodeRepository<T extends AbstractNode> {
         return this.connection.runQuery(query).pickOne('n').first();
     };
 
-    remove(id:string, detach:boolean = true):Promise<any> {
+    remove(id:string | undefined, detach:boolean = true):Promise<any> {
+        assertIdExists(id);
+
         let deletePrefix = detach ? 'DETACH DELETE' : 'DELETE';
 
         let query = buildQuery()
@@ -51,7 +54,7 @@ export class NodeRepository<T extends AbstractNode> {
         return this.connection.runQuery(query).toArray();
     }
 
-    where(nodeParams:Partial<T>):Promise<(Persisted<T>)[]> {
+    where(nodeParams:Partial<T>):Promise<T[]> {
         let query = buildQuery()
             .match(m => m.node(this.klass).params(nodeParams).as('n'))
             .returns('n');
@@ -59,7 +62,7 @@ export class NodeRepository<T extends AbstractNode> {
         return this.connection.runQuery(query).pickOne('n').toArray();
     }
 
-    first(nodeParams:Partial<T>):Promise<Persisted<T> | null> {
+    first(nodeParams:Partial<T>):Promise<T | null> {
         let query = buildQuery()
             .match(m => m.node(this.klass).params(nodeParams).as('n'))
             .returns('n')

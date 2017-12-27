@@ -1,20 +1,20 @@
-import {AbstractNode} from "../model/AbstractNode";
-import {AbstractRelation} from "../model/AbstractRelation";
-import {buildQuery} from "../cypher/index";
+import {AbstractNode, AbstractRelation, assertIdExists, assertPersisted} from "../model";
+import {buildQuery} from "../cypher";
 import {Type} from "../utils/types";
 import {Connection} from "../connection/Connection";
-import {assertPersisted, Persisted, PersistedAggregate} from "../model/GraphEntity";
 import {getClassFromInstance} from "../utils/core";
 
 
 export class NodeRelationsRepository {
 
-    constructor(private fromNode:Persisted<AbstractNode>,
+    constructor(private fromNode:AbstractNode,
                 private connection:Connection) {
         assertPersisted(this.fromNode);
     }
 
-    exists(relationKlass:Type<AbstractRelation>, id:string):Promise<boolean> {
+    exists(relationKlass:Type<AbstractRelation>, id:string|undefined):Promise<boolean> {
+        assertIdExists(id);
+
         let query = buildQuery()
             .match(m => [
                 m.node(),
@@ -51,7 +51,7 @@ export class NodeRelationsRepository {
         return this.connection.runQuery(query).pickOne('relation').first();
     }
 
-    create<R extends AbstractRelation, TO extends AbstractNode>(relation:R, to:Persisted<TO>):Promise<Persisted<R>> {
+    create<R extends AbstractRelation, TO extends AbstractNode>(relation:R, to:TO):Promise<R> {
         assertPersisted(to);
 
         let query = buildQuery()
@@ -69,7 +69,7 @@ export class NodeRelationsRepository {
         return this.connection.runQuery(query).pickOne('rel').first();
     }
 
-    update<R extends AbstractRelation>(rel:Persisted<R>):Promise<R> {
+    update<R extends AbstractRelation>(rel:R):Promise<R> {
         assertPersisted(rel);
 
         let query = buildQuery()
@@ -99,7 +99,7 @@ export class NodeRelationsRepository {
     getConnectedNodes<R extends AbstractRelation, N extends AbstractNode>(relClass:Type<R>,
                                                                           params:Partial<R> = {},
                                                                           targetNodeClass:Type<N> = null as any,
-                                                                          targetNodeParams:Partial<N> = {}):Promise<PersistedAggregate<{ relation:R, node:N }>[]> {
+                                                                          targetNodeParams:Partial<N> = {}):Promise<{ relation:R, node:N }[]> {
         let query = buildQuery()
             .match(m => [
                 m.node(getClassFromInstance(this.fromNode)).params({id: this.fromNode.id} as any),
