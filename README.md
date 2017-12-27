@@ -1,11 +1,12 @@
 # Neography
 
 [![Build Status](https://travis-ci.org/robak86/neography.svg?branch=master)](https://travis-ci.org/robak86/neography)
+[![Coverage Status](https://coveralls.io/repos/github/robak86/neography/badge.svg?branch=master&service=github)](https://coveralls.io/github/robak86/neography?branch=simplify_types)
 
-Thin opinionated mapping layer and queries builder for official neo4j driver. (https://github.com/neo4j/neo4j-javascript-driver)
+Simple object mapper and queries builder for official neo4j driver. (https://github.com/neo4j/neo4j-javascript-driver)
 
 ## Warning 
-This library is at early stage of development. The API is most likely will change over time.
+This library is at early stage of development. The API most likely will change over time.
 **All suggestion, opinions and ideas are gladly welcome.**
 
 
@@ -31,11 +32,11 @@ neography.registerExtension(TimestampsExtension.getDefault());
 
 ## Defining Model Classes
 
-Neography provides mapping layer over persisted neo4j data and classes defined by UserNode. In order to create mappable class 
+Neography provides mapping layer over persisted neo4j data. In order to create mappable class 
 you have to decorate it with ```@node('NodeLabel')``` or ```@relation('RELATION_TYPE')``` decorators. Additionally each 
 entity class have to inherit consequently from ```AbstractNode``` or ```AbstractRelation``` class. Abstract classes provide optional ```id``` 
 string property. By default neography generates uuid string for identifying entities.
-Abstract classes were introduced for making most of query builder's and repositories' methods type safe.
+Abstract classes were introduced for providing types safety for repositories. 
 
  
 ```typescript
