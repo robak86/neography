@@ -25,7 +25,7 @@ export const getDefaultContext = () => {
 };
 
 export const cleanDatabase = ():Promise<any> => {
-    return getSharedConnection().runQuery(q => q.literal(`MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r`)).toArray();
+    return getSharedConnection().runQuery(q => q.literal(`MATCH (n) DETACH DELETE n`)).toArray();
 };
 
 export const createConnectionFactory = ():() => Connection => {

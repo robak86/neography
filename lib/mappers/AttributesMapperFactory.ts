@@ -1,9 +1,8 @@
 import {AttributesMapper, MappingContext, TransformersRegistry} from "./AttributesMapper";
 import {Type} from "../utils/types";
-import {Peristable} from "../model/GraphEntity";
 import {NodesTypesRegistryEntry} from "../annotations/NodeTypesRegistry";
 import {isPresent} from "../utils/core";
-import {AbstractNode} from "../model/AbstractNode";
+import {AbstractNode, GraphEntity} from "../model";
 import {NodeMetadata} from "../metadata/NodeMetadata";
 import {RelationsTypesRegistryEntry} from "../annotations/RelationsTypesRegistry";
 import {RelationMetadata} from "../metadata/RelationMetadata";
@@ -16,7 +15,7 @@ export class AttributesMapperFactory {
                 private _transformers:TransformersRegistry = {}) {
     }
 
-    getMapper<T extends Peristable>(klass:Type<T>):AttributesMapper<T> {
+    getMapper<T extends GraphEntity>(klass:Type<T>):AttributesMapper<T> {
         return new AttributesMapper(klass, this._transformers);
     }
 
@@ -25,7 +24,7 @@ export class AttributesMapperFactory {
         return isPresent(entry);
     }
 
-    getNodeMapper<T extends Peristable>(labels:string[]):AttributesMapper<T> {
+    getNodeMapper<T extends GraphEntity>(labels:string[]):AttributesMapper<T> {
         let entry:NodesTypesRegistryEntry = this.getNodeRegistryEntry(labels.sort());
         if (_.isUndefined(entry)) {
             throw new Error("Missing metadata for " + labels);
@@ -46,7 +45,7 @@ export class AttributesMapperFactory {
         return isPresent(entry);
     }
 
-    getRelationMapper<T extends Peristable>(type:string):AttributesMapper<T> {
+    getRelationMapper<T extends GraphEntity>(type:string):AttributesMapper<T> {
         let entry:RelationsTypesRegistryEntry = this.registeredRelations[type];
         if (_.isUndefined(entry)) {
             throw new Error("Missing metadata for " + type);
@@ -64,7 +63,7 @@ export class AttributesMapperFactory {
         transformers.push(transformer);
     }
 
-    private getNodeRegistryEntry<T extends Peristable>(labelOrLabels:string[]):NodesTypesRegistryEntry {
+    private getNodeRegistryEntry<T extends GraphEntity>(labelOrLabels:string[]):NodesTypesRegistryEntry {
         let labels:string[] = _.isArray(labelOrLabels) ? labelOrLabels : [labelOrLabels];
         let labelsId = labels.join('_');
 

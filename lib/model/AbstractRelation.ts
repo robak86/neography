@@ -1,7 +1,5 @@
-import {attribute, timestamp} from "../annotations/AttributesAnnotations";
+import {AbstractEntity} from "./AbstractEntity";
 
-export abstract class AbstractRelation {
+export abstract class AbstractRelation extends AbstractEntity {
     private _entityType:'Relation';
-
-    @attribute() id?:string;
 }
