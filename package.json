@@ -5,11 +5,10 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "dist": "npm run clear && npm run build && cp README.md dist/lib && cp package.json dist/lib",
-    "build": "tsc",
-    "test": "mocha --require dist/spec/SpecHelper.js dist/spec/**/*.spec.js",
-    "clear": "rm -rf ./dist",
-    "build:dev": "tsc --watch",
+    "build:clear": "rm -rf ./dist",
+    "build:watch": "npm run build:clear && tsc --watch --pretty",
+    "build:dist": "npm run clear && tsc && cp README.md dist/lib && cp package.json dist/lib",
+    "test": "mocha --opts mocha.opts dist/spec/**/*.spec.js",
     "docker:start": "docker-compose up -d",
     "docker:stop": "docker-compose down",
     "coverage": "nyc --reporter=text mocha -- -- spec dist/spec/**/*.spec.js",
@@ -48,7 +47,7 @@
   "dependencies": {
     "@types/p-queue": "^1.1.0",
     "lodash": "^4.17.4",
-    "neo4j-driver": "^1.4.0",
+    "neo4j-driver": "^1.5.1",
     "p-queue": "^1.1.0",
     "reflect-metadata": "^0.1.10",
     "shortid": "^2.2.8"
