@@ -24,7 +24,7 @@ describe("Queries", () => {
         let q:QueryBuilder;
 
         beforeEach(async () => {
-            newNode = DummyGraphNode.build({attr1: 'attr1', attr2: 123});
+            newNode = new DummyGraphNode({attr1: 'attr1', attr2: 123});
             q = neography.query()
                 .create(c => c.node(newNode).as('n'))
                 .returns('n');
@@ -84,7 +84,7 @@ describe("Queries", () => {
     describe("Creating node inheriting from another node", () => {
         //TODO split expectations in more granular test cases and investigate if adding inheritance is good idea
         it("creates single node", async () => {
-            let node = ChildDummyGraphNode.build({attr1: 'attr1', attr2: 123, attr3: 'inheritance is bad, mkay'});
+            let node = new ChildDummyGraphNode({attr1: 'attr1', attr2: 123, attr3: 'inheritance is bad, mkay'});
             let q = neography.query()
                 .create(c => c.node(node).as('n'))
                 .returns('n');
@@ -103,8 +103,8 @@ describe("Queries", () => {
     describe("Creating relations", () => {
         let node1:DummyGraphNode,
             node2:DummyGraphNode,
-            newNode1 = DummyGraphNode.build({attr1: 'n1Attr'}),
-            newNode2 = DummyGraphNode.build({attr1: 'n2Attr'});
+            newNode1 = new DummyGraphNode({attr1: 'n1Attr'}),
+            newNode2 = new DummyGraphNode({attr1: 'n2Attr'});
 
         beforeEach(async () => {
             //create nodes which will be connected by relation
@@ -122,7 +122,7 @@ describe("Queries", () => {
                 createRelationQuery:QueryBuilder;
 
             beforeEach(() => {
-                newRelation = DummyGraphRelation.build({attr1: 'rel1Attr'});
+                newRelation = new DummyGraphRelation({attr1: 'rel1Attr'});
                 createRelationQuery = neography.query()
                     .match(m => m.node(DummyGraphNode).params({id: node1.id}).as('n1'))
                     .match(m => m.node(DummyGraphNode).params({id: node2.id}).as('n2'))
@@ -224,9 +224,9 @@ describe("Queries", () => {
                 node4:any;
 
             beforeEach(async () => {
-                node1 = await saveNode(DummyGraphNode.build({attr1: 'a', attr2: 0}));
-                node2 = await saveNode(DummyGraphNode.build({attr1: 'b', attr2: 1}));
-                node3 = await saveNode(DummyGraphNode.build({attr1: 'c', attr2: 2}));
+                node1 = await saveNode(new DummyGraphNode({attr1: 'a', attr2: 0}));
+                node2 = await saveNode(new DummyGraphNode({attr1: 'b', attr2: 1}));
+                node3 = await saveNode(new DummyGraphNode({attr1: 'c', attr2: 2}));
                 node4 = await connection.runQuery(q => q.literal(`CREATE (n {someAttr: 1}) RETURN n`)).pickOne('n').toArray();
             });
 
@@ -308,11 +308,11 @@ describe("Queries", () => {
                 a_rel_c:CreatedRelation;
 
             beforeEach(async () => {
-                a = await saveNode(DummyGraphNode.build({attr1: 'a'}));
-                b = await saveNode(DummyGraphNode.build({attr1: 'b'}));
-                c = await saveNode(DummyGraphNode.build({attr1: 'c'}));
-                a_rel_b = await saveRelation(a, DummyGraphRelation.build({attr2: 1}), b);
-                a_rel_c = await saveRelation(a, DummyGraphRelation.build({attr2: 1}), c);
+                a = await saveNode(new DummyGraphNode({attr1: 'a'}));
+                b = await saveNode(new DummyGraphNode({attr1: 'b'}));
+                c = await saveNode(new DummyGraphNode({attr1: 'c'}));
+                a_rel_b = await saveRelation(a, new DummyGraphRelation({attr2: 1}), b);
+                a_rel_c = await saveRelation(a, new DummyGraphRelation({attr2: 1}), c);
             });
 
             it("all nodes connected by given relation typ", async () => {

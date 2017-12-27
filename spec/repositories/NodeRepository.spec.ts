@@ -23,7 +23,7 @@ describe("NodeRepository", () => {
         connection = getSharedConnection();
         nodeRepository = connection.getNodeRepository(DummyGraphNode);
         relationRepository = connection.getRelationRepository(DummyGraphNode, DummyGraphRelation, DummyGraphNode);
-        dummyNode = DummyGraphNode.build({attr1: "John"});
+        dummyNode = new DummyGraphNode({attr1: "John"});
     });
 
     describe(".save", () => {
@@ -62,7 +62,7 @@ describe("NodeRepository", () => {
 
     describe(".exists", () => {
         it("returns true if buildNode exists", async () => {
-            let node = DummyGraphNode.build({attr1: 'Tomasz'});
+            let node = new DummyGraphNode({attr1: 'Tomasz'});
             let storedNode:DummyGraphNode = await nodeRepository.save(node);
             expect(await nodeRepository.exists(storedNode.id)).to.eq(true);
         });
@@ -95,9 +95,9 @@ describe("NodeRepository", () => {
 
         it("removes all related relations", async () => {
             let from = await nodeRepository.save(dummyNode);
-            let to = await nodeRepository.save(DummyGraphNode.build({attr1: 'Jane'}));
+            let to = await nodeRepository.save(new DummyGraphNode({attr1: 'Jane'}));
 
-            let createdRelation = await relationRepository.save(from, to, DummyGraphRelation.build({}));
+            let createdRelation = await relationRepository.save(from, to, new DummyGraphRelation({}));
             expect(await nodeRepository.exists(from.id)).to.eq(true);
             expect(await nodeRepository.exists(to.id)).to.eq(true);
             expect(await relationRepository.exists(createdRelation.id)).to.eq(true);
@@ -114,7 +114,7 @@ describe("NodeRepository", () => {
         let savedNode:DummyGraphNode;
 
         beforeEach(async () => {
-            savedNode = await nodeRepository.save(DummyGraphNode.build({attr1: 'John'}));
+            savedNode = await nodeRepository.save(new DummyGraphNode({attr1: 'John'}));
         });
 
         it("updates with provided params", async () => {

@@ -14,7 +14,7 @@ describe("CreateNodeQueryPart", () => {
 
     describe("create node with parameters", () => {
         let nodeCreate:CreateNodeQueryPart<DummyGraphNode>,
-            node:DummyGraphNode = DummyGraphNode.build({attr1: "someValue", attr2: 123});
+            node:DummyGraphNode = new DummyGraphNode({attr1: "someValue", attr2: 123});
 
         beforeEach(() => {
             nodeCreate = new CreateNodeQueryPart(node);

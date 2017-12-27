@@ -15,7 +15,7 @@ describe("CreateRelationQueryPart", () => {
 
     describe("create node with parameters", () => {
         let createRelationQueryPart:CreateRelationQueryPart<DummyGraphRelation>,
-            relation:DummyGraphRelation = DummyGraphRelation.build({attr1: "someValue", attr2: 123});
+            relation:DummyGraphRelation = new DummyGraphRelation({attr1: "someValue", attr2: 123});
 
         beforeEach(() => {
             createRelationQueryPart = new CreateRelationQueryPart(relation);

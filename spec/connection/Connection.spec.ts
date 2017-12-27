@@ -139,7 +139,7 @@ describe("Connection", () => {
 
         describe("with nesting", () => {
             const createNode = (params:Partial<DummyGraphNode>) => connection.runQuery(cypher => cypher
-                .create(c => c.node(DummyGraphNode.build(params)).as('n'))
+                .create(c => c.node(new DummyGraphNode(params)).as('n'))
                 .returns('n')
             );
 
