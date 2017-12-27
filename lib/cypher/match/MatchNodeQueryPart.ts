@@ -1,5 +1,5 @@
-import {Partial, Type} from "../../utils/types";
-import {AbstractNode} from "../../model/AbstractNode";
+import {Type} from "../../utils/types";
+import {AbstractNode} from "../../model";
 import {NodeMetadata} from "../../metadata/NodeMetadata";
 import {QueryContext} from "../common/QueryContext";
 import {generateMatchAssignments} from "../utils/QueryHelpers";
@@ -19,7 +19,7 @@ export class MatchNodeQueryPart<N extends AbstractNode> implements INodeMatchQue
         return cloned(this, (el:MatchNodeQueryPart<N>) => el._alias = alias);
     }
 
-    params(params:Partial<N>|void):MatchNodeQueryPart<N> {
+    params(params:Partial<N> | void):MatchNodeQueryPart<N> {
         return cloned(this, (el:MatchNodeQueryPart<N>) => el._params = params);
     }
 

@@ -1,14 +1,10 @@
 import {IQueryPart} from "../abstract/IQueryPart";
-import {AbstractRelation} from "../../model/AbstractRelation";
+import {AbstractRelation} from "../../model";
 import {RelationMetadata} from "../../metadata/RelationMetadata";
 import {QueryContext} from "../common/QueryContext";
 import {IBoundQueryPart} from "../abstract/IBoundQueryPart";
-
-
-import {AttributesMapper} from "../../mappers/AttributesMapper";
-import {relationsTypesRegistry} from "../../annotations/RelationAnnotations";
 import {RelationDirectionType} from "../match/IRelationMatchQueryPart";
-import {cloned, someOrThrow} from "../../utils/core";
+import {cloned} from "../../utils/core";
 
 export class CreateRelationQueryPart<R extends AbstractRelation> implements IQueryPart {
     protected _alias:string;

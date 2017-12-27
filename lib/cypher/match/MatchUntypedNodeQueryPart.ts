@@ -1,4 +1,3 @@
-
 import {QueryContext} from "../common/QueryContext";
 import {generateMatchAssignments} from "../utils/QueryHelpers";
 import {IBoundQueryPart} from "../abstract/IBoundQueryPart";

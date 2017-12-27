@@ -1,16 +1,9 @@
-import {AbstractNode} from "../../model/AbstractNode";
-import {AbstractRelation} from "../../model/AbstractRelation";
-
-import {Partial} from "../../utils/types";
+import {AbstractNode, AbstractRelation} from "../../model";
 import {IQueryPart} from "../abstract/IQueryPart";
 import {QueryContext} from "../common/QueryContext";
 import {IBoundQueryPart} from "../abstract/IBoundQueryPart";
-
-
-import {relationsTypesRegistry} from "../../annotations/RelationAnnotations";
 import {Type} from "../../utils/types";
 import {invariant, isPresent, someOrThrow} from "../../utils/core";
-import {nodeTypesRegistry} from "../../annotations/NodeAnnotations";
 
 
 const SET_OPERATORS = {

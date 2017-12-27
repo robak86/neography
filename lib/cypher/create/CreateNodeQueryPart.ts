@@ -1,12 +1,9 @@
 import {IQueryPart} from "../abstract/IQueryPart";
 import {IBoundQueryPart} from "../abstract/IBoundQueryPart";
 import {QueryContext} from "../common/QueryContext";
-
 import {NodeMetadata} from "../../metadata/NodeMetadata";
-import {AbstractNode} from "../../model/AbstractNode";
-import {AttributesMapper} from "../../mappers/AttributesMapper";
-
-import {cloned, someOrThrow} from "../../utils/core";
+import {AbstractNode} from "../../model";
+import {cloned} from "../../utils/core";
 
 
 export class CreateNodeQueryPart<N extends AbstractNode> implements IQueryPart {
