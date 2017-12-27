@@ -1,14 +1,14 @@
 {
   "name": "neography",
   "version": "0.0.9",
-  "description": "Thin mapping layer and queries builder for official neo4j driver.",
+  "description": "Simple object mapper and queries builder for official neo4j driver.",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
     "test": "mocha --opts mocha.opts dist/spec/**/*.spec.js",
     "build:clear": "rm -rf ./dist",
     "build:watch": "npm run build:clear && tsc --watch --pretty",
-    "build:dist": "npm run clear && tsc && cp README.md dist/lib && cp package.json dist/lib",
+    "build:dist": "npm run build:clear && tsc && cp README.md dist/lib && cp package.json dist/lib",
     "build:coverage:publish": "nyc --reporter=text-lcov mocha -- -- spec dist/spec/**/*.spec.js | coveralls",
     "build:coverage": "nyc --reporter=text mocha -- -- spec dist/spec/**/*.spec.js",
     "docker:start": "docker-compose up -d",
