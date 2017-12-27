@@ -7,6 +7,6 @@ services:
   - docker
 
 before_script:
-  - npm run dist
+  - npm run build:dist
   - docker-compose up -d
   - npm run neo4j:wait
