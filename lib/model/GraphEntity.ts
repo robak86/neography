@@ -10,8 +10,8 @@ export function assertPersisted(entity:GraphEntity) {
     }
 }
 
-export function assertIdExists(id:string|undefined){
-    if (!isPresent(id)){
+export function assertIdExists(id:string | undefined) {
+    if (!isPresent(id)) {
         throw new Error('Passed id property is undefined')
     }
 }
