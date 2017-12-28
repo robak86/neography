@@ -18,7 +18,8 @@
     "build:coverage": "nyc --reporter=text mocha -- -- spec dist/spec/**/*.spec.js",
     "docker:start": "docker-compose up -d",
     "docker:stop": "docker-compose down",
-    "neo4j:wait": "while ! curl --silent http://localhost:7474/; do sleep 0.1; done"
+    "neo4j:wait": "while ! curl --silent http://localhost:7474/; do sleep 0.1; done",
+    "link": "cd dist/lib && yarn install --prod && yarn link"
   },
   "repository": {
     "type": "git",
