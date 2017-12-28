@@ -120,9 +120,9 @@ describe("NodeRepository", () => {
         it("updates with provided params", async () => {
             let edited:DummyGraphNode = _.cloneDeep(savedNode);
             edited.attr1 = 'updateFirstName';
-            (edited as any).attr2 = null;
+            edited.attr2 = 123;
             let result = await nodeRepository.update(edited);
-            expect(_.omit('updatedAt', result)).to.eql(_.omit('updatedAt', edited))
+            expect(_.omit(result, 'updatedAt')).to.eql(_.omit(edited, 'updatedAt'))
         });
 
         it("updates updatedAt property", async () => {
