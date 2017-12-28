@@ -10,3 +10,4 @@
  - remove ```Persisted``` type. Repositories accept now entities with optional ```id``` property
   and throw error if ```id``` is missing
  - rename ```pickOne``` method of GraphResponse to more intuitive ```pluck```
+ - allow user to pass logger instance in configuration 
