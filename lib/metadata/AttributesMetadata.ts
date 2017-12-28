@@ -66,6 +66,18 @@ export class AttributesMetadata {
         return _.values(this.getAttributes()).map(attr => attr.propertyName)
     }
 
+    hasAttribute(name:string):boolean {
+        return !!this.getAttributes()[name];
+    }
+
+    forEachAttribute(iterFn:(attribute:AttributeAnnotationParams, attributeName:string) => void) {
+        let propertiesNames = this.getAttributesNames();
+        propertiesNames.forEach(prop => {
+            let attributeMetadata = this.getAttributeMetadata(prop);
+            iterFn(attributeMetadata,prop)
+        });
+    }
+
     getAttributeMetadata(attribute:string):AttributeAnnotationParams {
         return this.getAttributes()[attribute];
     }

@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
-import {int} from "../driver/Integer";
 import * as _ from 'lodash';
+import neo4j from "neo4j-driver";
 
 export interface AttributeAnnotationParams {
     toRowMapper?:(val:any) => any;
@@ -23,13 +23,19 @@ export function attribute({toRowMapper = _.identity, fromRowMapper = _.identity,
 
 export function timestamp():PropertyDecorator {
     return attribute({
-        toRowMapper: (val) => int(val),
-        fromRowMapper: (val) => val.toNumber(),
-        beforeSaveTransform: (val, context:'create' | 'update') => {
-            if (context === 'create') {
-                return new Date().getTime();
+        //TODO: extract to interface (ValueTransformer) and create concrete implementation for timestamp decorator
+        toRowMapper: (val) => {
+            if (_.isDate(val)){
+                return neo4j.int(val.getTime())
             } else {
-                return val;
+                return null
+            }
+        },
+        fromRowMapper: (val) => {
+            if (neo4j.isInt(val)) {
+                return new Date(val.toNumber());
+            } else {
+                return  null
             }
         }
     });

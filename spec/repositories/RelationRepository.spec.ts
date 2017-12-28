@@ -41,8 +41,8 @@ describe("RelationRepository", () => {
             let rel = await relationRepository.save(u1, u2, new DummyGraphRelation({attr2: 123}));
 
             expect(rel.id).to.be.a('string');
-            expect(rel.createdAt).to.be.a('number');
-            expect(rel.updatedAt).to.be.a('number');
+            expect(rel.createdAt).to.be.a('Date');
+            expect(rel.updatedAt).to.be.a('Date');
         });
     });
 

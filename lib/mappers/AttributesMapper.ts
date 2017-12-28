@@ -4,7 +4,7 @@ import {isPresent} from "../utils/core";
 import {GraphEntity} from "../model";
 import {ExtensionsRowMapper} from "./ExtensionsRowMapper";
 import {TransformContext} from "../extensions/IRowTransformer";
-
+import * as _ from 'lodash';
 
 export class AttributesMapper<T extends GraphEntity> {
 
@@ -40,19 +40,25 @@ export class AttributesMapper<T extends GraphEntity> {
     }
 
     mapToRow(nodeInstance, type:TransformContext) {
-        let row:any = {};
+        let row = {};
 
         if (this.hasAnyAttributes) {
-            let propertiesNames = this.attributesMetadata.getAttributesNames();
-            propertiesNames.forEach(prop => {
-                let attributeMetadata = this.attributesMetadata.getAttributeMetadata(prop);
-                if (isPresent(nodeInstance[prop])) {
-                    row[prop] = attributeMetadata.toRowMapper(nodeInstance[prop]);
+            _.forOwn(nodeInstance, (value, propName) => {
+                if (this.attributesMetadata.hasAttribute(propName)) { //rewrite only known attributes
+                    row[propName] = value;
                 }
             });
         }
 
         row = this.extensionsRowMapper.mapToRow(row, type);
+
+        if (this.hasAnyAttributes) {
+            this.attributesMetadata.forEachAttribute((attributeMetadata, prop) => {
+                if (isPresent(row[prop])) {
+                    row[prop] = attributeMetadata.toRowMapper(row[prop]);
+                }
+            });
+        }
 
         return row;
     }

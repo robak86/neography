@@ -10,7 +10,6 @@ import {buildQuery} from "../../lib/cypher";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import {RelationRepository} from "../../lib/repositories/RelationRepository";
 
-
 describe("NodeRepository", () => {
 
     let nodeRepository:NodeRepository<DummyGraphNode>,
@@ -40,8 +39,8 @@ describe("NodeRepository", () => {
 
         it("return created entity having Persisted", () => {
             expect(createdGenericNode.id).to.be.a('string');
-            expect(createdGenericNode.createdAt).to.be.a('number');
-            expect(createdGenericNode.updatedAt).to.be.a('number');
+            expect(createdGenericNode.createdAt).to.be.a('Date');
+            expect(createdGenericNode.updatedAt).to.be.a('Date');
         });
 
         it("does not store additional params", () => {
@@ -57,6 +56,90 @@ describe("NodeRepository", () => {
             expect(nodes[0].createdAt).to.eql(createdGenericNode.createdAt);
             expect(nodes[0].updatedAt).to.eql(createdGenericNode.updatedAt);
             expect(nodes[0].attr1).to.eql(createdGenericNode.attr1);
+        });
+    });
+
+    describe(".saveMany", () => {
+        let savedNodes:DummyGraphNode[];
+        let n1:DummyGraphNode,
+            n2:DummyGraphNode;
+
+        beforeEach(async () => {
+            n1 = new DummyGraphNode({attr1: 'n1'});
+            n2 = new DummyGraphNode({attr1: 'n2'});
+            savedNodes = await nodeRepository.saveMany([n1, n2]);
+            console.log(savedNodes);
+        });
+
+        it('returns all saved nodes', () => {
+            expect(savedNodes.length).to.eq(2);
+        });
+
+        it('maps returned data to instances of correct class', () => {
+            expect(savedNodes[0]).to.be.instanceof(DummyGraphNode);
+            expect(savedNodes[1]).to.be.instanceof(DummyGraphNode);
+        });
+
+        it("sets correct properties for returned nodes", async () => {
+            expect(savedNodes[0].attr1).to.eql(n1.attr1);
+            expect(savedNodes[1].attr1).to.eql(n2.attr1);
+        });
+
+        it("sets id, createdAt and updatedAt properties for saved nodes", () => {
+            expect(savedNodes[0].id).to.be.a('string');
+            expect(savedNodes[0].createdAt).to.be.a('Date');
+            expect(savedNodes[0].updatedAt).to.be.a('Date');
+
+            expect(savedNodes[1].id).to.be.a('string');
+            expect(savedNodes[1].createdAt).to.be.a('Date');
+            expect(savedNodes[1].updatedAt).to.be.a('Date');
+        });
+
+        it("does not store additional params", () => {
+            expect(Object.keys(savedNodes[0]).sort())
+                .to.eql(['attr1', 'id', 'createdAt', 'updatedAt'].sort());
+
+            expect(Object.keys(savedNodes[1]).sort())
+                .to.eql(['attr1', 'id', 'createdAt', 'updatedAt'].sort());
+        });
+
+        it("creates nodes", async () => {
+            let query = buildQuery().literal(`MATCH(n {id: {id}}) return n`, {id: savedNodes[0].id});
+            let n1 = await connection.runQuery(query).pluck('n').first();
+
+            query = buildQuery().literal(`MATCH(n {id: {id}}) return n`, {id: savedNodes[1].id});
+            let n2 = await connection.runQuery(query).pluck('n').first();
+
+            expect(savedNodes[0].id).to.eql(n1.id);
+            expect(savedNodes[0].createdAt).to.eql(n1.createdAt);
+            expect(savedNodes[0].updatedAt).to.eql(n1.updatedAt);
+            expect(savedNodes[0].attr1).to.eql(n1.attr1);
+
+            expect(savedNodes[1].id).to.eql(n2.id);
+            expect(savedNodes[1].createdAt).to.eql(n2.createdAt);
+            expect(savedNodes[1].updatedAt).to.eql(n2.updatedAt);
+            expect(savedNodes[1].attr1).to.eql(n2.attr1);
+        });
+
+        it('returns empty array if passed array is empty', async () => {
+            savedNodes = await nodeRepository.saveMany([]);
+            expect(savedNodes.length).to.eq(0);
+        });
+    });
+
+    describe(".findByIds", () => {
+        let n1:DummyGraphNode,
+            n2:DummyGraphNode;
+
+        beforeEach(async () => {
+            n1 = await nodeRepository.save(new DummyGraphNode({attr1: 'n1'}));
+            n2 = await nodeRepository.save(new DummyGraphNode({attr1: 'n2'}));
+        });
+
+        it('fetches all nodes with given ids', async () => {
+            let fetched = await nodeRepository.findByIds([n1.id, n2.id]);
+            expect(fetched.length).to.eq(2);
+            expect(fetched).to.eql([n1, n2])
         });
     });
 
@@ -127,7 +210,7 @@ describe("NodeRepository", () => {
 
         it("updates updatedAt property", async () => {
             let result = await nodeRepository.update(savedNode);
-            expect(result.updatedAt).to.be.greaterThan(savedNode.updatedAt as number);
+            expect(result.updatedAt).to.be.greaterThan((savedNode.updatedAt as Date).getTime());
         });
     });
 });

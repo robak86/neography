@@ -4,7 +4,6 @@ import {cypher} from "../cypher/builders/QueryBuilder";
 import {Type} from "../utils/types";
 import {buildQuery} from "../index";
 
-
 export class NodeRepository<T extends AbstractNode> {
     constructor(private klass:Type<T>,
                 private connection:Connection) {
@@ -31,6 +30,18 @@ export class NodeRepository<T extends AbstractNode> {
         return this.connection.runQuery(query).pluck('n').first();
     };
 
+    async saveMany(nodes:T[]):Promise<T[]> {
+        if (Array.isArray(nodes) && nodes.length === 0) {
+            return []
+        } else {
+            let query = buildQuery()
+                .create(c => nodes.map((node, idx) => c.node(node).as('n' + idx)))
+                .returns(`[${nodes.map((n, idx) => 'n' + idx)}] as list`);
+
+            return this.connection.runQuery(query).pluck('list').first()
+        }
+    };
+
     update(node:T):Promise<T> {
         assertPersisted(node);
 
@@ -41,6 +52,17 @@ export class NodeRepository<T extends AbstractNode> {
 
         return this.connection.runQuery(query).pluck('n').first();
     };
+
+    findByIds(ids:(string | undefined)[]):Promise<T[]> {
+        ids.forEach(assertIdExists);
+
+        let query = buildQuery()
+            .match(m => m.node(this.klass as Type<AbstractNode>).as('n'))
+            .where(w => w.literal('n.id in {ids}').params({ids}))
+            .returns('n');
+
+        return this.connection.runQuery(query).pluck('n').toArray();
+    }
 
     remove(id:string | undefined, detach:boolean = true):Promise<any> {
         assertIdExists(id);

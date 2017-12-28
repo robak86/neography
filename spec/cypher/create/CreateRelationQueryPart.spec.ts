@@ -7,7 +7,6 @@ import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 
 
 describe("CreateRelationQueryPart", () => {
-
     let ctx:QueryContext;
     beforeEach(() => {
         ctx = getDefaultContext();
