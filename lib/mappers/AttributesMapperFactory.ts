@@ -1,4 +1,4 @@
-import {AttributesMapper, MappingContext, TransformersRegistry} from "./AttributesMapper";
+import {AttributesMapper} from "./AttributesMapper";
 import {Type} from "../utils/types";
 import {NodesTypesRegistryEntry} from "../annotations/NodeTypesRegistry";
 import {isPresent} from "../utils/core";
@@ -7,16 +7,17 @@ import {NodeMetadata} from "../metadata/NodeMetadata";
 import {RelationsTypesRegistryEntry} from "../annotations/RelationsTypesRegistry";
 import {RelationMetadata} from "../metadata/RelationMetadata";
 import * as _ from 'lodash';
+import {ExtensionsRowMapper} from "./ExtensionsRowMapper";
 
 export class AttributesMapperFactory {
 
     constructor(private registeredNodes:{ [labels:string]:NodesTypesRegistryEntry },
                 private registeredRelations:{ [type:string]:RelationsTypesRegistryEntry },
-                private _transformers:TransformersRegistry = {}) {
+                private extensionsMapper:ExtensionsRowMapper) {
     }
 
     getMapper<T extends GraphEntity>(klass:Type<T>):AttributesMapper<T> {
-        return new AttributesMapper(klass, this._transformers);
+        return new AttributesMapper(klass, this.extensionsMapper);
     }
 
     hasNodeMapper(labels:string[]):boolean {
@@ -24,7 +25,7 @@ export class AttributesMapperFactory {
         return isPresent(entry);
     }
 
-    getNodeMapper<T extends GraphEntity>(labels:string[]):AttributesMapper<T> {
+    getNodeAttributesMapper<T extends GraphEntity>(labels:string[]):AttributesMapper<T> {
         let entry:NodesTypesRegistryEntry = this.getNodeRegistryEntry(labels.sort());
         if (_.isUndefined(entry)) {
             throw new Error("Missing metadata for " + labels);
@@ -36,7 +37,7 @@ export class AttributesMapperFactory {
         let nodeMetadata = NodeMetadata.getForClass(klass);
 
         return isPresent(nodeMetadata) ?
-            this.getNodeMapper(nodeMetadata.getLabels()) as any :
+            this.getNodeAttributesMapper(nodeMetadata.getLabels()) as any :
             null;
     }
 
@@ -45,7 +46,7 @@ export class AttributesMapperFactory {
         return isPresent(entry);
     }
 
-    getRelationMapper<T extends GraphEntity>(type:string):AttributesMapper<T> {
+    getRelationAttributesMapper<T extends GraphEntity>(type:string):AttributesMapper<T> {
         let entry:RelationsTypesRegistryEntry = this.registeredRelations[type];
         if (_.isUndefined(entry)) {
             throw new Error("Missing metadata for " + type);
@@ -55,12 +56,7 @@ export class AttributesMapperFactory {
 
     getRelationMapperForClass(klass):AttributesMapper<any> | null {
         let relationMetadata = RelationMetadata.getForClass(klass);
-        return isPresent(relationMetadata) ? this.getRelationMapper(relationMetadata.getId()) : null;
-    }
-
-    addTransformFunction(context:MappingContext, transformer:(obj:any) => any) {
-        let transformers = this._transformers[context] || (this._transformers[context] = []);
-        transformers.push(transformer);
+        return isPresent(relationMetadata) ? this.getRelationAttributesMapper(relationMetadata.getId()) : null;
     }
 
     private getNodeRegistryEntry<T extends GraphEntity>(labelOrLabels:string[]):NodesTypesRegistryEntry {

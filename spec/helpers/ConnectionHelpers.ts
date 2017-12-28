@@ -1,9 +1,8 @@
-import {Connection} from "../../lib/connection/Connection";
+import {Connection, Neography} from "../../lib";
 import * as _ from 'lodash';
 import {someOrThrow} from "../../lib/utils/core";
-import {Neography} from "../../lib/index";
 import {QueryContext} from "../../lib/cypher/common/QueryContext";
-import {TimestampsExtension} from "../../lib/extensions/TimestampsExtension";
+import {TimestampsExtension} from "../../lib/extensions";
 
 export const getDefaultNeography = ():Neography => {
     let neography = new Neography({host: 'localhost', username: 'neo4j', password: 'password'});
