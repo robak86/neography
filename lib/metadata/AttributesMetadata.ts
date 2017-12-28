@@ -33,7 +33,7 @@ export class AttributesMetadata {
     }
 
     static getForClass(klass):AttributesMetadata {
-        return Reflect.getOwnMetadata(AttributesMetadata.ATTRIBUTES_METADATA_KEY, klass);
+        return Reflect.getMetadata(AttributesMetadata.ATTRIBUTES_METADATA_KEY, klass)
     }
 
     static getForInstance(instance):AttributesMetadata {
