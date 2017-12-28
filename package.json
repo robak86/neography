@@ -4,11 +4,16 @@
   "description": "Simple object mapper and queries builder for official neo4j driver.",
   "main": "index.js",
   "types": "index.d.ts",
+  "engines": {
+    "node": ">=6.0.0 <9.0.0",
+    "yarn": ">=1.0.2 <2.0.0"
+  },
   "scripts": {
     "test": "mocha --opts mocha.opts dist/spec/**/*.spec.js",
-    "build:clear": "rm -rf ./dist",
-    "build:watch": "npm run build:clear && tsc --watch --pretty",
-    "build:dist": "npm run build:clear && tsc && cp README.md dist/lib && cp package.json dist/lib",
+    "build:clear": "rm -rf ./dist && mkdir -p dist/lib",
+    "build:copy": "cp README.md dist/lib && cp package.json dist/lib",
+    "build:watch": "npm run build:clear && npm run build:copy && tsc --watch --pretty",
+    "build:dist": "npm run build:clear && tsc && npm run build:copy",
     "build:coverage:publish": "nyc --reporter=text-lcov mocha -- -- spec dist/spec/**/*.spec.js | coveralls",
     "build:coverage": "nyc --reporter=text mocha -- -- spec dist/spec/**/*.spec.js",
     "docker:start": "docker-compose up -d",
@@ -37,6 +42,7 @@
     "@types/lodash": "^4.14.71",
     "@types/mocha": "^2.2.40",
     "@types/node": "^7.0.12",
+    "@types/p-queue": "^1.1.0",
     "chai": "^3.5.0",
     "coveralls": "^3.0.0",
     "faker": "^4.1.0",
@@ -47,11 +53,13 @@
     "typescript": "^2.4.2"
   },
   "dependencies": {
-    "@types/p-queue": "^1.1.0",
     "lodash": "^4.17.4",
     "neo4j-driver": "^1.5.1",
     "p-queue": "^1.1.0",
     "reflect-metadata": "^0.1.10",
     "shortid": "^2.2.8"
+  },
+  "peerDependencies": {
+    "reflect-metadata": "^0.1.10"
   }
 }
