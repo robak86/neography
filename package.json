@@ -51,13 +51,13 @@
     "nyc": "^10.2.0",
     "sinon": "^2.1.0",
     "source-map-support": "^0.4.14",
-    "typescript": "^2.4.2"
+    "typescript": "^2.4.2",
+    "reflect-metadata": "^0.1.10"
   },
   "dependencies": {
     "lodash": "^4.17.4",
     "neo4j-driver": "^1.5.1",
     "p-queue": "^1.1.0",
-    "reflect-metadata": "^0.1.10",
     "shortid": "^2.2.8"
   },
   "peerDependencies": {
