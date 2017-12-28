@@ -11,3 +11,5 @@
   and throw error if ```id``` is missing
  - rename ```pickOne``` method of GraphResponse to more intuitive ```pluck```
  - allow user to pass logger instance in configuration 
+ - add saveMany for NodeRepository
+ - @timestamp maps neo4j integer value to javascript Date object

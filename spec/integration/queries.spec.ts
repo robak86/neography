@@ -5,7 +5,7 @@ import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 
 import {QueryBuilder} from "../../lib/cypher/builders/QueryBuilder";
 import {int} from "../../lib/driver/Integer";
-import {expectIsNowTimeStamp} from "../helpers/assertions";
+import {expectIsNowDate} from "../helpers/assertions";
 import {ChildDummyGraphNode} from "../fixtures/ChildDummyGraphNode";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 
@@ -65,8 +65,8 @@ describe("Queries", () => {
             });
 
             it("adds updatedAt and createdAt properties (TimestampsExtension enabled)", () => {
-                expectIsNowTimeStamp(matchedNode.createdAt as number);
-                expectIsNowTimeStamp(matchedNode.updatedAt as number);
+                expectIsNowDate(matchedNode.createdAt as Date);
+                expectIsNowDate(matchedNode.updatedAt as Date);
             });
 
             describe("object returned by runQuery", () => {
@@ -94,9 +94,9 @@ describe("Queries", () => {
             expect(savedNode.attr1).to.eq('attr1');
             expect(savedNode.attr2).to.eq(123);
             expect(savedNode.attr3).to.eq('inheritance is bad, mkay');
-            expect(savedNode.createdAt).to.be.a('number');
-            expectIsNowTimeStamp(savedNode.createdAt);
-            expectIsNowTimeStamp(savedNode.updatedAt);
+            expect(savedNode.createdAt).to.be.a('Date');
+            expectIsNowDate(savedNode.createdAt);
+            expectIsNowDate(savedNode.updatedAt);
         });
     });
 
@@ -173,8 +173,8 @@ describe("Queries", () => {
                 });
 
                 it("adds updatedAt and createdAt properties (TimestampsExtension enabled)", () => {
-                    expectIsNowTimeStamp(matchedRelation.createdAt as number);
-                    expectIsNowTimeStamp(matchedRelation.updatedAt as number);
+                    expectIsNowDate(matchedRelation.createdAt as Date);
+                    expectIsNowDate(matchedRelation.updatedAt as Date);
                 });
 
                 describe("object returned by runQuery", () => {
