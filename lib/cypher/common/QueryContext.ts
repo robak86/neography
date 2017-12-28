@@ -3,22 +3,14 @@ import {Type} from "../../utils/types";
 import {AbstractNode, AbstractRelation} from "../../model";
 import {isPresent, someOrThrow} from "../../utils/core";
 import {AttributesMapperFactory} from "../../mappers/AttributesMapperFactory";
-import {nodeTypesRegistry, relationsTypesRegistry} from "../../annotations";
 
 
 export class QueryContext {
     private _nodesCounter:number = 0;
     private _relationsCounter:number = 0;
     private _literalCounter:number = 0;
-    private _userDefinedAliases:{ [alias:string]:any } = {};
 
-    static buildDefault(attributesMapperFactory?:AttributesMapperFactory) {
-        return new QueryContext(attributesMapperFactory ? attributesMapperFactory
-            : new AttributesMapperFactory(nodeTypesRegistry.getEntries(),relationsTypesRegistry.getEntries()));
-    }
-
-    constructor(private attributesMapperFactory:AttributesMapperFactory) {
-    }
+    constructor(private attributesMapperFactory:AttributesMapperFactory) {}
 
     //TODO: prefix with double underscore in order to prevent collisions with user speciefied fields
     checkoutNodeAlias():string {
@@ -30,6 +22,7 @@ export class QueryContext {
         return `${entityAlias}Params`;
     }
 
+    //TODO: investigate if this will be ever used
     checkoutLiteralParamsAlias():string {
         return `literalParams${this._literalCounter += 1}`;
     }
@@ -45,7 +38,7 @@ export class QueryContext {
     }
 
     hasMapperForRelationClass<T extends AbstractRelation>(relationClass:Type<T>):boolean {
-        let mapper =this.attributesMapperFactory.getRelationMapperForClass(relationClass);
+        let mapper = this.attributesMapperFactory.getRelationMapperForClass(relationClass);
         return isPresent(mapper);
     }
 
@@ -53,15 +46,17 @@ export class QueryContext {
         return someOrThrow(this.attributesMapperFactory.getNodeMapperForClass(nodeClass), `Cannot find node mapper for ${nodeClass}`);
     }
 
+    //TODO: investigate if this will be ever used
     getMapperForNodeLabels(labels:string[]):AttributesMapper<any> {
-        return this.attributesMapperFactory.getNodeMapper(labels)
+        return this.attributesMapperFactory.getNodeAttributesMapper(labels)
     }
 
     getMapperForRelationClass<T extends AbstractRelation>(relationClass:Type<T>):AttributesMapper<T> {
         return someOrThrow(this.attributesMapperFactory.getRelationMapperForClass(relationClass), `Cannot find relation mapper for ${relationClass}`)
     }
 
+    //TODO: investigate if this will be ever used
     getMapperForRelationType(type:string):AttributesMapper<any> {
-        return this.attributesMapperFactory.getRelationMapper(type);
+        return this.attributesMapperFactory.getRelationAttributesMapper(type);
     }
 }

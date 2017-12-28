@@ -13,12 +13,12 @@ export class AutoMapper {
 
             record.forEach((recordField:Node|Relationship, id) => {
                 if (isNode(recordField) && this.attributesMapperFactory.hasNodeMapper(recordField.labels)) {
-                    row[id] = this.attributesMapperFactory.getNodeMapper(recordField.labels).mapToInstance(recordField);
+                    row[id] = this.attributesMapperFactory.getNodeAttributesMapper(recordField.labels).mapToInstance(recordField);
                     return;
                 }
 
                 if (isRelationship(recordField) && this.attributesMapperFactory.hasRelationMapper(recordField.type)) {
-                    row[id] = this.attributesMapperFactory.getRelationMapper(recordField.type).mapToInstance(recordField);
+                    row[id] = this.attributesMapperFactory.getRelationAttributesMapper(recordField.type).mapToInstance(recordField);
                     return;
                 }
 

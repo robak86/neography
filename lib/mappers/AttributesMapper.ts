@@ -1,22 +1,15 @@
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
 import {Type} from "../utils/types";
 import {isPresent} from "../utils/core";
-import * as _ from 'lodash';
 import {GraphEntity} from "../model";
+import {ExtensionsRowMapper} from "./ExtensionsRowMapper";
+import {TransformContext} from "../extensions/IRowTransformer";
 
-
-export type MappingContext = 'create' | 'update' | 'read';
-
-//TODO: add support for read
-export interface TransformersRegistry {
-    create?:((obj) => any)[]
-    update?:((obj) => any)[]
-    read?:((obj) => any)[]
-}
 
 export class AttributesMapper<T extends GraphEntity> {
 
-    constructor(private klass:Type<T>, private transformers:TransformersRegistry) {}
+    constructor(private klass:Type<T>,
+                private extensionsRowMapper:ExtensionsRowMapper) {}
 
     private get attributesMetadata():AttributesMetadata {
         return AttributesMetadata.getForClass(this.klass);
@@ -31,21 +24,19 @@ export class AttributesMapper<T extends GraphEntity> {
         let propertiesNames = this.attributesMetadata.getAttributesNames();
 
         propertiesNames.forEach(prop => {
-            let fromRowMapper = this.attributesMetadata.getAttributeMetadata(prop);
+            let attributeMetadata = this.attributesMetadata.getAttributeMetadata(prop);
             if (isPresent(record.properties[prop])) {
-                instance[prop] = fromRowMapper.fromRowMapper(record.properties[prop]);
+                instance[prop] = attributeMetadata.fromRowMapper(record.properties[prop]);
             }
         });
 
         return instance as T;
     }
 
-    mapToRow(nodeInstance, type:'create' | 'update' | 'skip') {
-        let propertiesTransformers = _.get(this.transformers, [type], []);
-        let propertiesNames = this.attributesMetadata.getAttributesNames();
+    mapToRow(nodeInstance, type:TransformContext) {
         let row:any = {};
 
-
+        let propertiesNames = this.attributesMetadata.getAttributesNames();
         propertiesNames.forEach(prop => {
             let attributeMetadata = this.attributesMetadata.getAttributeMetadata(prop);
             if (isPresent(nodeInstance[prop])) {
@@ -53,9 +44,7 @@ export class AttributesMapper<T extends GraphEntity> {
             }
         });
 
-        row = propertiesTransformers.reduce((prev, currentTransform) => {
-            return currentTransform(prev);
-        }, row);
+        row = this.extensionsRowMapper.mapToRow(row,type);
 
         return row;
     }
