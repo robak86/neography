@@ -27,9 +27,7 @@ export class AttributesMapper<T extends GraphEntity> {
         let instance = new this.klass();
 
         if (this.hasAnyAttributes) {
-            let propertiesNames = this.attributesMetadata.getAttributesNames();
-            propertiesNames.forEach(prop => {
-                let attributeMetadata = this.attributesMetadata.getAttributeMetadata(prop);
+            this.attributesMetadata.forEachAttribute((attributeMetadata, prop) => {
                 if (isPresent(record.properties[prop])) {
                     instance[prop] = attributeMetadata.fromRowMapper(record.properties[prop]);
                 }
