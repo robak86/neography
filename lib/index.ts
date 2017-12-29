@@ -37,6 +37,9 @@ export class Neography {
 
         if (this.config.debug) {
             setDebugLogger(new SimpleDebugLogger());
+            if (!configParams.logger) {
+                setLogger(new SimpleDebugLogger());
+            }
         }
     }
 
