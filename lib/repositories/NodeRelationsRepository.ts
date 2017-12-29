@@ -5,7 +5,7 @@ import {Connection} from "../connection/Connection";
 import {getClassFromInstance} from "../utils/core";
 
 
-export class NodeRelationsRepository {
+export class NodeRelationsRepository<T> {
 
     constructor(private fromNode:AbstractNode,
                 private connection:Connection) {

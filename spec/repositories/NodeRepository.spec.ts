@@ -9,6 +9,7 @@ import {buildQuery} from "../../lib/cypher";
 
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import {RelationRepository} from "../../lib/repositories/RelationRepository";
+import {assertAllPersisted} from "../../lib/model";
 
 describe("NodeRepository", () => {
 
@@ -68,7 +69,6 @@ describe("NodeRepository", () => {
             n1 = new DummyGraphNode({attr1: 'n1'});
             n2 = new DummyGraphNode({attr1: 'n2'});
             savedNodes = await nodeRepository.saveMany([n1, n2]);
-            console.log(savedNodes);
         });
 
         it('returns all saved nodes', () => {
@@ -125,6 +125,12 @@ describe("NodeRepository", () => {
             savedNodes = await nodeRepository.saveMany([]);
             expect(savedNodes.length).to.eq(0);
         });
+
+        it('accepts up to 100 nodes', async () => {
+            let nodes = _.times(100).map((id) => new DummyGraphNode({attr1: id.toString()}));
+            let storedNodes = await nodeRepository.saveMany(nodes);
+            assertAllPersisted(storedNodes);
+        }).timeout(4000);
     });
 
     describe(".findByIds", () => {
@@ -180,7 +186,39 @@ describe("NodeRepository", () => {
             let from = await nodeRepository.save(dummyNode);
             let to = await nodeRepository.save(new DummyGraphNode({attr1: 'Jane'}));
 
-            let createdRelation = await relationRepository.save(from, to, new DummyGraphRelation({}));
+            let createdRelation = await relationRepository.connectNodes(from, to, new DummyGraphRelation({}));
+            expect(await nodeRepository.exists(from.id)).to.eq(true);
+            expect(await nodeRepository.exists(to.id)).to.eq(true);
+            expect(await relationRepository.exists(createdRelation.id)).to.eq(true);
+
+            await nodeRepository.remove(from.id);
+
+            expect(await nodeRepository.exists(from.id)).to.eq(false);
+            expect(await nodeRepository.exists(to.id)).to.eq(true);
+            expect(await relationRepository.exists(createdRelation.id)).to.eq(false);
+        });
+    });
+
+    describe(".removeMany", () => {
+        it.only("removes node", async () => {
+            let n1 = await nodeRepository.save(new DummyGraphNode());
+            let n2 = await nodeRepository.save(new DummyGraphNode());
+
+
+            expect(await nodeRepository.exists(n1.id)).to.eq(true);
+            expect(await nodeRepository.exists(n2.id)).to.eq(true);
+
+            await nodeRepository.removeMany([n1.id, n2.id]);
+
+            expect(await nodeRepository.exists(n1.id)).to.eq(false);
+            expect(await nodeRepository.exists(n2.id)).to.eq(false);
+        });
+
+        it("removes all related relations", async () => {
+            let from = await nodeRepository.save(dummyNode);
+            let to = await nodeRepository.save(new DummyGraphNode({attr1: 'Jane'}));
+
+            let createdRelation = await relationRepository.connectNodes(from, to, new DummyGraphRelation({}));
             expect(await nodeRepository.exists(from.id)).to.eq(true);
             expect(await nodeRepository.exists(to.id)).to.eq(true);
             expect(await relationRepository.exists(createdRelation.id)).to.eq(true);
@@ -212,5 +250,87 @@ describe("NodeRepository", () => {
             let result = await nodeRepository.update(savedNode);
             expect(result.updatedAt).to.be.greaterThan((savedNode.updatedAt as Date).getTime());
         });
+    });
+
+    describe(".updateMany", () => {
+        let savedNodes:DummyGraphNode[];
+        let n1:DummyGraphNode,
+            n2:DummyGraphNode;
+
+        beforeEach(async () => {
+            n1 = await nodeRepository.save(new DummyGraphNode({attr1: 'n1'}));
+            n2 = await nodeRepository.save(new DummyGraphNode({attr1: 'n2'}));
+
+            n1.attr1 = 'n1Updated';
+            n2.attr1 = 'n2Updated';
+
+            savedNodes = await nodeRepository.updateMany([n1, n2]);
+        });
+
+        it('returns all saved nodes', () => {
+            expect(savedNodes.length).to.eq(2);
+        });
+
+        it('maps returned data to instances of correct class', () => {
+            expect(savedNodes[0]).to.be.instanceof(DummyGraphNode);
+            expect(savedNodes[1]).to.be.instanceof(DummyGraphNode);
+        });
+
+        it("sets correct properties for returned nodes", async () => {
+            expect(savedNodes[0].attr1).to.eql(n1.attr1);
+            expect(savedNodes[1].attr1).to.eql(n2.attr1);
+        });
+
+        it("sets id, createdAt and updatedAt properties for saved nodes", () => {
+            expect(savedNodes[0].id).to.be.a('string');
+            expect(savedNodes[0].createdAt).to.be.a('Date');
+            expect(savedNodes[0].updatedAt).to.be.a('Date');
+
+            expect(savedNodes[1].id).to.be.a('string');
+            expect(savedNodes[1].createdAt).to.be.a('Date');
+            expect(savedNodes[1].updatedAt).to.be.a('Date');
+        });
+
+        it("does not store additional params", () => {
+            expect(Object.keys(savedNodes[0]).sort())
+                .to.eql(['attr1', 'id', 'createdAt', 'updatedAt'].sort());
+
+            expect(Object.keys(savedNodes[1]).sort())
+                .to.eql(['attr1', 'id', 'createdAt', 'updatedAt'].sort());
+        });
+
+        it("creates nodes", async () => {
+            let query = buildQuery().literal(`MATCH(n {id: {id}}) return n`, {id: savedNodes[0].id});
+            let n1 = await connection.runQuery(query).pluck('n').first();
+
+            query = buildQuery().literal(`MATCH(n {id: {id}}) return n`, {id: savedNodes[1].id});
+            let n2 = await connection.runQuery(query).pluck('n').first();
+
+            expect(savedNodes[0].id).to.eql(n1.id);
+            expect(savedNodes[0].createdAt).to.eql(n1.createdAt);
+            expect(savedNodes[0].updatedAt).to.eql(n1.updatedAt);
+            expect(savedNodes[0].attr1).to.eql(n1.attr1);
+
+            expect(savedNodes[1].id).to.eql(n2.id);
+            expect(savedNodes[1].createdAt).to.eql(n2.createdAt);
+            expect(savedNodes[1].updatedAt).to.eql(n2.updatedAt);
+            expect(savedNodes[1].attr1).to.eql(n2.attr1);
+        });
+
+        it('returns empty array if passed array is empty', async () => {
+            savedNodes = await nodeRepository.saveMany([]);
+            expect(savedNodes.length).to.eq(0);
+        });
+
+        it('accepts up to 100 nodes', async () => {
+            let storedNodes = await nodeRepository.saveMany(
+                _.times(100).map((id) => new DummyGraphNode({attr1: id.toString()}))
+            );
+
+            assertAllPersisted(storedNodes);
+            storedNodes.forEach(node => node.attr1 = 'updated');
+            let updatedNodes = await nodeRepository.updateMany(storedNodes);
+            expect(updatedNodes.every(node => node.attr1 === 'updated')).to.eq(true);
+        }).timeout(4000);
     });
 });

@@ -3,8 +3,10 @@ import {Connection} from "../connection/Connection";
 import {AbstractRelation} from "../model";
 import {AbstractNode} from "../model";
 import {Type} from "../utils/types";
-import {either} from "../utils/core";
+import {either, getClassFromInstance} from "../utils/core";
 import {buildQuery} from "../cypher";
+import {ConnectedNode, isConnectedNode} from "../model/ConnectedNode";
+
 
 export class RelationRepository<FROM extends AbstractNode, R extends AbstractRelation, TO extends AbstractNode> {
 
@@ -40,14 +42,35 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
         return this.connection.runQuery(query).pluck('rel').first();
     }
 
-    save(from:FROM, to:TO, relation:R):Promise<R> {
+    async setConnectedNodes(from:FROM, connectedNodes:(ConnectedNode<R, TO> | TO)[], removeDetached:boolean = true) {
+        let existingConnections = await this.getConnectedNodes(from);
+
+        let persistedNodes:TO[] = [];
+        let newNodes:TO[] = [];
+        connectedNodes.map(connectedNode => {
+            let node = isConnectedNode(connectedNode, this.relationClass, this.toClass) ?
+                connectedNode.node :
+                connectedNode;
+
+            node.isPersisted() ?
+                persistedNodes.push(node) :
+                newNodes.push(node);
+        });
+        let nodeRepository = this.connection.getNodeRepository(this.toClass);
+        persistedNodes = await nodeRepository.updateMany(persistedNodes);
+        newNodes = await nodeRepository.saveMany(newNodes);
+
+        let newlyConnectdNodes = [...persistedNodes, ...newNodes];
+    }
+
+    connectNodes(from:FROM, to:TO, relation:R = new this.relationClass()):Promise<R> {
         assertPersisted(from);
         assertPersisted(to);
 
         let query = buildQuery()
             .match(m => [
-                m.node<FROM>(this.fromClass).params({id: from.id} as any).as('from'),
-                m.node(this.toClass).params({id: to.id} as any).as('to')
+                m.node(getClassFromInstance(from)).params({id: from.id} as any).as('from'),
+                m.node(getClassFromInstance(to)).params({id: to.id} as any).as('to')
             ])
             .create(c => [
                 c.matchedNode('from'),
@@ -59,11 +82,13 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
         return this.connection.runQuery(query).pluck('rel').first();
     }
 
-    remove(id:string | undefined):Promise<any> {
+    remove(relation:R):Promise<any> {
+        assertPersisted(relation);
+
         let query = buildQuery()
             .match(m => [
                 m.node(),
-                m.relation(this.relationClass).params({id} as any).as('rel'),
+                m.relation(this.relationClass).params({id: relation.id} as any).as('rel'),
                 m.node()
             ])
             .append('DELETE rel');
@@ -72,7 +97,7 @@ export class RelationRepository<FROM extends AbstractNode, R extends AbstractRel
     }
 
     //TODO: write specs
-    async getRelatedNodes(from:FROM, relationParams:Partial<R> = {}, connectedNodeParams:Partial<TO> = {}):Promise<{ relation:R, node:TO }[]> {
+    async getConnectedNodes(from:FROM, relationParams:Partial<R> = {}, connectedNodeParams:Partial<TO> = {}):Promise<{ relation:R, node:TO }[]> {
         assertPersisted(from);
 
         let query = buildQuery()

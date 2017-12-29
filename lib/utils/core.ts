@@ -41,8 +41,8 @@ export function getClassAncestors(klass):Type<any>[] {
     return ancestors;
 }
 
-export function invariant(condition:boolean | (() => boolean), message:string) {
-    if ((_.isFunction(condition) && (!condition())) || !condition) {
+export function invariant(condition:boolean, message:string) {
+    if (!condition) {
         throw new Error(message);
     }
 }

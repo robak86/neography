@@ -4,10 +4,15 @@ import {someOrThrow} from "../../lib/utils/core";
 import {QueryContext} from "../../lib/cypher/common/QueryContext";
 import {TimestampsExtension} from "../../lib/extensions";
 
-const DEBUG_ENABLED = false;
+const DEBUG_ENABLED = true;
 
 export const getDefaultNeography = _.memoize(():Neography => {
-    let neography = new Neography({host: 'localhost', username: 'neo4j', password: 'password', debug:DEBUG_ENABLED});
+    let neography = new Neography({
+        host: 'localhost',
+        username: 'neo4j',
+        password: 'password',
+        debug:DEBUG_ENABLED
+    });
     neography.registerExtension(TimestampsExtension.getDefault());
     return neography;
 });

@@ -1,8 +1,13 @@
-import {AbstractNode, assertIdExists, assertPersisted} from "../model";
+import {
+    AbstractNode, assertAllIdsPresent, assertAllNew, assertAllPersisted, assertIdExists,
+    assertPersisted
+} from "../model";
 import {Connection} from "../connection/Connection";
 import {cypher} from "../cypher/builders/QueryBuilder";
 import {Type} from "../utils/types";
 import {buildQuery} from "../index";
+import {MatchBuilder} from "../cypher/builders/MatchBuilder";
+import {SetQueryBuilder} from "../cypher/builders/SetQueryBuilder";
 
 export class NodeRepository<T extends AbstractNode> {
     constructor(private klass:Type<T>,
@@ -33,13 +38,13 @@ export class NodeRepository<T extends AbstractNode> {
     async saveMany(nodes:T[]):Promise<T[]> {
         if (Array.isArray(nodes) && nodes.length === 0) {
             return []
-        } else {
-            let query = buildQuery()
-                .create(c => nodes.map((node, idx) => c.node(node).as('n' + idx)))
-                .returns(`[${nodes.map((n, idx) => 'n' + idx)}] as list`);
-
-            return this.connection.runQuery(query).pluck('list').first()
         }
+        assertAllNew(nodes);
+        let query = buildQuery()
+            .create(c => nodes.map((node, idx) => c.node(node).as('n' + idx)))
+            .returns(`[${nodes.map((n, idx) => 'n' + idx)}] as list`);
+
+        return this.connection.runQuery(query).pluck('list').first()
     };
 
     update(node:T):Promise<T> {
@@ -51,6 +56,32 @@ export class NodeRepository<T extends AbstractNode> {
             .returns('n');
 
         return this.connection.runQuery(query).pluck('n').first();
+    };
+
+    async updateMany(nodes:T[]):Promise<T[]> {
+        if (Array.isArray(nodes) && nodes.length === 0) {
+            return []
+        }
+        assertAllPersisted(nodes);
+
+        const matchTargetNodes = (m:MatchBuilder) => nodes.map((node, idx) => {
+            return m.node<T>(this.klass).params({id: node.id} as any).as('n' + idx)
+        });
+
+        const updateTargetNodes = (s:SetQueryBuilder) => nodes.map((node, idx) => {
+            return s.update('n' + idx).typed(this.klass, node);
+        });
+
+        if (Array.isArray(nodes) && nodes.length === 0) {
+            return []
+        } else {
+            let query = buildQuery()
+                .match(matchTargetNodes)
+                .set(updateTargetNodes)
+                .returns(`[${nodes.map((n, idx) => 'n' + idx).join(',')}] as list`);
+
+            return this.connection.runQuery(query).pluck('list').first();
+        }
     };
 
     findByIds(ids:(string | undefined)[]):Promise<T[]> {
@@ -72,6 +103,27 @@ export class NodeRepository<T extends AbstractNode> {
         let query = buildQuery()
             .match(m => m.node(this.klass as Type<AbstractNode>).params({id}).as('n'))
             .append(`${deletePrefix} n`);
+
+        return this.connection.runQuery(query).toArray();
+    }
+
+    async removeMany(ids:(string | undefined)[], detach:boolean = true):Promise<any> {
+        assertAllIdsPresent(ids);
+
+        if (ids.length === 0) {
+            return []
+        }
+
+        const matchTargetNodes = (m:MatchBuilder) => ids.map((id, idx) => {
+            return m.node<T>(this.klass).params({id} as any).as('n' + idx)
+        });
+
+        let deletePrefix = detach ? 'DETACH DELETE' : 'DELETE';
+        const returnStatement = ` ${deletePrefix}  ${ids.map((_, idx) => 'n' + idx).join(',')} `;
+
+        let query = buildQuery()
+            .match(matchTargetNodes)
+            .append(returnStatement);
 
         return this.connection.runQuery(query).toArray();
     }
