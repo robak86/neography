@@ -5,7 +5,7 @@
     "sourceMap": true,
     "declaration": true,
     "lib": ["es6", "dom"],
-    "types": ["reflect-metadata", "mocha", "chai", "node"],
+    "types": ["reflect-metadata", "mocha", "chai", "node", "chai-string", "chai-as-promised"],
     "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
