@@ -1,7 +1,6 @@
 import * as PQueue from "p-queue";
 import {StatementResult} from "neo4j-driver/types/v1/result";
-import {Driver} from "neo4j-driver/types/v1/driver";
-import {ILogger} from "../utils/ILogger";
+import {DriverProxy} from "../driver/DriverProxy";
 
 /***
  * It creates new session for each query.
@@ -9,9 +8,8 @@ import {ILogger} from "../utils/ILogger";
 export class QueryRunner {
     private queue:PQueue;
 
-    constructor(private driver:Driver,
-                private concurrency = 100,
-                private logger:ILogger) {
+    constructor(private driver:DriverProxy,
+                private concurrency = 100) {
         this.queue = new PQueue({concurrency});
     }
 
@@ -21,8 +19,8 @@ export class QueryRunner {
             let response:StatementResult;
 
             try {
-                this.logger.logQuery(statement, parameters);
                 response = await session.run(statement, parameters);
+                session.close()
             } catch (e) {
                 session.close();
                 throw e;

@@ -11,6 +11,7 @@ export type NeographyConfigParams = {
     objectTransform?:((obj:any) => any)[];
     sessionsPoolSize?:number;
     logger?:ILogger;
+    debug?:boolean;
 }
 
 export class Config {
@@ -21,13 +22,15 @@ export class Config {
     objectTransform:((obj:any) => any)[];
     sessionsPoolSize:number;
     logger:ILogger;
+    debug:boolean;
 
     constructor(private params:NeographyConfigParams) {
         _.merge(this, {
             objectTransform: [],
             uidGenerator: genId,
             poolSize: 10,
-            logger: new MutedLogger()
+            logger: new MutedLogger(),
+            debug: false
         }, params);
     }
 }

@@ -1,29 +1,24 @@
 import {pfinally} from "../utils/promise";
 import {StatementResult} from "neo4j-driver/types/v1/result";
-import {Driver} from "neo4j-driver/types/v1/driver";
-import Session from "neo4j-driver/types/v1/session";
-import Transaction from "neo4j-driver/types/v1/transaction";
-import {ILogger} from "../utils/ILogger";
+import {DriverProxy} from "../driver/DriverProxy";
+import {SessionProxy} from "../driver/SessionProxy";
+import {TransactionProxy} from "../driver/TransactionProxy";
 
 
 export class TransactionRunner {
     private ongoingTransactions:number = 0;
-    private transaction:Transaction;
+    private transaction:TransactionProxy;
     private hasError:boolean = false; //merge this two variables
     private lastError:any;
-    private session:Session;
+    private session:SessionProxy;
 
-    constructor(private driver:Driver,
-                private logger:ILogger) {
-        this.session = driver.session();
-        this.transaction = this.session.beginTransaction();
+    constructor(private driver:DriverProxy) {
     }
 
     async run(statement:string, parameters?:any):Promise<StatementResult> {
         if (this.hasError) {
             return Promise.reject(this.lastError);
         } else {
-            this.logger.logQuery(statement, parameters);
             return this.transaction
                 .run(statement, parameters)
                 .catch(err => {
@@ -34,14 +29,12 @@ export class TransactionRunner {
     }
 
     rollback(err = new Error('Unknown error')) {
-        this.logger.error('ROLLBACK transaction');
         this.transaction.rollback();
         this.hasError = true;
         this.lastError = err;
     }
 
     commit():Promise<any> {
-        this.logger.info('COMMIT transaction');
         let commitPromise = !this.hasError ? this.transaction.commit() : Promise.reject(this.lastError);
         return pfinally(() => this.session.close(), commitPromise);
     }
@@ -73,7 +66,6 @@ export class TransactionRunner {
     }
 
     private checkoutNewTransaction() {
-        this.logger.info('BEGIN transaction');
         this.hasError = false;
         this.lastError = undefined;
         this.session = this.driver.session();
