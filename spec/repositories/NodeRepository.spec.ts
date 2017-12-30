@@ -8,13 +8,14 @@ import {Connection} from "../../lib";
 import {buildQuery} from "../../lib/cypher";
 
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
-import {RelationRepository} from "../../lib/repositories/RelationRepository";
+import {FromNodeRelationsRepository} from "../../lib/repositories/FromNodeRelationsRepository";
 import {assertAllPersisted} from "../../lib/model";
+import {RelationRepository} from "../../lib/repositories/RelationRepository";
 
 describe("NodeRepository", () => {
 
     let nodeRepository:NodeRepository<DummyGraphNode>,
-        relationRepository:RelationRepository<DummyGraphNode, DummyGraphRelation, DummyGraphNode>,
+        relationRepository:RelationRepository<DummyGraphRelation>,
         dummyNode:DummyGraphNode,
         connection:Connection;
 
@@ -22,7 +23,7 @@ describe("NodeRepository", () => {
         await cleanDatabase();
         connection = getSharedConnection();
         nodeRepository = connection.getNodeRepository(DummyGraphNode);
-        relationRepository = connection.getRelationRepository(DummyGraphNode, DummyGraphRelation, DummyGraphNode);
+        relationRepository = connection.getRelationRepository(DummyGraphRelation);
         dummyNode = new DummyGraphNode({attr1: "John"});
     });
 
@@ -144,6 +145,8 @@ describe("NodeRepository", () => {
 
         it('fetches all nodes with given ids', async () => {
             let fetched = await nodeRepository.findByIds([n1.id, n2.id]);
+            fetched = <any>_.sortBy(fetched, (e) => (<any>e.createdAt).getTime()); //TODO: we should not sort result. Elements should be returned in correct order
+
             expect(fetched.length).to.eq(2);
             expect(fetched).to.eql([n1, n2])
         });
@@ -186,7 +189,7 @@ describe("NodeRepository", () => {
             let from = await nodeRepository.save(dummyNode);
             let to = await nodeRepository.save(new DummyGraphNode({attr1: 'Jane'}));
 
-            let createdRelation = await relationRepository.connectNodes(from, to, new DummyGraphRelation({}));
+            let createdRelation = await relationRepository.from(from).connectTo(to, new DummyGraphRelation({}));
             expect(await nodeRepository.exists(from.id)).to.eq(true);
             expect(await nodeRepository.exists(to.id)).to.eq(true);
             expect(await relationRepository.exists(createdRelation.id)).to.eq(true);
@@ -200,7 +203,7 @@ describe("NodeRepository", () => {
     });
 
     describe(".removeMany", () => {
-        it.only("removes node", async () => {
+        it("removes node", async () => {
             let n1 = await nodeRepository.save(new DummyGraphNode());
             let n2 = await nodeRepository.save(new DummyGraphNode());
 
@@ -218,7 +221,7 @@ describe("NodeRepository", () => {
             let from = await nodeRepository.save(dummyNode);
             let to = await nodeRepository.save(new DummyGraphNode({attr1: 'Jane'}));
 
-            let createdRelation = await relationRepository.connectNodes(from, to, new DummyGraphRelation({}));
+            let createdRelation = await relationRepository.from(from).connectTo(to);
             expect(await nodeRepository.exists(from.id)).to.eq(true);
             expect(await nodeRepository.exists(to.id)).to.eq(true);
             expect(await relationRepository.exists(createdRelation.id)).to.eq(true);

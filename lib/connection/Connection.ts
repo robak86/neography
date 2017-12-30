@@ -7,10 +7,11 @@ import {TransactionRunner} from "./TransactionRunner";
 import {AbstractNode, AbstractRelation} from "../model";
 import {Type} from "../utils/types";
 import {NodeRepository} from "../repositories/NodeRepository";
-import {RelationRepository} from "../repositories/RelationRepository";
+import {FromNodeRelationsRepository} from "../repositories/FromNodeRelationsRepository";
 import {GraphResponseFactory} from "../response/GraphResponseFactory";
 import {NodeRelationsRepository} from "../repositories/NodeRelationsRepository";
 import {QueryRunner} from "./QueryRunner";
+import {RelationRepository} from "../repositories/RelationRepository";
 
 export class Connection {
 
@@ -37,13 +38,13 @@ export class Connection {
         return new NodeRepository(nodeClass, this);
     }
 
-    getRelationRepository<FROM extends AbstractNode, REL extends AbstractRelation, TO extends AbstractNode>(from:Type<FROM>, relationClass:Type<REL>, to:Type<TO>):RelationRepository<FROM, REL, TO> {
-        return new RelationRepository(from, relationClass, to, this);
+    getRelationRepository<REL extends AbstractRelation>(relationClass:Type<REL>):RelationRepository<REL> {
+        return new RelationRepository(relationClass, this);
     }
 
-    getNodeRelationsRepository<N extends AbstractNode>(node:N):NodeRelationsRepository {
-        return new NodeRelationsRepository(node, this);
-    }
+    // getNodeRelationsRepository<N extends AbstractNode>(node:N):NodeRelationsRepository {
+    //     return new NodeRelationsRepository(node, this);
+    // }
 
     private execQuery(cypherQuery:string, params?:any):GraphResponse {
         let resultStatementQuery = this.transactionRunner.isTransactionOpened() ?

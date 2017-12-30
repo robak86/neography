@@ -6,7 +6,7 @@ import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import * as _ from 'lodash';
 
-describe.only("NodeRelationsRepository", () => {
+describe("NodeRelationsRepository", () => {
     let node1RelationsRepo:NodeRelationsRepository<DummyGraphRelation>;
     let node1:DummyGraphNode;
     let node2:DummyGraphNode;
