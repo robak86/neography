@@ -7,6 +7,6 @@ export class BoundNodesRepository<FROM extends AbstractRelation, TO extends Abst
     //         return
     // }
 
-    where<R extends AbstractRelation>(type:Type<R>, params:Partial<R> = {}):Promise<R[]>
+    // where<R extends AbstractRelation>(type:Type<R>, params:Partial<R> = {}):Promise<R[]>
 
 }

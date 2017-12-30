@@ -128,9 +128,6 @@ export class FromNodeRelationsRepository<FROM extends AbstractNode, R extends Ab
         return this.connection.runQuery(query).toArray();
     }
 
-    to<TO extends AbstractNode>(toNode:TO):BoundTypedRelationRepository<FROM, R, TO> {
-        return new BoundTypedRelationRepository(this.fromNode, this.relationClass, toNode, this.connection);
-    }
 
     //TODO: write specs
     // async getRelationById(id:string):Promise<R | null> {
