@@ -8,7 +8,7 @@ import {Connection} from "../../lib";
 import {buildQuery} from "../../lib/cypher";
 
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
-import {FromNodeRelationsRepository} from "../../lib/repositories/FromNodeRelationsRepository";
+import {NodeInstanceRepository} from "../../lib/repositories/NodeInstanceRepository";
 import {assertAllPersisted} from "../../lib/model";
 import {UnboundRelationRepository} from "../../lib/repositories/UnboundRelationRepository";
 

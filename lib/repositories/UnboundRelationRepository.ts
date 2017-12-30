@@ -1,5 +1,5 @@
 import {AbstractNode, AbstractRelation} from "../model";
-import {FromNodeRelationsRepository} from "./FromNodeRelationsRepository";
+import {NodeInstanceRepository} from "./NodeInstanceRepository";
 import {Type} from "../utils/types";
 import {Connection} from "../";
 import {BoundTypedRelationRepository} from "./BoundTypedRelationRepository";
@@ -11,8 +11,8 @@ export class UnboundRelationRepository<R extends AbstractRelation> {
 
     }
 
-    forNode<FROM extends AbstractNode>(node:FROM):FromNodeRelationsRepository<FROM, R> {
-        return new FromNodeRelationsRepository(this.relationClass, node, this.connection);
+    forNode<FROM extends AbstractNode>(node:FROM):NodeInstanceRepository<FROM, R> {
+        return new NodeInstanceRepository(this.relationClass, node, this.connection);
     }
 
     forNodes<FROM extends AbstractNode, TO extends AbstractNode>(nodeFrom:FROM, nodeTo:TO):BoundTypedRelationRepository<FROM, R, TO> {

@@ -9,8 +9,7 @@ import {CreateBuilder} from "../cypher/builders/CreateBuilder";
 import * as _ from 'lodash';
 import {MatchBuilder} from "../cypher/builders/MatchBuilder";
 
-//TODO: find better name
-export class FromNodeRelationsRepository<FROM extends AbstractNode, R extends AbstractRelation> {
+export class NodeInstanceRepository<FROM extends AbstractNode, R extends AbstractRelation> {
 
     constructor(private relationClass:Type<R>,
                 private fromNode:FROM,
@@ -18,14 +17,12 @@ export class FromNodeRelationsRepository<FROM extends AbstractNode, R extends Ab
         assertPersisted(this.fromNode);
     }
 
-
-    // The idea is that relations will be always recreated. Now since id on relationships are removed we can do it with no consequences
-    // In order to provide custom relation values user has to pass ConnectedNode instance instead of persisted node
+    //TODO: consider using detach
     async setConnectedNodes<TO extends AbstractNode>(connectedNodes:(ConnectedNode<R, TO> | TO)[], removeConnectedNodes:boolean = false) {
         let existingConnections = await this.getConnectedNodes();
 
         let connectedNodesCollection = new ConnectedNodesCollection(this.relationClass, connectedNodes);
-        if (connectedNodesCollection.containsNode(this.fromNode as any)){
+        if (connectedNodesCollection.containsNode(this.fromNode as any)) {
             throw new Error('Cannot create self referencing relation')
         }
         connectedNodesCollection.assertAllNodesPersisted();
@@ -37,8 +34,7 @@ export class FromNodeRelationsRepository<FROM extends AbstractNode, R extends Ab
         let connectionsForDetach = _.differenceWith(existingConnections, unchangedConnections, ConnectedNode.isEqual);
         let connectionsForAttach = _.differenceWith(newConnections, unchangedConnections, ConnectedNode.isEqual);
 
-
-        await this.detachNodes(connectionsForDetach.map(c => c.node),removeConnectedNodes);
+        await this.detachNodes(connectionsForDetach.map(c => c.node), removeConnectedNodes);
         await this.connectToMany(connectionsForAttach);
 
         return [...unchangedConnections, ...connectionsForAttach];
@@ -122,8 +118,6 @@ export class FromNodeRelationsRepository<FROM extends AbstractNode, R extends Ab
     }
 
 
-    //TODO: write specs
-
     //TODO: for narrowing to type we have to create another repository accepting also toNodeInstance (except fromNodeInstance)
     async getConnectedNodes<TO extends AbstractNode>(relationParams:Partial<R> = {}, connectedNodeParams:Partial<TO> = {}):Promise<{ relation:R, node:TO }[]> {
         let query = buildQuery()
@@ -136,19 +130,4 @@ export class FromNodeRelationsRepository<FROM extends AbstractNode, R extends Ab
 
         return this.connection.runQuery(query).toArray();
     }
-
-
-    //TODO: write specs
-    // async getRelationById(id:string):Promise<R | null> {
-    //     let rows = await this.connection.runQuery(cypher => cypher
-    //         .match(m => [
-    //             m.node(this.fromClass),
-    //             m.relation(this.relationClass).params({id} as any).as('rel'),
-    //             m.node(this.toClass)
-    //         ])
-    //         .returns('rel')
-    //     );
-    //
-    //     return either(() => rows[0].rel, null);
-    // }
 }
