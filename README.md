@@ -35,13 +35,15 @@ neography.registerExtension(TimestampsExtension.getDefault());
 Neography provides mapping layer over persisted neo4j data. In order to create mappable class 
 you have to decorate it with ```@node('NodeLabel')``` or ```@relation('RELATION_TYPE')``` decorators. Additionally each 
 entity class have to inherit consequently from ```AbstractNode``` or ```AbstractRelation``` class. ```AbstractNode``` class
-provides on save auto generated unique ```id``` property.
+provides auto generated unique ```id``` property.
 Abstract classes were introduced for providing types safety for repositories. 
 
  
 ```typescript
 import {AbstractNode, AbstractRelation} from 'neography/model';
 import {node, relation, timestamp} from 'neography/annotations';
+
+//Nodes definitions
 
 @node('User') //node label
 class UserNode extends AbstractNode<UserNode> {
@@ -55,7 +57,9 @@ class AddressNode extends AbstractNode<AddressNode> {
     @attribute() city:string;
 }
 
-@relation('KNOWS') //relation type
+//Relations definitions
+
+@relation('KNOWS') //relation name
 class KnowsRelation extends AbstractRelation<KnowsRelation> {
     @timestamp() since:Date;
 }
@@ -75,11 +79,11 @@ import {Neography} from 'neography';
 const neography = new Neography({host: 'localhost', username: 'neo4j', password: 'password'});
 const connection = neography.checkoutConnection()
 
-//Create repository for given node class
+//Create repository for given nodes types
 const usersRepository = connection.nodeType(UserNode);
 const addressesRepository = connection.nodeType(AddressNode);
 
-//Create repository for given node classes and it's relation
+//Create repository for given relations types
 const knowsRelationsRepository = connection.relationType(KnowsRelation);
 const hasHomeAddressRelationsRepository = connection.relationType(HasHomeAddressRelation);
 ```
@@ -88,11 +92,11 @@ const hasHomeAddressRelationsRepository = connection.relationType(HasHomeAddress
 
 ```typescript
 let user1: UserNode = await usersRepository.save(new User({firstName: 'Jane', lastName: 'Doe'}));
-// User { id: 'BJ-_f8-Al', createdAt: 1492374120811, updatedAt: 1492374120811, firstName: 'Jane', lastName: 'Doe'}
+// User { id: 'BJ-_f8-Al', createdAt: Sat Dec 30 2017 20:51:51 GMT+0100 (CET), updatedAt: ..., firstName: 'Jane', lastName: 'Doe'}
 
 user1.firstName = 'John';
 user1 = await usersRepository.update(user1);
-//  User { id: 'BJ-_f8-Al', createdAt: 1492374120811, updatedAt: 1492375654349, firstName: 'John', lastName: 'Doe'}
+//  User { id: 'BJ-_f8-Al', createdAt: Sat Dec 30 2017 20:51:51 GMT+0100 (CET), updatedAt: ..., firstName: 'John', lastName: 'Doe'}
 
 let user2:User[] = await usersRepository.where({id: user1.id})
 // user2[0] and user1 points to the same persisted entity
@@ -110,22 +114,17 @@ let relation:KnowsRelation = await knowsRelationsRepository.nodes(user1, user2).
 
 //alternatively
 let relation:KnowsRelation = await knowsRelationsRepository.node(user1).connectTo(user2, new KnowsRelation({since: new Date()}));
-// Relation {id: 'SfXi-89', since: Date object instance}
+// Relation {id: 'SfXi-89', since: Sat Dec 30 2017 20:51:51 GMT+0100 (CET)}
 
 relation.since = new Date();
 relation = await knowsRelationsRepository.nodes(user1, user2).update(relation);
-// Relation {id: 'SfXi-89', since: updated ate object instance}
+// Relation {id: 'SfXi-89', since: Sat Dec 30 2017 20:51:52 GMT+0100 (CET)}
 await knowsRelationsRepository.nodes(user1, user2)
 ```
 
-
-## Connection
-
-TODO
-
 ## Query Builder
 
-Query builder provides simple dsl for building cypher queries.
+Query builder provides simple DSL for building cypher queries.
 It tries to reflect cypher syntax without introducing any additional abstractions.  
 
 
@@ -159,7 +158,7 @@ CREATE(user:UserNode { firstName: "Jane", lastName: "Doe" })
 RETURN user
 ```
 
-Response object provides convenient helper methods for queries like the previous one.
+Response object provides convenient helper methods for manipulating data. 
 
 ```typescript
 let response:UserNode = await connection.runQuery(insertQuery).pluck('user').first();
