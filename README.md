@@ -34,14 +34,14 @@ neography.registerExtension(TimestampsExtension.getDefault());
 
 Neography provides mapping layer over persisted neo4j data. In order to create mappable class 
 you have to decorate it with ```@node('NodeLabel')``` or ```@relation('RELATION_TYPE')``` decorators. Additionally each 
-entity class have to inherit consequently from ```AbstractNode``` or ```AbstractRelation``` class. Abstract classes provide optional ```id``` 
-string property. By default neography generates uuid string for identifying entities.
+entity class have to inherit consequently from ```AbstractNode``` or ```AbstractRelation``` class. ```AbstractNode``` class
+provides on save auto generated unique ```id``` property.
 Abstract classes were introduced for providing types safety for repositories. 
 
  
 ```typescript
-import {AbstractNode, AbstractRelation, Integer, int, createFactoryMethod} from 'neography/model';
-import {node, relation} from 'neography/annotations';
+import {AbstractNode, AbstractRelation} from 'neography/model';
+import {node, relation, timestamp} from 'neography/annotations';
 
 @node('User') //node label
 class UserNode extends AbstractNode<UserNode> {
@@ -57,9 +57,7 @@ class AddressNode extends AbstractNode<AddressNode> {
 
 @relation('KNOWS') //relation type
 class KnowsRelation extends AbstractRelation<KnowsRelation> {
-    
-    
-    @attribute() since:Integer;
+    @timestamp() since:Date;
 }
 
 @relation('HAS_HOME_ADDRESS')
@@ -78,12 +76,12 @@ const neography = new Neography({host: 'localhost', username: 'neo4j', password:
 const connection = neography.checkoutConnection()
 
 //Create repository for given node class
-const usersRepository = connection.getNodeRepository(UserNode);
-const addressesRepository = connection.getNodeRepository(AddressNode);
+const usersRepository = connection.nodeType(UserNode);
+const addressesRepository = connection.nodeType(AddressNode);
 
 //Create repository for given node classes and it's relation
-const knowsRelationsRepository = connection.getRelationRepository(UserNode, KnowsRelation, UserNode);
-const hasHomeAddressRelationsRepository = connection.getRelationRepository(UserNode, HasHomeAddressRelation, AddressNode);
+const knowsRelationsRepository = connection.relationType(KnowsRelation);
+const hasHomeAddressRelationsRepository = connection.relationType(HasHomeAddressRelation);
 ```
 
 ### Managing Nodes 
@@ -108,23 +106,17 @@ await usersRepository.remove(user1.id);
 let user1:User = await usersRepository.save(new User({firstName: 'Jane', lastName: 'Doe'}));
 let user2:User = await usersRepository.save(new User({firstName: 'John', lastName: 'Smith'}));
 
-let relation:KnowsRelation = await knowsRelationsRepository.save(user1, user2, new KnowsRelation({since: int(new Date().getTime())}))
-// Relation {id: 'SfXi-89', since: Integer(1492711624208)}
+let relation:KnowsRelation = await knowsRelationsRepository.nodes(user1, user2).createRelation(new KnowsRelation({since: new Date()}));
 
-relation.since = int(0);
-relation = await knowsRelationsRepository.update(relation);
-// Relation {id: 'SfXi-89', since: Integer(0)}
-await knowsRelationsRepository.remove(relation.id)
+//alternatively
+let relation:KnowsRelation = await knowsRelationsRepository.node(user1).connectTo(user2, new KnowsRelation({since: new Date()}));
+// Relation {id: 'SfXi-89', since: Date object instance}
+
+relation.since = new Date();
+relation = await knowsRelationsRepository.nodes(user1, user2).update(relation);
+// Relation {id: 'SfXi-89', since: updated ate object instance}
+await knowsRelationsRepository.nodes(user1, user2)
 ```
-
-**TODO** 
-```typescript
-knowsRelationsRepository.where();
-knowsRelationsRepository.first();
-//and getting all connected nodes for given node
-```
-
-
 
 
 ## Connection
