@@ -11,11 +11,11 @@ export class UnboundRelationRepository<R extends AbstractRelation> {
 
     }
 
-    forNode<FROM extends AbstractNode>(node:FROM):NodeInstanceRepository<FROM, R> {
+    node<FROM extends AbstractNode>(node:FROM):NodeInstanceRepository<FROM, R> {
         return new NodeInstanceRepository(this.relationClass, node, this.connection);
     }
 
-    forNodes<FROM extends AbstractNode, TO extends AbstractNode>(nodeFrom:FROM, nodeTo:TO):BoundTypedRelationRepository<FROM, R, TO> {
+    nodes<FROM extends AbstractNode, TO extends AbstractNode>(nodeFrom:FROM, nodeTo:TO):BoundTypedRelationRepository<FROM, R, TO> {
         return new BoundTypedRelationRepository(nodeFrom, this.relationClass, nodeTo, this.connection);
     }
 

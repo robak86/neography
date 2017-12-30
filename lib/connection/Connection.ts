@@ -32,11 +32,11 @@ export class Connection {
         return this.transactionRunner.withTransaction(fn)
     }
 
-    getNodeRepository<T extends AbstractNode>(nodeClass:Type<T>):NodeRepository<T> {
+    nodeType<T extends AbstractNode>(nodeClass:Type<T>):NodeRepository<T> {
         return new NodeRepository(nodeClass, this);
     }
 
-    getRelationRepository<REL extends AbstractRelation>(relationClass:Type<REL>):UnboundRelationRepository<REL> {
+    relationType<REL extends AbstractRelation>(relationClass:Type<REL>):UnboundRelationRepository<REL> {
         return new UnboundRelationRepository(relationClass, this);
     }
 
