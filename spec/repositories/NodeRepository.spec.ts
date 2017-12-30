@@ -131,7 +131,7 @@ describe("NodeRepository", () => {
             let nodes = _.times(100).map((id) => new DummyGraphNode({attr1: id.toString()}));
             let storedNodes = await nodeRepository.saveMany(nodes);
             assertAllPersisted(storedNodes);
-        }).timeout(4000);
+        }).timeout(40000);
     });
 
     describe(".findByIds", () => {
@@ -320,6 +320,6 @@ describe("NodeRepository", () => {
             storedNodes.forEach(node => node.attr1 = 'updated');
             let updatedNodes = await nodeRepository.updateMany(storedNodes);
             expect(updatedNodes.every(node => node.attr1 === 'updated')).to.eq(true);
-        }).timeout(4000);
+        }).timeout(40000);
     });
 });

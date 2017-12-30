@@ -133,7 +133,7 @@ describe("Connection", () => {
 
                 expect(responseOutsideTransaction.length).to.eq(0);
                 expect(responseWithinTransaction.length).to.eq(2);
-            }).timeout(3000);
+            }).timeout(30000);
         });
 
         describe("with nesting", () => {

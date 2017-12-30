@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import {Maybe, Type} from "./types";
 
 
+//TODO: SIMPLIFY and optimize
 export function isPresent<T>(val:T | void | null | undefined):val is T {
     return (typeof val !== 'undefined') && (val !== null) && (!_.isNumber(val) || !isNaN(val))
 }

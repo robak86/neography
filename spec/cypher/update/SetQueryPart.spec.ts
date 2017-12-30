@@ -33,7 +33,7 @@ describe("SetQueryPart", () => {
             it("returns proper params", () => {
                 let boundQueryPart:IBoundQueryPart = setQueryPart.toCypher(context);
                 expect(boundQueryPart.params.n1Params.attr1).to.eql('updatedValue');
-                let updatedAt = boundQueryPart.params.n1Params.updatedAt.toNumber();
+                let updatedAt = boundQueryPart.params.n1Params.updatedAt;
                 expectIsNowTimeStamp(updatedAt)
             });
         });
@@ -60,14 +60,14 @@ describe("SetQueryPart", () => {
             it("returns merged params for n1Params", () => {
                 let boundQueryPart:IBoundQueryPart = setQueryPart.toCypher(context);
                 expect(boundQueryPart.params.n1Params.attr1).to.eql('updatedValue');
-                let updatedAt = boundQueryPart.params.n1Params.updatedAt.toNumber();
+                let updatedAt = boundQueryPart.params.n1Params.updatedAt;
                 expectIsNowTimeStamp(updatedAt);
             });
 
             it("returns merged params for n2Params", () => {
                 let boundQueryPart:IBoundQueryPart = setQueryPart.toCypher(context);
                 expect(boundQueryPart.params.n2Params.attr1).to.eql('updatedValue2');
-                let updatedAt = boundQueryPart.params.n2Params.updatedAt.toNumber();
+                let updatedAt = boundQueryPart.params.n2Params.updatedAt;
                 expectIsNowTimeStamp(updatedAt);
             });
         });
