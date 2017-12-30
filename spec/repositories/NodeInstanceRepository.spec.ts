@@ -5,12 +5,12 @@ import {Connection} from "../../lib";
 import {cleanDatabase, countRelations, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import {buildQuery} from "../../lib/cypher";
-import {FromNodeRelationsRepository} from "../../lib/repositories/FromNodeRelationsRepository";
+import {NodeInstanceRepository} from "../../lib/repositories/NodeInstanceRepository";
 import {UnboundRelationRepository} from "../../lib/repositories/UnboundRelationRepository";
 import {ConnectedNode} from "../../lib/model/ConnectedNode";
 
 
-describe("FromNodeRelationsRepository", () => {
+describe("NodeInstanceRepository", () => {
     let nodeRepository:NodeRepository<DummyGraphNode>,
         relationRepository:UnboundRelationRepository<DummyGraphRelation>,
         connection:Connection;

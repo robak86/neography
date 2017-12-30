@@ -7,7 +7,7 @@ import {Type} from "../../lib/utils/types";
 import {buildQuery} from "../../lib/cypher";
 import {TimestampsExtension} from "../../lib/extensions/TimestampsExtension";
 
-const DEBUG_ENABLED = true;
+const DEBUG_ENABLED = false;
 
 export const getDefaultNeography = _.memoize(():Neography => {
     let neography = new Neography({
