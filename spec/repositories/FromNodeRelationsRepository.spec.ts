@@ -43,7 +43,6 @@ describe("FromNodeRelationsRepository", () => {
                 .forNode(u1)
                 .connectTo(u2, new DummyGraphRelation({attr2: 123}));
 
-
             let query = buildQuery().literal(`MATCH ()-[rel:CONNECTED_BY_DUMMY {attr2: 123}]->() RETURN rel`);
             let result = await connection.runQuery(query).pluck('rel').first();
 
@@ -108,7 +107,7 @@ describe("FromNodeRelationsRepository", () => {
         });
     });
 
-    describe.only(".setConnectedNodes", () => {
+    describe(".setConnectedNodes", () => {
         it('creates relation for attached nodes', async () => {
             expect(await countRelations(DummyGraphRelation)).to.eq(0);
 
