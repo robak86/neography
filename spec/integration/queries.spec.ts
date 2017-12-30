@@ -64,7 +64,7 @@ describe("Queries", () => {
                 expect(matchedNode.id).to.be.a('string');
             });
 
-            it("adds updatedAt and createdAt properties (TimestampsExtension enabled)", () => {
+            it("adds updatedAt and createdAt properties (WriteTimestampsTransformer enabled)", () => {
                 expectIsNowDate(matchedNode.createdAt as Date);
                 expectIsNowDate(matchedNode.updatedAt as Date);
             });
@@ -168,7 +168,7 @@ describe("Queries", () => {
                     expect(matchedRelation.attr1).to.eq(newRelation.attr1);
                 });
 
-                it("adds updatedAt and createdAt properties (TimestampsExtension enabled)", () => {
+                it("adds updatedAt and createdAt properties (WriteTimestampsTransformer enabled)", () => {
                     expectIsNowDate(matchedRelation.createdAt as Date);
                     expectIsNowDate(matchedRelation.updatedAt as Date);
                 });

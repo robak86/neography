@@ -1,19 +1,15 @@
-import {IRowTransformer} from "./IRowTransformer";
+import {IdentityExtension} from "./IdentityExtension";
+import {IWriteTransformer} from "../mappers/ITransformer";
+import {WriteTimestampsTransformer} from "../mappers/write/WriteTimestampsTransformer";
 
-export class TimestampsExtension implements IRowTransformer {
+const timestampsTransformer = new WriteTimestampsTransformer();
+
+export class TimestampsExtension extends IdentityExtension {
     static getDefault():TimestampsExtension {
         return new TimestampsExtension();
     }
 
-    create(row) {
-        let now = new Date();
-        row.createdAt = now;
-        row.updatedAt = now;
-        return row;
-    }
-
-    update(row) {
-        row.updatedAt = new Date();
-        return row;
+    getWriteTransformer():IWriteTransformer {
+        return timestampsTransformer;
     }
 }

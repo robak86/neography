@@ -8,9 +8,8 @@ import {ConnectedNodesCollection} from "../model/ConnectedNodeCollection";
 import {CreateBuilder} from "../cypher/builders/CreateBuilder";
 import * as _ from 'lodash';
 import {MatchBuilder} from "../cypher/builders/MatchBuilder";
-import {BoundTypedRelationRepository} from "./BoundTypedRelationRepository";
 
-
+//TODO: find better name
 export class FromNodeRelationsRepository<FROM extends AbstractNode, R extends AbstractRelation> {
 
     constructor(private relationClass:Type<R>,
@@ -20,6 +19,8 @@ export class FromNodeRelationsRepository<FROM extends AbstractNode, R extends Ab
     }
 
 
+    // The idea is that relations will be always recreated. Now since id on relationships are removed we can do it with no consequences
+    // In order to provide custom relation values user has to pass ConnectedNode instance instead of persisted node
     async setConnectedNodes<TO extends AbstractNode>(connectedNodes:(ConnectedNode<R, TO> | TO)[], removeDetached:boolean = true) {
         let existingConnections = await this.getConnectedNodes();
 
