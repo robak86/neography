@@ -152,7 +152,7 @@ describe("NodeRepository", () => {
         });
     });
 
-    describe(".exists", () => {
+    describe(".areConnected", () => {
         it("returns true if buildNode exists", async () => {
             let node = new DummyGraphNode({attr1: 'Tomasz'});
             let storedNode:DummyGraphNode = await nodeRepository.save(node);
@@ -192,13 +192,13 @@ describe("NodeRepository", () => {
             await relationRepository.node(from).connectTo(to);
             expect(await nodeRepository.exists(from.id)).to.eq(true);
             expect(await nodeRepository.exists(to.id)).to.eq(true);
-            expect(await relationRepository.nodes(from,to).exists()).to.eq(true);
+            expect(await relationRepository.nodes(from,to).areConnected()).to.eq(true);
 
             await nodeRepository.remove(from.id);
 
             expect(await nodeRepository.exists(from.id)).to.eq(false);
             expect(await nodeRepository.exists(to.id)).to.eq(true);
-            expect(await relationRepository.nodes(from,to).exists()).to.eq(false);
+            expect(await relationRepository.nodes(from,to).areConnected()).to.eq(false);
         });
     });
 
