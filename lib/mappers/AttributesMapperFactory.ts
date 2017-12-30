@@ -12,6 +12,7 @@ import {EntityIdExtension} from "./write/EntityIdExtension";
 import {WriteInlineMappersRunner} from "./write/WriteInlineMappersRunner";
 import {ReadInlineMappersRunner} from "./read/ReadInlineMappersRunner";
 import {IExtension} from "../extensions/IExtension";
+import {ReadIntegerTransformer} from "./read/ReadIntegerTransformer";
 
 
 export class AttributesMapperFactory {
@@ -34,7 +35,8 @@ export class AttributesMapperFactory {
         //TODO: should be cached
         let forReads = [
             ...this.extensions.map(ext => ext.getReadTransformer()),
-            new ReadInlineMappersRunner()
+            new ReadIntegerTransformer(),
+            new ReadInlineMappersRunner(),
         ];
 
         return new AttributesMapper(klass, forWrites, forReads);

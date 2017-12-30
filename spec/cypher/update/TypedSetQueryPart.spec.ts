@@ -4,7 +4,6 @@ import {TypedSetQueryPart} from "../../../lib/cypher/update/TypedSetQueryPart";
 import {DummyGraphNode} from "../../fixtures/DummyGraphNode";
 import {QueryContext} from "../../../lib/cypher/common/QueryContext";
 import {IBoundQueryPart} from "../../../lib/cypher/abstract/IBoundQueryPart";
-import {isInt} from "../../../lib/driver/Integer";
 import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 
 describe("TypedSetQueryPart", () => {
@@ -32,7 +31,7 @@ describe("TypedSetQueryPart", () => {
                     let boundQueryPart:IBoundQueryPart = typedSetQueryPart.toCypher(context);
                     expect(boundQueryPart.params.n1Params.attr1).to.eql('updatedVal1');
                     expect(boundQueryPart.params.n1Params.attr2).to.eql(2);
-                    expect(isInt(boundQueryPart.params.n1Params.updatedAt)).to.eq(true);
+                    expect(boundQueryPart.params.n1Params.updatedAt).to.be.a('number');
                     expect(_.keys(boundQueryPart.params.n1Params).sort()).to.eql(['attr1', 'attr2', 'updatedAt'].sort())
                 });
             });
@@ -51,7 +50,7 @@ describe("TypedSetQueryPart", () => {
                     let boundQueryPart:IBoundQueryPart = typedSetQueryPart.toCypher(context);
                     expect(boundQueryPart.params.n1Params.attr1).to.eql('updatedVal1');
                     expect(boundQueryPart.params.n1Params.attr2).to.eql(2);
-                    expect(isInt(boundQueryPart.params.n1Params.updatedAt)).to.eq(true);
+                    expect(boundQueryPart.params.n1Params.updatedAt).to.be.a('number');
                     expect(_.keys(boundQueryPart.params.n1Params).sort()).to.eql(['attr1', 'attr2', 'updatedAt'].sort())
                 });
             });
@@ -77,7 +76,7 @@ describe("TypedSetQueryPart", () => {
                     let boundQueryPart:IBoundQueryPart = typedSetQueryPart.toCypher(context);
                     expect(boundQueryPart.params.n1Params.attr1).to.eql('updatedVal1');
                     expect(boundQueryPart.params.n1Params.attr2).to.eql(2);
-                    expect(isInt(boundQueryPart.params.n1Params.updatedAt)).to.eq(true);
+                    expect(boundQueryPart.params.n1Params.updatedAt).to.be.a('number');
                     expect(_.keys(boundQueryPart.params.n1Params).sort()).to.eql(['attr1', 'attr2', 'updatedAt'].sort())
                 });
             });
@@ -96,7 +95,7 @@ describe("TypedSetQueryPart", () => {
                     let boundQueryPart:IBoundQueryPart = typedSetQueryPart.toCypher(context);
                     expect(boundQueryPart.params.n1Params.attr1).to.eql('updatedVal1');
                     expect(boundQueryPart.params.n1Params.attr2).to.eql(2);
-                    expect(isInt(boundQueryPart.params.n1Params.updatedAt)).to.eq(true);
+                    expect(boundQueryPart.params.n1Params.updatedAt).to.be.a('number');
                     expect(_.keys(boundQueryPart.params.n1Params).sort()).to.eql(['attr1', 'attr2', 'updatedAt'].sort())
                 });
             });
