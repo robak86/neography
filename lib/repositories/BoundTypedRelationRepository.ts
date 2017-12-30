@@ -13,7 +13,7 @@ export class BoundTypedRelationRepository<FROM extends AbstractNode, R extends A
         assertPersisted(this.toNode);
     }
 
-    update(rel:R):Promise<R> {
+    updateRelation(rel:R):Promise<R> {
         let query = buildQuery()
             .match(m => [
                 m.node(getClassFromInstance(this.fromNode)).params({id: this.fromNode.id} as any),
@@ -26,7 +26,7 @@ export class BoundTypedRelationRepository<FROM extends AbstractNode, R extends A
         return this.connection.runQuery(query).pluck('rel').first();
     }
 
-    exists():Promise<boolean> {
+    areConnected():Promise<boolean> {
         let query = buildQuery()
             .match(m => [
                 m.node(getClassFromInstance(this.fromNode)).params({id: this.fromNode.id} as any),
@@ -38,7 +38,7 @@ export class BoundTypedRelationRepository<FROM extends AbstractNode, R extends A
         return this.connection.runQuery(query).pluck('relCount').map(count => count > 0).first();
     }
 
-    remove():Promise<any> {
+    removeRelation():Promise<any> {
         let query = buildQuery()
             .match(m => [
                 m.node(getClassFromInstance(this.fromNode)).params({id: this.fromNode.id} as any),
@@ -50,7 +50,7 @@ export class BoundTypedRelationRepository<FROM extends AbstractNode, R extends A
         return this.connection.runQuery(query).first();
     }
 
-    create(relation:R) {
+    async createRelation(relation:R):Promise<R> {
         let query = buildQuery()
             .match(m => [
                 m.node(getClassFromInstance(this.fromNode)).params({id: this.fromNode.id} as any).as('from'),
