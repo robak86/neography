@@ -1,5 +1,4 @@
 import {expect} from 'chai';
-import * as _ from 'lodash';
 import {NodeRepository} from "../../lib/repositories/NodeRepository";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {Connection} from "../../lib";
@@ -7,13 +6,13 @@ import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import {buildQuery} from "../../lib/cypher";
 import {FromNodeRelationsRepository} from "../../lib/repositories/FromNodeRelationsRepository";
-import {RelationRepository} from "../../lib/repositories/RelationRepository";
+import {UnboundRelationRepository} from "../../lib/repositories/UnboundRelationRepository";
 import {ConnectedNode} from "../../lib/model/ConnectedNode";
 
 
 describe("FromNodeRelationsRepository", () => {
     let nodeRepository:NodeRepository<DummyGraphNode>,
-        relationRepository:RelationRepository<DummyGraphRelation>,
+        relationRepository:UnboundRelationRepository<DummyGraphRelation>,
         connection:Connection;
 
     let u1:DummyGraphNode,
@@ -45,16 +44,15 @@ describe("FromNodeRelationsRepository", () => {
         });
 
         it('creates relation without any attributes if relation is not passed to .connectTo()', async () => {
-            let rel = await relationRepository.from(u1).connectTo(u2);
-            let query = buildQuery().literal(`MATCH ()-[rel:CONNECTED_BY_DUMMY]->() RETURN rel`);
+            let rel = await relationRepository.from(u1).connectTo(u2, new DummyGraphRelation({attr1: '1'}));
+            let query = buildQuery().literal(`MATCH ()-[rel:CONNECTED_BY_DUMMY {attr1: "1"}]->() RETURN rel`);
             let results = await connection.runQuery(query).pluck('rel').first();
-            expect(results.id).to.eql(rel.id);
+            expect(results.attr1).to.eql(rel.attr1);
         });
 
         it("adds params for persisted entity", async () => {
             let rel = await relationRepository.from(u1).connectTo(u2, new DummyGraphRelation({attr2: 123}));
 
-            expect(rel.id).to.be.a('string');
             expect(rel.createdAt).to.be.a('Date');
             expect(rel.updatedAt).to.be.a('Date');
         });
@@ -124,7 +122,7 @@ describe("FromNodeRelationsRepository", () => {
         });
     });
 
-    describe(".removeManyRelations", () => {
+    describe(".detachNodes", () => {
         it('returns all connected nodes', async () => {
             let query = buildQuery().literal(`MATCH ()-[rel:CONNECTED_BY_DUMMY]->() RETURN count(rel) as count`);
 
@@ -133,7 +131,7 @@ describe("FromNodeRelationsRepository", () => {
             let count = await connection.runQuery(query).pluck('count').first();
             expect(count.toNumber()).to.eq(2);
 
-            await relationRepository.from(u1).removeManyRelations([rel1, rel2]);
+            await relationRepository.from(u1).detachNodes([u2, u3]);
 
             count = await connection.runQuery(query).pluck('count').first();
             expect(count.toNumber()).to.eq(0);

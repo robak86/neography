@@ -1,4 +1,4 @@
-import {AbstractNode, AbstractRelation, assertAllPersisted, assertPersisted} from "../model";
+import {AbstractNode, AbstractRelation, assertPersisted} from "../model";
 import {Connection} from "../connection/Connection";
 import {Type} from "../utils/types";
 import {getClassFromInstance} from "../utils/core";
@@ -8,6 +8,8 @@ import {ConnectedNodesCollection} from "../model/ConnectedNodeCollection";
 import {CreateBuilder} from "../cypher/builders/CreateBuilder";
 import * as _ from 'lodash';
 import {MatchBuilder} from "../cypher/builders/MatchBuilder";
+import {BoundTypedRelationRepository} from "./BoundTypedRelationRepository";
+
 
 export class FromNodeRelationsRepository<FROM extends AbstractNode, R extends AbstractRelation> {
 
@@ -31,27 +33,26 @@ export class FromNodeRelationsRepository<FROM extends AbstractNode, R extends Ab
         let connectionsForAttach = _.pullAllWith(newConnections, unchangedConnections, ConnectedNode.isEqual);
 
 
-        await this.removeManyRelations(connectionsForDetach.map(c => c.relation));
+        await this.detachNodes(connectionsForDetach.map(c => c.node));
         await this.connectToMany(connectionsForAttach);
 
         return [...unchangedConnections, ...connectionsForAttach];
     }
 
-    async removeManyRelations(relations:R[]):Promise<any> {
-        if (relations.length === 0) {
+    async detachNodes<N extends AbstractNode>(nodes:N[]):Promise<any> {
+        if (nodes.length === 0) {
             return;
         }
 
-        assertAllPersisted(relations);
-        let ids = relations.map(r => r.id);
+        let ids = nodes.map(r => r.id);
 
         let query = buildQuery()
             .match(m => [
                 m.node(getClassFromInstance(this.fromNode)).params({id: this.fromNode.id} as any).as('from'),
                 m.relation(this.relationClass).as('rel'),
-                m.node()
+                m.node().as('to')
             ])
-            .where(w => w.literal('rel.id in {ids}').params({ids}))
+            .where(w => w.literal('to.id in {ids}').params({ids}))
             .append(`DELETE rel`);
 
         return this.connection.runQuery(query).toArray();
@@ -125,6 +126,10 @@ export class FromNodeRelationsRepository<FROM extends AbstractNode, R extends Ab
             .returns('relation', 'node');
 
         return this.connection.runQuery(query).toArray();
+    }
+
+    to<TO extends AbstractNode>(toNode:TO):BoundTypedRelationRepository<FROM, R, TO> {
+        return new BoundTypedRelationRepository(this.fromNode, this.relationClass, toNode, this.connection);
     }
 
     //TODO: write specs

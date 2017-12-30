@@ -164,10 +164,6 @@ describe("Queries", () => {
                     expect(matchedRelation).to.be.instanceof(DummyGraphRelation);
                 });
 
-                it("sets value for id property", () => {
-                    expect(matchedRelation.id).to.be.a('string');
-                });
-
                 it("stores relation attributes", () => {
                     expect(matchedRelation.attr1).to.eq(newRelation.attr1);
                 });

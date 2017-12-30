@@ -3,7 +3,7 @@ import {attribute} from "../annotations";
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
 
 export abstract class AbstractEntity<T> {
-    @attribute() readonly id?:string;
+
 
     constructor(params:Partial<T> = {}) {
         if (isPresent((params as any).id)) {
@@ -20,7 +20,4 @@ export abstract class AbstractEntity<T> {
         });
     }
 
-    isPersisted():boolean {
-        return isPresent(this.id);
-    }
 }

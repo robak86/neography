@@ -2,7 +2,10 @@ import {AbstractNode} from "./AbstractNode";
 import {AbstractRelation} from "./AbstractRelation";
 import {invariant, isPresent} from "../utils/core";
 
-export type GraphEntity = AbstractNode | AbstractRelation;
+
+export type GraphElement = AbstractNode | AbstractRelation;
+
+export type GraphEntity = AbstractNode ;
 
 export function assertPersisted(entity:GraphEntity) {
     invariant(entity.isPersisted(), `Expected entity to be persisted: ${entity}`);
@@ -12,7 +15,7 @@ export function assertIdExists(id:string | undefined) {
     invariant(isPresent(id), 'Passed id property is undefined');
 }
 
-export function assertAllIdsPresent(arr:(string|undefined)[]) {
+export function assertAllIdsPresent(arr:(string | undefined)[]) {
     arr.forEach((id) => {
         invariant(isPresent(id), `Passed array contains empty id`);
     });
