@@ -101,6 +101,24 @@ describe("FromNodeRelationsRepository", () => {
         });
     });
 
+    describe(".setConnectedNodes", () => {
+        it('creates relation for attached nodes', async () => {
+            // expect(await countRelations(DummyGraphRelation)).to.eq(0);
+            //
+            // await relationRepository.forNode(u1).setConnectedNodes([u2, u1]);
+            // expect(await countRelations(DummyGraphRelation)).to.eq(2);
+
+
+            // let connected = await relationRepository.forNode(u1).getConnectedNodes();
+            //
+            // connected = connected.sort(n => (<any>n).node.createdAt.getTime());
+            //
+            // expect(connected[0].node).to.eql(u2);
+            // expect(connected[1].node).to.eql(u3);
+            // expect(connected.length).to.eq(2);
+        });
+    });
+
     describe(".getConnectedNodes", () => {
         it('returns all connected nodes', async () => {
             await relationRepository.forNode(u1).connectTo(u2);

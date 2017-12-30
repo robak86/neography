@@ -1,1 +1,1 @@
-export * from './TimestampsExtension';
+export * from '../mappers/write/WriteTimestampsTransformer';

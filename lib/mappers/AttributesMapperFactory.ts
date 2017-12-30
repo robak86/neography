@@ -7,17 +7,37 @@ import {NodeMetadata} from "../metadata/NodeMetadata";
 import {RelationsTypesRegistryEntry} from "../annotations/RelationsTypesRegistry";
 import {RelationMetadata} from "../metadata/RelationMetadata";
 import * as _ from 'lodash';
-import {ExtensionsRowMapper} from "./ExtensionsRowMapper";
+import {StripUnknownDataForWrite} from "./write/StripUnknownDataForWrite";
+import {EntityIdExtension} from "./write/EntityIdExtension";
+import {WriteInlineMappersRunner} from "./write/WriteInlineMappersRunner";
+import {ReadInlineMappersRunner} from "./read/ReadInlineMappersRunner";
+import {IExtension} from "../extensions/IExtension";
+
 
 export class AttributesMapperFactory {
 
     constructor(private registeredNodes:{ [labels:string]:NodesTypesRegistryEntry },
                 private registeredRelations:{ [type:string]:RelationsTypesRegistryEntry },
-                private extensionsMapper:ExtensionsRowMapper) {
+                private genId:() => string,
+                private extensions:IExtension[]) {
     }
 
     getMapper<T extends GraphEntity>(klass:Type<T>):AttributesMapper<T> {
-        return new AttributesMapper(klass, this.extensionsMapper);
+        //TODO: should be cached
+        let forWrites = [
+            new StripUnknownDataForWrite(),
+            new EntityIdExtension(this.genId),
+            ...this.extensions.map(ext => ext.getWriteTransformer()),
+            new WriteInlineMappersRunner()
+        ];
+
+        //TODO: should be cached
+        let forReads = [
+            ...this.extensions.map(ext => ext.getReadTransformer()),
+            new ReadInlineMappersRunner()
+        ];
+
+        return new AttributesMapper(klass, forWrites, forReads);
     }
 
     hasNodeMapper(labels:string[]):boolean {
