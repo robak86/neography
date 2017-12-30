@@ -27,7 +27,7 @@ describe("BoundTypedRelationRepository", () => {
         u1 = await nodeRepository.save(new DummyGraphNode({attr1: 'John'}));
         u2 = await nodeRepository.save(new DummyGraphNode({attr1: 'Glen'}));
 
-        relationRepository = connection.getRelationRepository(DummyGraphRelation).from(u1).to(u2);
+        relationRepository = connection.getRelationRepository(DummyGraphRelation).forNodes(u1, u2);
     });
 
     beforeEach(async () => {
@@ -39,7 +39,7 @@ describe("BoundTypedRelationRepository", () => {
 
         savedRelation = await connection
             .getRelationRepository(DummyGraphRelation)
-            .from(u1)
+            .forNode(u1)
             .connectTo(u2, relation);
 
         editedRelation = _.clone(savedRelation);

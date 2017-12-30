@@ -33,7 +33,7 @@ describe("FromNodeRelationsRepository", () => {
     describe(".connectTo", () => {
         it("creates relation", async () => {
             let rel = await relationRepository
-                .from(u1)
+                .forNode(u1)
                 .connectTo(u2, new DummyGraphRelation({attr2: 123}));
 
 
@@ -44,14 +44,14 @@ describe("FromNodeRelationsRepository", () => {
         });
 
         it('creates relation without any attributes if relation is not passed to .connectTo()', async () => {
-            let rel = await relationRepository.from(u1).connectTo(u2, new DummyGraphRelation({attr1: '1'}));
+            let rel = await relationRepository.forNode(u1).connectTo(u2, new DummyGraphRelation({attr1: '1'}));
             let query = buildQuery().literal(`MATCH ()-[rel:CONNECTED_BY_DUMMY {attr1: "1"}]->() RETURN rel`);
             let results = await connection.runQuery(query).pluck('rel').first();
             expect(results.attr1).to.eql(rel.attr1);
         });
 
         it("adds params for persisted entity", async () => {
-            let rel = await relationRepository.from(u1).connectTo(u2, new DummyGraphRelation({attr2: 123}));
+            let rel = await relationRepository.forNode(u1).connectTo(u2, new DummyGraphRelation({attr2: 123}));
 
             expect(rel.createdAt).to.be.a('Date');
             expect(rel.updatedAt).to.be.a('Date');
@@ -61,7 +61,7 @@ describe("FromNodeRelationsRepository", () => {
     describe(".connectToMany", () => {
         it("creates relation", async () => {
             let rel:ConnectedNode<DummyGraphRelation, DummyGraphNode>[] = await relationRepository
-                .from(u1)
+                .forNode(u1)
                 .connectToMany([u2, u3]);
 
 
@@ -76,7 +76,7 @@ describe("FromNodeRelationsRepository", () => {
 
         it('allows for setting own instance of relation', async () => {
             let rel:ConnectedNode<DummyGraphRelation, DummyGraphNode>[] = await relationRepository
-                .from(u1)
+                .forNode(u1)
                 .connectToMany([
                     u2,
                     {relation: new DummyGraphRelation({attr1: 'custom'}), node: u3}
@@ -94,7 +94,7 @@ describe("FromNodeRelationsRepository", () => {
 
         it('throws while connecting to not persisted node', () => {
             let connect = relationRepository
-                .from(u1)
+                .forNode(u1)
                 .connectToMany([new DummyGraphNode()]);
 
             expect(connect).to.eventually.be.rejected;
@@ -103,9 +103,9 @@ describe("FromNodeRelationsRepository", () => {
 
     describe(".getConnectedNodes", () => {
         it('returns all connected nodes', async () => {
-            await relationRepository.from(u1).connectTo(u2);
-            await relationRepository.from(u1).connectTo(u3);
-            let connected = await relationRepository.from(u1).getConnectedNodes();
+            await relationRepository.forNode(u1).connectTo(u2);
+            await relationRepository.forNode(u1).connectTo(u3);
+            let connected = await relationRepository.forNode(u1).getConnectedNodes();
             connected = connected.sort(n => (<any>n).node.createdAt.getTime());
 
             expect(connected[0].node).to.eql(u2);
@@ -114,9 +114,9 @@ describe("FromNodeRelationsRepository", () => {
         });
 
         it('filters relations', async () => {
-            await relationRepository.from(u1).connectTo(u2, new DummyGraphRelation({attr1: '1'}));
-            await relationRepository.from(u1).connectTo(u3, new DummyGraphRelation({attr1: '2'}));
-            let connected = await relationRepository.from(u1).getConnectedNodes({attr1: '1'});
+            await relationRepository.forNode(u1).connectTo(u2, new DummyGraphRelation({attr1: '1'}));
+            await relationRepository.forNode(u1).connectTo(u3, new DummyGraphRelation({attr1: '2'}));
+            let connected = await relationRepository.forNode(u1).getConnectedNodes({attr1: '1'});
             expect(connected.length).to.eq(1);
             expect(connected[0].node).to.eql(u2);
         });
@@ -126,12 +126,12 @@ describe("FromNodeRelationsRepository", () => {
         it('returns all connected nodes', async () => {
             let query = buildQuery().literal(`MATCH ()-[rel:CONNECTED_BY_DUMMY]->() RETURN count(rel) as count`);
 
-            let rel1:DummyGraphRelation = await relationRepository.from(u1).connectTo(u2);
-            let rel2:DummyGraphRelation = await relationRepository.from(u1).connectTo(u3);
+            let rel1:DummyGraphRelation = await relationRepository.forNode(u1).connectTo(u2);
+            let rel2:DummyGraphRelation = await relationRepository.forNode(u1).connectTo(u3);
             let count = await connection.runQuery(query).pluck('count').first();
             expect(count.toNumber()).to.eq(2);
 
-            await relationRepository.from(u1).detachNodes([u2, u3]);
+            await relationRepository.forNode(u1).detachNodes([u2, u3]);
 
             count = await connection.runQuery(query).pluck('count').first();
             expect(count.toNumber()).to.eq(0);
