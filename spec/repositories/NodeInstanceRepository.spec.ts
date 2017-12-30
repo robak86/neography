@@ -25,8 +25,8 @@ describe("NodeInstanceRepository", () => {
     beforeEach(async () => {
         await cleanDatabase();
         connection = getSharedConnection();
-        nodeRepository = connection.getNodeRepository(DummyGraphNode);
-        relationRepository = connection.getRelationRepository(DummyGraphRelation);
+        nodeRepository = connection.nodeType(DummyGraphNode);
+        relationRepository = connection.relationType(DummyGraphRelation);
 
         [u1, u2, u3, u4, u5] = await nodeRepository.saveMany([
             new DummyGraphNode({attr1: 'Tom'}),
@@ -40,7 +40,7 @@ describe("NodeInstanceRepository", () => {
     describe(".connectTo", () => {
         it("creates relation", async () => {
             let rel = await relationRepository
-                .forNode(u1)
+                .node(u1)
                 .connectTo(u2, new DummyGraphRelation({attr2: 123}));
 
             let query = buildQuery().literal(`MATCH ()-[rel:CONNECTED_BY_DUMMY {attr2: 123}]->() RETURN rel`);
@@ -50,14 +50,14 @@ describe("NodeInstanceRepository", () => {
         });
 
         it('creates relation without any attributes if relation is not passed to .connectTo()', async () => {
-            let rel = await relationRepository.forNode(u1).connectTo(u2, new DummyGraphRelation({attr1: '1'}));
+            let rel = await relationRepository.node(u1).connectTo(u2, new DummyGraphRelation({attr1: '1'}));
             let query = buildQuery().literal(`MATCH ()-[rel:CONNECTED_BY_DUMMY {attr1: "1"}]->() RETURN rel`);
             let results = await connection.runQuery(query).pluck('rel').first();
             expect(results.attr1).to.eql(rel.attr1);
         });
 
         it("adds params for persisted entity", async () => {
-            let rel = await relationRepository.forNode(u1).connectTo(u2, new DummyGraphRelation({attr2: 123}));
+            let rel = await relationRepository.node(u1).connectTo(u2, new DummyGraphRelation({attr2: 123}));
 
             expect(rel.createdAt).to.be.a('Date');
             expect(rel.updatedAt).to.be.a('Date');
@@ -67,7 +67,7 @@ describe("NodeInstanceRepository", () => {
     describe(".connectToMany", () => {
         it("creates relation", async () => {
             let rel:ConnectedNode<DummyGraphRelation, DummyGraphNode>[] = await relationRepository
-                .forNode(u1)
+                .node(u1)
                 .connectToMany([u2, u3]);
 
 
@@ -82,7 +82,7 @@ describe("NodeInstanceRepository", () => {
 
         it('allows for setting own instance of relation', async () => {
             let rel:ConnectedNode<DummyGraphRelation, DummyGraphNode>[] = await relationRepository
-                .forNode(u1)
+                .node(u1)
                 .connectToMany([
                     u2,
                     {relation: new DummyGraphRelation({attr1: 'custom'}), node: u3}
@@ -100,7 +100,7 @@ describe("NodeInstanceRepository", () => {
 
         it('throws while connecting to not persisted node', async () => {
             let connect = relationRepository
-                .forNode(u1)
+                .node(u1)
                 .connectToMany([new DummyGraphNode()]);
 
             await expect(connect).to.eventually.be.rejected;
@@ -111,68 +111,68 @@ describe("NodeInstanceRepository", () => {
         it('creates relation for attached nodes', async () => {
             expect(await countRelations(DummyGraphRelation)).to.eq(0);
 
-            await relationRepository.forNode(u1).setConnectedNodes([u2, u3]);
+            await relationRepository.node(u1).setConnectedNodes([u2, u3]);
             expect(await countRelations(DummyGraphRelation)).to.eq(2);
-            let connected = await relationRepository.forNode(u1).getConnectedNodes();
+            let connected = await relationRepository.node(u1).getConnectedNodes();
             let connectedNodes:any[] = connected.map(c => c.node);
             expect(connectedNodes).to.have.deep.members([u2, u3])
         });
 
         it('removes existing relations', async () => {
             expect(await countRelations(DummyGraphRelation)).to.eq(0);
-            await relationRepository.forNode(u1).setConnectedNodes([u2, u3]);
+            await relationRepository.node(u1).setConnectedNodes([u2, u3]);
             expect(await countRelations(DummyGraphRelation)).to.eq(2);
-            await relationRepository.forNode(u1).setConnectedNodes([u2]);
+            await relationRepository.node(u1).setConnectedNodes([u2]);
             expect(await countRelations(DummyGraphRelation)).to.eq(1);
-            await relationRepository.forNode(u1).setConnectedNodes([]);
+            await relationRepository.node(u1).setConnectedNodes([]);
             expect(await countRelations(DummyGraphRelation)).to.eq(0);
 
-            let connected = await relationRepository.forNode(u1).getConnectedNodes();
+            let connected = await relationRepository.node(u1).getConnectedNodes();
             expect(connected.length).to.eq(0)
         });
 
         it('throws for creating self referenced relation', async () => {
-            let thrown = relationRepository.forNode(u1).setConnectedNodes([u1, u2]);
+            let thrown = relationRepository.node(u1).setConnectedNodes([u1, u2]);
             await expect(thrown).to.eventually.be.rejected;
         });
 
         it('modifies only relations attached to given node', async () => {
-            await relationRepository.forNode(u1).setConnectedNodes([u2]);
-            await relationRepository.forNode(u3).setConnectedNodes([u4, u5]);
+            await relationRepository.node(u1).setConnectedNodes([u2]);
+            await relationRepository.node(u3).setConnectedNodes([u4, u5]);
             expect(await countRelations(DummyGraphRelation)).to.eq(3);
 
-            let u1Connections = await relationRepository.forNode(u1).getConnectedNodes();
-            let u2Connections = await relationRepository.forNode(u3).getConnectedNodes();
+            let u1Connections = await relationRepository.node(u1).getConnectedNodes();
+            let u2Connections = await relationRepository.node(u3).getConnectedNodes();
 
             expect(u1Connections.map(c => c.node)).to.have.deep.members([u2]);
             expect(u2Connections.map(c => c.node)).to.have.deep.members([u4, u5]);
 
-            u1Connections = await relationRepository.forNode(u1).setConnectedNodes([]);
-            u2Connections = await relationRepository.forNode(u3).setConnectedNodes([u4]);
+            u1Connections = await relationRepository.node(u1).setConnectedNodes([]);
+            u2Connections = await relationRepository.node(u3).setConnectedNodes([u4]);
 
             expect(u1Connections.map(c => c.node)).to.have.deep.members([]);
             expect(u2Connections.map(c => c.node)).to.have.deep.members([u4]);
         });
 
         it('recreates all relations params', async () => {
-            await relationRepository.forNode(u1).setConnectedNodes([{
+            await relationRepository.node(u1).setConnectedNodes([{
                 relation: new DummyGraphRelation({attr1: '1'}), node: u2
             }]);
 
-            let connected = await relationRepository.forNode(u1).getConnectedNodes();
+            let connected = await relationRepository.node(u1).getConnectedNodes();
             expect(connected[0].relation.attr1).to.eq('1');
 
-            await relationRepository.forNode(u1).setConnectedNodes([u2]);
-            connected = await relationRepository.forNode(u1).getConnectedNodes();
+            await relationRepository.node(u1).setConnectedNodes([u2]);
+            connected = await relationRepository.node(u1).getConnectedNodes();
             expect(connected[0].relation.attr1).to.be.undefined;
         });
     });
 
     describe(".getConnectedNodes", () => {
         it('returns all connected nodes', async () => {
-            await relationRepository.forNode(u1).connectTo(u2);
-            await relationRepository.forNode(u1).connectTo(u3);
-            let connected = await relationRepository.forNode(u1).getConnectedNodes();
+            await relationRepository.node(u1).connectTo(u2);
+            await relationRepository.node(u1).connectTo(u3);
+            let connected = await relationRepository.node(u1).getConnectedNodes();
             connected = connected.sort(n => (<any>n).node.createdAt.getTime());
 
             expect(connected[0].node).to.eql(u2);
@@ -181,9 +181,9 @@ describe("NodeInstanceRepository", () => {
         });
 
         it('filters relations', async () => {
-            await relationRepository.forNode(u1).connectTo(u2, new DummyGraphRelation({attr1: '1'}));
-            await relationRepository.forNode(u1).connectTo(u3, new DummyGraphRelation({attr1: '2'}));
-            let connected = await relationRepository.forNode(u1).getConnectedNodes({attr1: '1'});
+            await relationRepository.node(u1).connectTo(u2, new DummyGraphRelation({attr1: '1'}));
+            await relationRepository.node(u1).connectTo(u3, new DummyGraphRelation({attr1: '2'}));
+            let connected = await relationRepository.node(u1).getConnectedNodes({attr1: '1'});
             expect(connected.length).to.eq(1);
             expect(connected[0].node).to.eql(u2);
         });
@@ -191,20 +191,20 @@ describe("NodeInstanceRepository", () => {
 
     describe(".detachNodes", () => {
         it('returns all connected nodes', async () => {
-            await relationRepository.forNode(u1).connectTo(u2);
-            await relationRepository.forNode(u1).connectTo(u3);
+            await relationRepository.node(u1).connectTo(u2);
+            await relationRepository.node(u1).connectTo(u3);
             expect(await countRelations(DummyGraphRelation)).to.eq(2);
 
-            await relationRepository.forNode(u1).detachNodes([u2, u3]);
+            await relationRepository.node(u1).detachNodes([u2, u3]);
             expect(await countRelations(DummyGraphRelation)).to.eq(0);
         });
 
         it('removes connected nodes', async () => {
-            await relationRepository.forNode(u1).connectTo(u2);
-            await relationRepository.forNode(u1).connectTo(u3);
+            await relationRepository.node(u1).connectTo(u2);
+            await relationRepository.node(u1).connectTo(u3);
             expect(await countRelations(DummyGraphRelation)).to.eq(2);
 
-            await relationRepository.forNode(u1).detachNodes([u2, u3], true);
+            await relationRepository.node(u1).detachNodes([u2, u3], true);
             expect(await countRelations(DummyGraphRelation)).to.eq(0);
 
             expect(await nodeRepository.exists(u2.id)).to.eq(false);
@@ -212,12 +212,12 @@ describe("NodeInstanceRepository", () => {
         });
 
         it('throws when trying to remove node having other relations', async () => {
-            await relationRepository.forNode(u1).connectTo(u2);
-            await relationRepository.forNode(u2).connectTo(u3);
+            await relationRepository.node(u1).connectTo(u2);
+            await relationRepository.node(u2).connectTo(u3);
 
             expect(await countRelations(DummyGraphRelation)).to.eq(2);
 
-            let cannotRemove = relationRepository.forNode(u1).detachNodes([u2], true);
+            let cannotRemove = relationRepository.node(u1).detachNodes([u2], true);
             await expect(cannotRemove).to.eventually.be.rejected;
         });
     });

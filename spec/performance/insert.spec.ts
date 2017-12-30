@@ -10,7 +10,7 @@ describe("Inserting nodes", () => {
 
     const insertNode = (connection) => {
         let node = new DummyGraphNode({attr1: 'someAttr'});
-        return connection.getNodeRepository(DummyGraphNode).save(node);
+        return connection.nodeType(DummyGraphNode).save(node);
     };
 
     const countNodes = (connection) => connection.runQuery(
