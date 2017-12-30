@@ -29,4 +29,8 @@ export class ConnectedNodesCollection<R extends AbstractRelation, TO extends Abs
     assertAllNodesPersisted() {
         assertAllPersisted(this.getNodes());
     }
+
+    containsNode(node:TO) {
+        return this.getNodes().some(n => n.id === node.id)
+    }
 }

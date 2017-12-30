@@ -19,7 +19,6 @@ describe("Inserting nodes", () => {
             .returns('count(n) as nodesCount')
     )
         .pluck('nodesCount')
-        .map(integer => integer.toNumber())
         .first();
 
     describe("single connection", () => {

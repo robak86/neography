@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {NodeRepository} from "../../lib/repositories/NodeRepository";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {Connection} from "../../lib";
-import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
+import {cleanDatabase, countRelations, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import {buildQuery} from "../../lib/cypher";
 import {FromNodeRelationsRepository} from "../../lib/repositories/FromNodeRelationsRepository";
@@ -17,7 +17,9 @@ describe("FromNodeRelationsRepository", () => {
 
     let u1:DummyGraphNode,
         u2:DummyGraphNode,
-        u3:DummyGraphNode;
+        u3:DummyGraphNode,
+        u4:DummyGraphNode,
+        u5:DummyGraphNode;
 
 
     beforeEach(async () => {
@@ -25,9 +27,14 @@ describe("FromNodeRelationsRepository", () => {
         connection = getSharedConnection();
         nodeRepository = connection.getNodeRepository(DummyGraphNode);
         relationRepository = connection.getRelationRepository(DummyGraphRelation);
-        u1 = await nodeRepository.save(new DummyGraphNode({attr1: 'Tom'}));
-        u2 = await nodeRepository.save(new DummyGraphNode({attr1: 'Glen'}));
-        u3 = await nodeRepository.save(new DummyGraphNode({attr1: 'Jack'}));
+
+        [u1, u2, u3, u4, u5] = await nodeRepository.saveMany([
+            new DummyGraphNode({attr1: 'Tom'}),
+            new DummyGraphNode({attr1: 'Glen'}),
+            new DummyGraphNode({attr1: 'Jack'}),
+            new DummyGraphNode({attr1: 'Victor'}),
+            new DummyGraphNode({attr1: 'Sebastian'})
+        ]);
     });
 
     describe(".connectTo", () => {
@@ -92,30 +99,73 @@ describe("FromNodeRelationsRepository", () => {
             expect(rel[1].node).to.eql(u3);
         });
 
-        it('throws while connecting to not persisted node', () => {
+        it('throws while connecting to not persisted node', async () => {
             let connect = relationRepository
                 .forNode(u1)
                 .connectToMany([new DummyGraphNode()]);
 
-            expect(connect).to.eventually.be.rejected;
+            await expect(connect).to.eventually.be.rejected;
         });
     });
 
-    describe(".setConnectedNodes", () => {
+    describe.only(".setConnectedNodes", () => {
         it('creates relation for attached nodes', async () => {
-            // expect(await countRelations(DummyGraphRelation)).to.eq(0);
-            //
-            // await relationRepository.forNode(u1).setConnectedNodes([u2, u1]);
-            // expect(await countRelations(DummyGraphRelation)).to.eq(2);
+            expect(await countRelations(DummyGraphRelation)).to.eq(0);
 
+            await relationRepository.forNode(u1).setConnectedNodes([u2, u3]);
+            expect(await countRelations(DummyGraphRelation)).to.eq(2);
+            let connected = await relationRepository.forNode(u1).getConnectedNodes();
+            let connectedNodes:any[] = connected.map(c => c.node);
+            expect(connectedNodes).to.have.deep.members([u2, u3])
+        });
 
-            // let connected = await relationRepository.forNode(u1).getConnectedNodes();
-            //
-            // connected = connected.sort(n => (<any>n).node.createdAt.getTime());
-            //
-            // expect(connected[0].node).to.eql(u2);
-            // expect(connected[1].node).to.eql(u3);
-            // expect(connected.length).to.eq(2);
+        it('removes existing relations', async () => {
+            expect(await countRelations(DummyGraphRelation)).to.eq(0);
+            await relationRepository.forNode(u1).setConnectedNodes([u2, u3]);
+            expect(await countRelations(DummyGraphRelation)).to.eq(2);
+            await relationRepository.forNode(u1).setConnectedNodes([u2]);
+            expect(await countRelations(DummyGraphRelation)).to.eq(1);
+            await relationRepository.forNode(u1).setConnectedNodes([]);
+            expect(await countRelations(DummyGraphRelation)).to.eq(0);
+
+            let connected = await relationRepository.forNode(u1).getConnectedNodes();
+            expect(connected.length).to.eq(0)
+        });
+
+        it('throws for creating self referenced relation', async () => {
+            let thrown = relationRepository.forNode(u1).setConnectedNodes([u1, u2]);
+            await expect(thrown).to.eventually.be.rejected;
+        });
+
+        it('modifies only relations attached to given node', async () => {
+            await relationRepository.forNode(u1).setConnectedNodes([u2]);
+            await relationRepository.forNode(u3).setConnectedNodes([u4, u5]);
+            expect(await countRelations(DummyGraphRelation)).to.eq(3);
+
+            let u1Connections = await relationRepository.forNode(u1).getConnectedNodes();
+            let u2Connections = await relationRepository.forNode(u3).getConnectedNodes();
+
+            expect(u1Connections.map(c => c.node)).to.have.deep.members([u2]);
+            expect(u2Connections.map(c => c.node)).to.have.deep.members([u4, u5]);
+
+            u1Connections = await relationRepository.forNode(u1).setConnectedNodes([]);
+            u2Connections = await relationRepository.forNode(u3).setConnectedNodes([u4]);
+
+            expect(u1Connections.map(c => c.node)).to.have.deep.members([]);
+            expect(u2Connections.map(c => c.node)).to.have.deep.members([u4]);
+        });
+
+        it('recreates all relations params', async () => {
+            await relationRepository.forNode(u1).setConnectedNodes([{
+                relation: new DummyGraphRelation({attr1: '1'}), node: u2
+            }]);
+
+            let connected = await relationRepository.forNode(u1).getConnectedNodes();
+            expect(connected[0].relation.attr1).to.eq('1');
+
+            await relationRepository.forNode(u1).setConnectedNodes([u2]);
+            connected = await relationRepository.forNode(u1).getConnectedNodes();
+            expect(connected[0].relation.attr1).to.be.undefined;
         });
     });
 
@@ -142,17 +192,34 @@ describe("FromNodeRelationsRepository", () => {
 
     describe(".detachNodes", () => {
         it('returns all connected nodes', async () => {
-            let query = buildQuery().literal(`MATCH ()-[rel:CONNECTED_BY_DUMMY]->() RETURN count(rel) as count`);
-
-            let rel1:DummyGraphRelation = await relationRepository.forNode(u1).connectTo(u2);
-            let rel2:DummyGraphRelation = await relationRepository.forNode(u1).connectTo(u3);
-            let count = await connection.runQuery(query).pluck('count').first();
-            expect(count.toNumber()).to.eq(2);
+            await relationRepository.forNode(u1).connectTo(u2);
+            await relationRepository.forNode(u1).connectTo(u3);
+            expect(await countRelations(DummyGraphRelation)).to.eq(2);
 
             await relationRepository.forNode(u1).detachNodes([u2, u3]);
+            expect(await countRelations(DummyGraphRelation)).to.eq(0);
+        });
 
-            count = await connection.runQuery(query).pluck('count').first();
-            expect(count.toNumber()).to.eq(0);
+        it('removes connected nodes', async () => {
+            await relationRepository.forNode(u1).connectTo(u2);
+            await relationRepository.forNode(u1).connectTo(u3);
+            expect(await countRelations(DummyGraphRelation)).to.eq(2);
+
+            await relationRepository.forNode(u1).detachNodes([u2, u3], true);
+            expect(await countRelations(DummyGraphRelation)).to.eq(0);
+
+            expect(await nodeRepository.exists(u2.id)).to.eq(false);
+            expect(await nodeRepository.exists(u3.id)).to.eq(false);
+        });
+
+        it('throws when trying to remove node having other relations', async () => {
+            await relationRepository.forNode(u1).connectTo(u2);
+            await relationRepository.forNode(u2).connectTo(u3);
+
+            expect(await countRelations(DummyGraphRelation)).to.eq(2);
+
+            let cannotRemove = relationRepository.forNode(u1).detachNodes([u2], true);
+            await expect(cannotRemove).to.eventually.be.rejected;
         });
     });
 });

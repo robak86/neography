@@ -34,7 +34,6 @@ describe("Queries", () => {
             const getNodesCount = () => connection
                 .runQuery(q => q.literal('MATCH(n) RETURN count(n) as nodesCount'))
                 .pluck('nodesCount')
-                .map(integer => integer.toNumber())
                 .first();
 
             expect(await getNodesCount()).to.eq(0); //make sure that there is no nodes in database
@@ -137,7 +136,6 @@ describe("Queries", () => {
                 const getRelationsCount = () => connection
                     .runQuery(q => q.literal('MATCH(n1)-[rel]->(n2) RETURN count(rel) as relationsCount'))
                     .pluck('relationsCount')
-                    .map(integer => integer.toNumber())
                     .first();
 
                 expect(await getRelationsCount()).to.eq(0); //make sure that there is no relations in database

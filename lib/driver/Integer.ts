@@ -1,9 +1,21 @@
+import {getLogger} from "../utils/logger";
+
 const neo4j = require('neo4j-driver').v1;
 const Integer = neo4j.Integer;
 
-export const int = (val:Integer|number|string|{low:number; high:number}):Integer => neo4j.int(val);
+export const int = (val:Integer | number | string | { low:number; high:number }):Integer => neo4j.int(val);
 export const isInt = (obj:any):boolean => neo4j.isInt(obj);
-export const inSafeRange = (val:Integer|number|string|{low:number; high:number}): boolean => neo4j.integer.inSafeRange(val);
+export const inSafeRange = (val:Integer | number | string | { low:number; high:number }):boolean => neo4j.integer.inSafeRange(val);
+
+export const convertToNumber = (val):number => {
+    if (isInt(val) && !inSafeRange(val)) {
+        getLogger().warn('Cannot convert to number. Returning native Integer type');
+    }
+
+    return isInt(val) && inSafeRange(val) ?
+        val.toNumber() :
+        val;
+};
 
 export interface Integer {
     inSafeRange():boolean;
@@ -29,14 +41,14 @@ export interface Integer {
     add(addend:number):number;
     subtract(subtrahend:number):number;
     multiply(multiplier:number):number;
-    div(divisor:Integer|number|string):Integer;
-    modulo(divisor:Integer|number|string):Integer;
+    div(divisor:Integer | number | string):Integer;
+    modulo(divisor:Integer | number | string):Integer;
     not():Integer;
-    and(other:Integer|number|string):Integer;
-    or(other:Integer|number|string):Integer;
-    xor(other:Integer|number|string):Integer;
-    shiftLeft(numBits:number|Integer):Integer;
-    shiftRight(numBits:number|Integer):Integer;
+    and(other:Integer | number | string):Integer;
+    or(other:Integer | number | string):Integer;
+    xor(other:Integer | number | string):Integer;
+    shiftLeft(numBits:number | Integer):Integer;
+    shiftRight(numBits:number | Integer):Integer;
 }
 
 
