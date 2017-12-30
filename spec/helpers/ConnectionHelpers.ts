@@ -44,7 +44,7 @@ export const countRelations = (rel:Type<AbstractRelation>):Promise<number> => {
             m.relation(rel).as('rel'),
             m.node()
         ])
-        .returns('count(rel) as count');
+        .returns('count(distinct rel) as count');
 
     return getSharedConnection().runQuery(query).pluck('count').first();
 };

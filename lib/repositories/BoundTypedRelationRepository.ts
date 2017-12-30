@@ -35,7 +35,7 @@ export class BoundTypedRelationRepository<FROM extends AbstractNode, R extends A
             ])
             .returns('count(rel) as relCount');
 
-        return this.connection.runQuery(query).pluck('relCount').map(integer => integer.toNumber() > 0).first();
+        return this.connection.runQuery(query).pluck('relCount').map(count => count > 0).first();
     }
 
     remove():Promise<any> {

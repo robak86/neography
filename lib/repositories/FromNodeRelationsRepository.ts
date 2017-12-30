@@ -21,26 +21,30 @@ export class FromNodeRelationsRepository<FROM extends AbstractNode, R extends Ab
 
     // The idea is that relations will be always recreated. Now since id on relationships are removed we can do it with no consequences
     // In order to provide custom relation values user has to pass ConnectedNode instance instead of persisted node
-    async setConnectedNodes<TO extends AbstractNode>(connectedNodes:(ConnectedNode<R, TO> | TO)[], removeDetached:boolean = true) {
+    async setConnectedNodes<TO extends AbstractNode>(connectedNodes:(ConnectedNode<R, TO> | TO)[], removeConnectedNodes:boolean = false) {
         let existingConnections = await this.getConnectedNodes();
 
         let connectedNodesCollection = new ConnectedNodesCollection(this.relationClass, connectedNodes);
+        if (connectedNodesCollection.containsNode(this.fromNode as any)){
+            throw new Error('Cannot create self referencing relation')
+        }
         connectedNodesCollection.assertAllNodesPersisted();
+
 
         let newConnections:ConnectedNode<R, TO>[] = connectedNodesCollection.getConnectedNodes();
 
         let unchangedConnections = _.intersectionWith(newConnections, existingConnections, ConnectedNode.isEqual);
-        let connectionsForDetach = _.pullAllWith(existingConnections, unchangedConnections, ConnectedNode.isEqual);
-        let connectionsForAttach = _.pullAllWith(newConnections, unchangedConnections, ConnectedNode.isEqual);
+        let connectionsForDetach = _.differenceWith(existingConnections, unchangedConnections, ConnectedNode.isEqual);
+        let connectionsForAttach = _.differenceWith(newConnections, unchangedConnections, ConnectedNode.isEqual);
 
 
-        await this.detachNodes(connectionsForDetach.map(c => c.node));
+        await this.detachNodes(connectionsForDetach.map(c => c.node),removeConnectedNodes);
         await this.connectToMany(connectionsForAttach);
 
         return [...unchangedConnections, ...connectionsForAttach];
     }
 
-    async detachNodes<N extends AbstractNode>(nodes:N[]):Promise<any> {
+    async detachNodes<N extends AbstractNode>(nodes:N[], removeConnectedNodes:boolean = false):Promise<any> {
         if (nodes.length === 0) {
             return;
         }
@@ -54,7 +58,7 @@ export class FromNodeRelationsRepository<FROM extends AbstractNode, R extends Ab
                 m.node().as('to')
             ])
             .where(w => w.literal('to.id in {ids}').params({ids}))
-            .append(`DELETE rel`);
+            .append(`DELETE rel ${removeConnectedNodes ? ', to' : ''}`);
 
         return this.connection.runQuery(query).toArray();
     }
@@ -63,6 +67,10 @@ export class FromNodeRelationsRepository<FROM extends AbstractNode, R extends Ab
         let collection = new ConnectedNodesCollection(this.relationClass, to);
         collection.assertAllNodesPersisted();
         let connections = collection.getConnectedNodes();
+
+        if (connections.length === 0) {
+            return []
+        }
 
         const createPart = (c:CreateBuilder) => {
             return _.flatMap(connections, (connection, idx) => [

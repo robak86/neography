@@ -14,3 +14,5 @@
  - add saveMany for NodeRepository
  - @timestamp maps neo4j integer value to javascript Date object
  - fix bug related to closing driver sessions
+ - timestamps are stored as float
+ - all Integer values read from database are converted to number

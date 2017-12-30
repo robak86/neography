@@ -3,6 +3,7 @@ import Record from "neo4j-driver/types/v1/record";
 import {Node, Relationship} from "neo4j-driver/types/v1/graph-types";
 import {isNode, isRelationship} from "../driver/NeoTypes";
 import * as _ from 'lodash';
+import {convertToNumber, isInt} from "../driver/Integer";
 
 
 export class AutoMapper {
@@ -31,6 +32,10 @@ export class AutoMapper {
 
         if (isRelationship(recordField) && this.attributesMapperFactory.hasRelationMapper(recordField.type)) {
             return this.attributesMapperFactory.getRelationAttributesMapper(recordField.type).mapToInstance(recordField);
+        }
+
+        if (isInt(recordField)){
+            return convertToNumber(recordField)
         }
 
         return recordField;
