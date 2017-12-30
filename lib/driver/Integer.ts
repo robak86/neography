@@ -3,7 +3,7 @@ const Integer = neo4j.Integer;
 
 export const int = (val:Integer|number|string|{low:number; high:number}):Integer => neo4j.int(val);
 export const isInt = (obj:any):boolean => neo4j.isInt(obj);
-export const inSafeRange = (val:Integer|number|string|{low:number; high:number}): boolean => Integer.inSafeRange(val);
+export const inSafeRange = (val:Integer|number|string|{low:number; high:number}): boolean => neo4j.integer.inSafeRange(val);
 
 export interface Integer {
     inSafeRange():boolean;
