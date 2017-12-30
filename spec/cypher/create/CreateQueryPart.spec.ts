@@ -10,7 +10,6 @@ import {MatchedNodeQueryPart} from "../../../lib/cypher/common/MatchedNodeQueryP
 import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 
 
-
 describe("CreateQueryPart", () => {
     let createNodeQuery1:CreateNodeQueryPart<DummyGraphNode>,
         createNodeQuery2:CreateNodeQueryPart<DummyGraphNode>,
@@ -97,8 +96,37 @@ describe("CreateQueryPart", () => {
             boundedQueryPart = new CreateQueryPart([matchedNode1, createRelationQuery1, matchedNode2]).toCypher(ctx);
         });
 
-        it("returns proper cypher string", () =>{
+        it("returns proper cypher string", () => {
             expect(boundedQueryPart.cypherString).to.eql('CREATE (n1)-[r1:CONNECTED_BY_DUMMY {r1Params}]-(n2)')
         })
+    });
+
+    describe("create two relations for matched nodes", () => {
+        let boundedQueryPart:IBoundQueryPart;
+
+        beforeEach(() => {
+            boundedQueryPart = new CreateQueryPart([
+                createNodeQuery1, createRelationQuery1.as('r1'), createNodeQuery2,
+                createNodeQuery1, createRelationQuery1.as('r2'), createNodeQuery2
+            ]).toCypher(ctx);
+        });
+
+        it("returns proper cypher string", () => {
+            expect(boundedQueryPart.cypherString).to.equalIgnoreSpaces(`
+            CREATE (n1:DummyGraphNode {n1Params})-[r1:CONNECTED_BY_DUMMY {r1Params}]-(n2:DummyGraphNode {n2Params}),
+                   (n3:DummyGraphNode {n3Params})-[r2:CONNECTED_BY_DUMMY {r2Params}]-(n4:DummyGraphNode {n4Params})
+            `)
+        });
+
+        it("returns proper params object", () => {
+            expect(boundedQueryPart.params.n1Params.attr1).to.eql('val1');
+            expect(boundedQueryPart.params.n1Params.attr2).to.eql(1);
+
+            expect(boundedQueryPart.params.r1Params.attr1).to.eql('rVal1');
+            expect(boundedQueryPart.params.r1Params.attr2).to.eql(21);
+
+            expect(boundedQueryPart.params.n2Params.attr1).to.eql('val2');
+            expect(boundedQueryPart.params.n2Params.attr2).to.eql(2);
+        });
     });
 });
