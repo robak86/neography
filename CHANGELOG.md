@@ -13,3 +13,4 @@
  - allow user to pass logger instance in configuration 
  - add saveMany for NodeRepository
  - @timestamp maps neo4j integer value to javascript Date object
+ - fix bug related to closing driver sessions

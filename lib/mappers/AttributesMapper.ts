@@ -1,12 +1,12 @@
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
 import {Type} from "../utils/types";
 import {isPresent} from "../utils/core";
-import {GraphEntity} from "../model";
+import {GraphElement} from "../model";
 import {ExtensionsRowMapper} from "./ExtensionsRowMapper";
 import {TransformContext} from "../extensions/IRowTransformer";
 import * as _ from 'lodash';
 
-export class AttributesMapper<T extends GraphEntity> {
+export class AttributesMapper<T extends GraphElement> {
 
     constructor(private klass:Type<T>,
                 private extensionsRowMapper:ExtensionsRowMapper) {}

@@ -10,12 +10,12 @@ import {buildQuery} from "../../lib/cypher";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import {FromNodeRelationsRepository} from "../../lib/repositories/FromNodeRelationsRepository";
 import {assertAllPersisted} from "../../lib/model";
-import {RelationRepository} from "../../lib/repositories/RelationRepository";
+import {UnboundRelationRepository} from "../../lib/repositories/UnboundRelationRepository";
 
 describe("NodeRepository", () => {
 
     let nodeRepository:NodeRepository<DummyGraphNode>,
-        relationRepository:RelationRepository<DummyGraphRelation>,
+        relationRepository:UnboundRelationRepository<DummyGraphRelation>,
         dummyNode:DummyGraphNode,
         connection:Connection;
 
@@ -189,16 +189,16 @@ describe("NodeRepository", () => {
             let from = await nodeRepository.save(dummyNode);
             let to = await nodeRepository.save(new DummyGraphNode({attr1: 'Jane'}));
 
-            let createdRelation = await relationRepository.from(from).connectTo(to, new DummyGraphRelation({}));
+            await relationRepository.from(from).connectTo(to);
             expect(await nodeRepository.exists(from.id)).to.eq(true);
             expect(await nodeRepository.exists(to.id)).to.eq(true);
-            expect(await relationRepository.exists(createdRelation.id)).to.eq(true);
+            expect(await relationRepository.from(from).to(to).exists()).to.eq(true);
 
             await nodeRepository.remove(from.id);
 
             expect(await nodeRepository.exists(from.id)).to.eq(false);
             expect(await nodeRepository.exists(to.id)).to.eq(true);
-            expect(await relationRepository.exists(createdRelation.id)).to.eq(false);
+            expect(await relationRepository.from(from).to(to).exists()).to.eq(false);
         });
     });
 
@@ -217,21 +217,7 @@ describe("NodeRepository", () => {
             expect(await nodeRepository.exists(n2.id)).to.eq(false);
         });
 
-        it("removes all related relations", async () => {
-            let from = await nodeRepository.save(dummyNode);
-            let to = await nodeRepository.save(new DummyGraphNode({attr1: 'Jane'}));
-
-            let createdRelation = await relationRepository.from(from).connectTo(to);
-            expect(await nodeRepository.exists(from.id)).to.eq(true);
-            expect(await nodeRepository.exists(to.id)).to.eq(true);
-            expect(await relationRepository.exists(createdRelation.id)).to.eq(true);
-
-            await nodeRepository.remove(from.id);
-
-            expect(await nodeRepository.exists(from.id)).to.eq(false);
-            expect(await nodeRepository.exists(to.id)).to.eq(true);
-            expect(await relationRepository.exists(createdRelation.id)).to.eq(false);
-        });
+        it("removes all related relations");
     });
 
     describe(".update", () => {
