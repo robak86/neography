@@ -7,9 +7,9 @@ import {NodeMetadata} from "../metadata/NodeMetadata";
 import {RelationsTypesRegistryEntry} from "../annotations/RelationsTypesRegistry";
 import {RelationMetadata} from "../metadata/RelationMetadata";
 import * as _ from 'lodash';
-import {StripUnknownDataForWrite} from "./write/StripUnknownDataForWrite";
+import {RemoveUnknownPropertiesTransform} from "./write/RemoveUnknownPropertiesTransform";
 import {EntityIdExtension} from "./write/EntityIdExtension";
-import {WriteInlineMappersRunner} from "./write/WriteInlineMappersRunner";
+import {InlineMappersTransform} from "./write/InlineMappersTransform";
 import {ReadInlineMappersRunner} from "./read/ReadInlineMappersRunner";
 import {IExtension} from "../extensions/IExtension";
 import {ReadIntegerTransformer} from "./read/ReadIntegerTransformer";
@@ -26,10 +26,10 @@ export class AttributesMapperFactory {
     getMapper<T extends GraphEntity>(klass:Type<T>):AttributesMapper<T> {
         //TODO: should be cached
         let forWrites = [
-            new StripUnknownDataForWrite(),
+            new RemoveUnknownPropertiesTransform(),
             new EntityIdExtension(this.genId),
             ...this.extensions.map(ext => ext.getWriteTransformer()),
-            new WriteInlineMappersRunner()
+            new InlineMappersTransform()
         ];
 
         //TODO: should be cached
