@@ -8,7 +8,7 @@
  
  ## 0.1.0
  - remove ```Persisted``` type. Repositories accept now nodes with optional ```id``` property
-  and throw error if ```id``` is missing but it is required.
+  and throw error if ```id``` is missing while it was expected
  - remove ```createFactoryMethod``` used for generating static ```build``` methods. This functionality was moved to
   constructor of ```AbstractRelation``` and ```AbstractNode```.
  - rename ```pickOne``` method of GraphResponse to more intuitive ```pluck```
