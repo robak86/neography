@@ -1,5 +1,31 @@
-- add more helper methods for GraphResponse(like pluck, props, etc)
+- add auto mapping of integer values 
+# remove id property on relation !!!!!!
+ 
+ 
+- pass type for each method from IRowTransformer. It is required by id extension -> we wanna set id only on node entity
+- Consider moving all repositories behaviour to Commands (strategy like classes)
+ 
+ write
+ 1. check if number which we are gonna insert is integer and wrap with int() if so
+ 2. for floats pass value unchanged
+ read
+ 1. if number is int() unwrap it to javascript number.
+  if it is outside the range print warning
+  2. if number is float pass it unchanged
+ 
+- splitting logic for timestamps in two places (@timestamp for converting types) and TimeExtensions for setting actual date sucks 
 - create repository for relations which don't have any props
+
+- create complex integration specs for query builder
+
+spec/integration/match.spec.ts
+spec/integration/create.spec.ts
+spec/integration/update.spec.ts
+
+- fix invariant method
+
+- create runRaw method for connection (for running plain cypher queries + params);
+- update README.md
 
 OneToOneRepository ?
 ManyToManyRepository ?
@@ -78,6 +104,20 @@ let s:SomeNode;
 s.edges.scores.update([]);
 
 
+```
+
+
+
+```typescript`
+       createRelationQuery = neography.query(query => query
+                    .match(m => m.node(DummyGraphNode).params({id: node1.id}).as('n1'))
+                    .match(m => m.node(DummyGraphNode).params({id: node2.id}).as('n2'))
+                    .create(c => [
+                        c.matchedNode('n1'),
+                        c.relation(newRelation).as('rel1').direction('->'),
+                        c.matchedNode('n2')])
+                    .returns('n1', 'rel1', 'n2')
+                    );
 ```
 
 
