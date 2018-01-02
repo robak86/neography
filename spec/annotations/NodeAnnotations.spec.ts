@@ -1,7 +1,7 @@
-import {node} from "../../lib/annotations/NodeAnnotations";
+import {node} from "../../lib/annotations";
 import {expect} from 'chai';
 import {NodeMetadata} from "../../lib/metadata/NodeMetadata";
-import {AbstractNode} from "../../lib/model/AbstractNode";
+import {AbstractNode} from "../../lib/model";
 
 describe("NodeAnnotations", () => {
     @node('DummyVehicle')

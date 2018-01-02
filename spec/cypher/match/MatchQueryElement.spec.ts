@@ -1,5 +1,4 @@
 import {expect} from 'chai';
-import * as sinon from 'sinon';
 import {MatchNodeQueryPart} from "../../../lib/cypher/match/MatchNodeQueryPart";
 import {DummyGraphNode} from "../../fixtures/DummyGraphNode";
 import {MatchRelationQueryPart} from "../../../lib/cypher/match/MatchRelationQueryPart";
@@ -21,11 +20,6 @@ describe('MatchQueryPart', () => {
 
     beforeEach(() => {
         ctx = getDefaultContext();
-        // sinon.stub(ctx, 'genId').returns('n2Params');
-
-        // let counter = 0;
-        // sinon.stub(ctx, 'genId', () => `p${counter += 1}`);
-
         nodeQuery1 = new MatchNodeQueryPart(DummyGraphNode).params({attr1: 'someCriteria'}).as('n1');
         nodeQuery2 = new MatchNodeQueryPart(DummyGraphNode).params({attr2: 123}).as('n2');
         nodeQuery3 = new MatchNodeQueryPart(DummyGraphNode).params({attr2: 456}).as('n3');
