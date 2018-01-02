@@ -69,7 +69,7 @@ class HasHomeAddressRelation extends AbstractRelation<HasHomeAddressRelation>{}
 ```
 
 Passing generic types for ```AbstractRelation``` and ```AbstractNode``` is optional (starting from typescript ^2.3).
-In this case generic types were introduced in order to enable type safety for constructors.
+Generic types were introduced in order to enable type safety for constructors.
 
 ```typescript
 new User({firstName: 'John', lastName: 'Doe'}); //OK
