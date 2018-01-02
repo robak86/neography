@@ -1,7 +1,7 @@
 {
   "name": "neography",
   "version": "0.1.0",
-  "description": "Simple object mapper and queries builder for official neo4j driver.",
+  "description": "Object mapper and queries builder for official neo4j driver.",
   "main": "index.js",
   "types": "index.d.ts",
   "engines": {
@@ -31,10 +31,11 @@
     "url": "https://github.com/robak86/neography/issues"
   },
   "keywords": [
-    "graph",
     "neo4j",
+    "cypher",
+    "graph",
     "orm",
-    "query"
+    "query builder"
   ],
   "homepage": "https://github.com/robak86/neography#readme",
   "devDependencies": {
