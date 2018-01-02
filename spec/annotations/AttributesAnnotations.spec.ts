@@ -1,4 +1,4 @@
-import {attribute} from "../../lib/annotations/AttributesAnnotations";
+import {attribute} from "../../lib/annotations";
 import {AttributesMetadata} from "../../lib/metadata/AttributesMetadata";
 import {expect} from 'chai';
 
