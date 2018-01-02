@@ -50,7 +50,7 @@ export class BoundTypedRelationRepository<FROM extends AbstractNode, R extends A
         return this.connection.runQuery(query).first();
     }
 
-    async createRelation(relation:R):Promise<R> {
+    connectWith(relation:R):Promise<R> {
         let query = buildQuery()
             .match(m => [
                 m.node(getClassFromInstance(this.fromNode)).params({id: this.fromNode.id} as any).as('from'),

@@ -73,21 +73,21 @@ describe("BoundTypedRelationRepository", () => {
     });
 
 
-    describe(".createRelation", () => {
+    describe(".connectWith", () => {
         it('creates new relation', async () => {
             expect(await countRelations(DummyGraphRelation)).to.eq(0);
 
             await connection
                 .relationType(DummyGraphRelation)
                 .nodes(u1, u2)
-                .createRelation(new DummyGraphRelation({attr1: '1'}));
+                .connectWith(new DummyGraphRelation({attr1: '1'}));
 
             expect(await countRelations(DummyGraphRelation)).to.eq(1);
 
             let connected = await connection
                 .relationType(DummyGraphRelation)
                 .nodes(u1, u2)
-                .createRelation(new DummyGraphRelation({attr1: '1'}));
+                .connectWith(new DummyGraphRelation({attr1: '1'}));
 
             expect(connected).to.eq(true);
         });
