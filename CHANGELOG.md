@@ -6,13 +6,17 @@
  ## 0.0.4 
  - limit Connection instance to using only one neo4j session at the time (Solves Error: read ECONNRESET error )
  
- ## 0.0.9
- - remove ```Persisted``` type. Repositories accept now entities with optional ```id``` property
+ ## 0.1.0
+ - remove ```Persisted``` type. Repositories accept now nodes with optional ```id``` property
   and throw error if ```id``` is missing
  - rename ```pickOne``` method of GraphResponse to more intuitive ```pluck```
  - allow user to pass logger instance in configuration 
- - add saveMany for NodeRepository
+ - add saveMany, updateMany for NodeRepository
+ - reorganize, rewrite repositories in order to cover for most frequent use cases
  - @timestamp maps neo4j integer value to javascript Date object
  - fix bug related to closing driver sessions
- - timestamps are stored as float
+ - remove explicit conversion to Integer for timestamps
  - all Integer values read from database are converted to number
+ - add automatic conversion of Integer to javascript number type during read.
+ Integers greater that ```Number.MAX_SAFE_INTEGER``` won't be converted and Integer will be returned.
+ 
