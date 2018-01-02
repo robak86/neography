@@ -8,11 +8,13 @@
  
  ## 0.1.0
  - remove ```Persisted``` type. Repositories accept now nodes with optional ```id``` property
-  and throw error if ```id``` is missing
+  and throw error if ```id``` is missing but it is required.
+ - remove ```createFactoryMethod``` used for generating static ```build``` methods. This functionality was moved to
+  constructor of ```AbstractRelation``` and ```AbstractNode```.
  - rename ```pickOne``` method of GraphResponse to more intuitive ```pluck```
  - allow user to pass logger instance in configuration 
  - add saveMany, updateMany for NodeRepository
- - reorganize, rewrite repositories in order to cover for most frequent use cases
+ - reorganize, rewrite repositories in order to cover most frequent use cases
  - @timestamp maps neo4j integer value to javascript Date object
  - fix bug related to closing driver sessions
  - remove explicit conversion to Integer for timestamps
