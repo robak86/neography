@@ -19,12 +19,11 @@ export class UnboundRelationRepository<R extends AbstractRelation> {
         return new BoundTypedRelationRepository(nodeFrom, this.relationClass, nodeTo, this.connection);
     }
 
-
-    // fromType<FROM extends AbstractNode>(nodeType:Type<FROM>) {}
-    //
-    // toType<FROM extends AbstractNode>(nodeType:Type<FROM>) {}
-    //
-    // count():{}
-    // findBy():{}
-    // removeBy():{}
+    /* TODO: implement following methods
+        nodeType<FROM extends AbstractNode>(from:Type<FROM>) {}
+        nodesTypes<FROM extends AbstractNode, TO extends AbstractNode>(from:Type<FROM>, to:Type<TO>) {}
+        count():{}
+        where():{}
+        removeBy():{}
+     */
 }
