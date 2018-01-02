@@ -1,6 +1,6 @@
 {
   "name": "neography",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Object mapper and queries builder for official neo4j driver.",
   "main": "index.js",
   "types": "index.d.ts",
