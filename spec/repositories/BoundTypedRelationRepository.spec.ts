@@ -87,7 +87,7 @@ describe("BoundTypedRelationRepository", () => {
             let connected = await connection
                 .relationType(DummyGraphRelation)
                 .nodes(u1, u2)
-                .connectWith(new DummyGraphRelation({attr1: '1'}));
+                .areConnected();
 
             expect(connected).to.eq(true);
         });
