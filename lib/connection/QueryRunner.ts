@@ -2,9 +2,7 @@ import * as PQueue from "p-queue";
 import {StatementResult} from "neo4j-driver/types/v1/result";
 import {DriverProxy} from "../driver/DriverProxy";
 
-/***
- * It creates new session for each query.
- */
+
 export class QueryRunner {
     private queue:PQueue;
 
@@ -15,7 +13,7 @@ export class QueryRunner {
 
     async run(statement:string, parameters?:any):Promise<StatementResult> {
         return this.queue.add(async () => {
-            let session = this.driver.session();
+            let session = this.driver.session(); //each query is run in new session
             let response:StatementResult;
 
             try {

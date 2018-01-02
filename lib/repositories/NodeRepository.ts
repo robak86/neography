@@ -5,9 +5,9 @@ import {
 import {Connection} from "../connection/Connection";
 import {cypher} from "../cypher/builders/QueryBuilder";
 import {Type} from "../utils/types";
-import {buildQuery} from "../index";
 import {MatchBuilder} from "../cypher/builders/MatchBuilder";
 import {SetQueryBuilder} from "../cypher/builders/SetQueryBuilder";
+import {buildQuery} from "../cypher";
 
 export class NodeRepository<T extends AbstractNode> {
     constructor(private klass:Type<T>,
@@ -35,6 +35,7 @@ export class NodeRepository<T extends AbstractNode> {
         return this.connection.runQuery(query).pluck('n').first();
     };
 
+    //TODO: add batching and figure out max size of nodes
     async saveMany(nodes:T[]):Promise<T[]> {
         if (Array.isArray(nodes) && nodes.length === 0) {
             return []
