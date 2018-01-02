@@ -2,7 +2,7 @@ import {IWriteTransformer, TransformContext} from "../ITransformer";
 import {AttributesMetadata} from "../../metadata/AttributesMetadata";
 import {isPresent} from "../../utils/core";
 
-export class WriteInlineMappersRunner implements IWriteTransformer {
+export class InlineMappersTransform implements IWriteTransformer {
     transformRow(row, type:TransformContext, attributesMetadata:AttributesMetadata):Object {
         if (attributesMetadata) {
             attributesMetadata.forEachAttribute((attributeMetadata, prop) => {

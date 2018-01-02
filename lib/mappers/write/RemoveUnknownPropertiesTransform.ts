@@ -2,7 +2,7 @@ import {IWriteTransformer, TransformContext} from "../ITransformer";
 import * as _ from "lodash";
 import {AttributesMetadata} from "../../metadata/AttributesMetadata";
 
-export class StripUnknownDataForWrite implements IWriteTransformer {
+export class RemoveUnknownPropertiesTransform implements IWriteTransformer {
     transformRow(nodeInstance, type:TransformContext, attributesMetadata:AttributesMetadata|null):Object {
         let row = {};
 
