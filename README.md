@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/robak86/neography.svg?branch=master)](https://travis-ci.org/robak86/neography)
 [![Coverage Status](https://coveralls.io/repos/github/robak86/neography/badge.svg?branch=master&service=github)](https://coveralls.io/github/robak86/neography?branch=simplify_types)
 
-Simple object mapper and queries builder for official neo4j driver. (https://github.com/neo4j/neo4j-javascript-driver)
+Object mapper and queries builder for official neo4j driver. (https://github.com/neo4j/neo4j-javascript-driver)
 
 ## Warning 
 This library is at early stage of development. The API most likely will change over time.
