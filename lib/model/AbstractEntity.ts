@@ -1,10 +1,7 @@
 import {isPresent} from "../utils/core";
-import {attribute} from "../annotations";
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
 
 export abstract class AbstractEntity<T> {
-
-
     constructor(params:Partial<T> = {}) {
         if (isPresent((params as any).id)) {
             throw new Error("Params object passed to constructor cannot contain id property!")
