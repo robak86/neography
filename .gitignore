@@ -3,6 +3,7 @@ node_modules
 dist
 *.iml
 .nyc_output
+TODO.md
 examples/dist
 examples/node_modules
 examples/**/*.js
