@@ -28,7 +28,7 @@ export class Connection {
         }
     }
 
-    withTransaction<T>(fn:() => Promise<T>):Promise<T> { //TODO: rename to runWithinCurrentTransaction??
+    withTransaction<T>(fn:() => Promise<T>):Promise<T> {
         return this.transactionRunner.withTransaction(fn)
     }
 
