@@ -36,7 +36,6 @@ Neography provides mapping layer over persisted neo4j data. In order to create m
 you have to decorate it with ```@node('NodeLabel')``` or ```@relation('RELATION_TYPE')``` decorators. Additionally each 
 entity class have to inherit consequently from ```AbstractNode``` or ```AbstractRelation``` class. ```AbstractNode``` class
 provides auto generated unique ```id``` property.
-Abstract classes were introduced for providing types safety for repositories. 
 
  
 ```typescript
@@ -46,7 +45,7 @@ import {node, relation, timestamp} from 'neography/annotations';
 //Nodes definitions
 
 @node('User') //node label
-class UserNode extends AbstractNode<UserNode> {
+class UserNode extends AbstractNode<UserNode> { 
     @attribute() firstName:string;
     @attribute() lastName:string;
 }
@@ -69,6 +68,15 @@ class HasHomeAddressRelation extends AbstractRelation<HasHomeAddressRelation>{}
 
 ```
 
+Passing generic types for ```AbstractRelation``` and ```AbstractNode``` is optional (starting from typescript ^2.3).
+In this case generic types were introduced in order to enable type safety for constructors.
+
+```typescript
+new User({firstName: 'John', lastName: 'Doe'}); //OK
+new User({firstName: 'John', someUnknownAttribute: 'Doe'}) //generates compile time error
+
+```
+
 ## Repositories
 
 Neography provides repositories for basic operations.
@@ -77,7 +85,7 @@ Neography provides repositories for basic operations.
 import {Neography} from 'neography';
 
 const neography = new Neography({host: 'localhost', username: 'neo4j', password: 'password'});
-const connection = neography.checkoutConnection()
+const connection = neography.checkoutConnection();
 
 //Create repository for given nodes types
 const usersRepository = connection.nodeType(UserNode);
@@ -110,7 +118,7 @@ await usersRepository.remove(user1.id);
 let user1:User = await usersRepository.save(new User({firstName: 'Jane', lastName: 'Doe'}));
 let user2:User = await usersRepository.save(new User({firstName: 'John', lastName: 'Smith'}));
 
-let relation:KnowsRelation = await knowsRelationsRepository.nodes(user1, user2).createRelation(new KnowsRelation({since: new Date()}));
+let relation:KnowsRelation = await knowsRelationsRepository.nodes(user1, user2).connectWith(new KnowsRelation({since: new Date()}));
 
 //alternatively
 let relation:KnowsRelation = await knowsRelationsRepository.node(user1).connectTo(user2, new KnowsRelation({since: new Date()}));
@@ -123,7 +131,6 @@ await knowsRelationsRepository.nodes(user1, user2)
 ```
 
 ## Query Builder
-
 Query builder provides simple DSL for building cypher queries.
 It tries to reflect cypher syntax without introducing any additional abstractions.  
 
@@ -255,7 +262,3 @@ let createRelation = neography.query()
 type Response = {user: UserNode, relation: KnowsRelation, friend: UserNode};
 let userWithFriend:Response = await connection.runQuery(createRelation).toArray();
 ```
-
-### Update Entities Using SET Clause
-TODO
-
