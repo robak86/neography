@@ -5,7 +5,8 @@ import {QueryContext} from "../../lib/cypher/common/QueryContext";
 import {AbstractRelation} from "../../lib/model";
 import {Type} from "../../lib/utils/types";
 import {buildQuery} from "../../lib/cypher";
-import {TimestampsExtension} from "../../lib/extensions/TimestampsExtension";
+import {TimestampsExtension} from "../../lib/extensions";
+import {connectionsFactory} from "../../lib/connection/ConnectionFactory";
 
 const DEBUG_ENABLED = false;
 
@@ -16,7 +17,7 @@ export const getDefaultNeography = _.memoize(():Neography => {
         password: 'password',
         debug: DEBUG_ENABLED
     });
-    neography.registerExtension(TimestampsExtension.getDefault());
+    connectionsFactory.registerExtension(TimestampsExtension.getDefault());
     return neography;
 });
 
@@ -30,7 +31,7 @@ export const checkoutConnection = ():Connection => {
 
 export const getDefaultContext = () => {
     let neography = getDefaultNeography();
-    return new QueryContext(neography.attributesMapperFactory);
+    return new QueryContext(connectionsFactory.attributesMapperFactory);
 };
 
 export const cleanDatabase = ():Promise<any> => {
