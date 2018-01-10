@@ -3,7 +3,7 @@ import {WhereAttributeBuilder, WhereAttributeQueryPart} from "./WhereAttributeBu
 import {MatchBuilderCallback} from "./QueryBuilder";
 
 
-export type WhereQueryPart = WhereLiteralQueryPart | WhereAttributeQueryPart;
+export type WhereStatementPart = WhereLiteralQueryPart | WhereAttributeQueryPart;
 
 
 export class WhereBuilder<T = any> {
@@ -12,7 +12,7 @@ export class WhereBuilder<T = any> {
     }
 
     attribute<K extends keyof T>(prop:K):WhereAttributeBuilder<T[K]> {
-        return new WhereAttributeBuilder();
+        return new WhereAttributeBuilder(prop);
     }
 
     //TODO: investigate matching for queries like WHERE NOT (n)-[:SOME_REL]-(b)

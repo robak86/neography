@@ -1,23 +1,53 @@
 import {IQueryPart} from "../abstract/IQueryPart";
 import {QueryContext} from "../common/QueryContext";
 import {IBoundQueryPart} from "../abstract/IBoundQueryPart";
+import {cloned, isPresent} from "../../utils/core";
 
 export class WhereAttributeQueryPart implements IQueryPart {
+    constructor(private propertyName:string,
+                private alias:string,
+                private operator:string,
+                private value:any) {}
+
     toCypher(ctx:QueryContext):IBoundQueryPart {
-        throw new Error("implement me")
+        let cypher = '';
+        let paramAlias = ctx.checkoutSinglePropertyAlias(this.alias, this.propertyName);
+
+        if (isPresent(this.alias)) {
+            cypher += `${this.alias}.`
+        }
+
+        cypher += this.propertyName;
+        cypher += ` ${this.operator} `;
+        cypher += `{ ${paramAlias} }`;
+
+        return {
+            cypherString: cypher,
+            params: {[paramAlias]: this.value}
+        }
     }
 }
 
 export class WhereAttributeBuilder<T> {
-    notEqual(val:T):WhereAttributeQueryPart {throw new Error("implement me")}
+    constructor(private propertyName:string, private _alias:string) {}
 
-    equal(val:T):WhereAttributeQueryPart {throw new Error("implement me")}
+    notEqual(val:T):WhereAttributeQueryPart {
+        return new WhereAttributeQueryPart(this.propertyName, this._alias, '!=', val);
+    }
 
-    greaterThan(val:T):WhereAttributeQueryPart {throw new Error("implement me")}
+    equal(val:T):WhereAttributeQueryPart {
+        return new WhereAttributeQueryPart(this.propertyName, this._alias, '=', val);
+    }
 
-    lessThan(val:T):WhereAttributeQueryPart {throw new Error("implement me")}
+    greaterThan(val:T):WhereAttributeQueryPart {
+        return new WhereAttributeQueryPart(this.propertyName, this._alias, '>', val);
+    }
 
-    in(values:T[]):WhereAttributeQueryPart {throw new Error("implement me")}
+    lessThan(val:T):WhereAttributeQueryPart {
+        return new WhereAttributeQueryPart(this.propertyName, this._alias, '<', val);
+    }
 
-    alias(alias:string):WhereAttributeBuilder<T> {throw new Error("implement me")}
+    in(values:T[]):WhereAttributeQueryPart {
+        return new WhereAttributeQueryPart(this.propertyName, this._alias, 'in', values);
+    }
 }

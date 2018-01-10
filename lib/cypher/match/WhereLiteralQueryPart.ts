@@ -15,7 +15,7 @@ export class WhereLiteralQueryPart implements IQueryPart {
 
     toCypher(ctx:QueryContext):IBoundQueryPart {
         return {
-            cypherString: 'WHERE ' + this.whereLiteral,
+            cypherString: this.whereLiteral,
             params: this._params
         }
     }

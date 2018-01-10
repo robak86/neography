@@ -7,13 +7,13 @@ import {ReturnQueryPart} from "./common/ReturnQueryPart";
 import {SetQueryPart} from "./update/SetQueryPart";
 import {CypherLiteral} from "./common/CypherLiteral";
 import {AttributesMapperFactory} from "../mappers/AttributesMapperFactory";
-import {WhereQueryPart} from "./builders/WhereBuilder";
+import {WhereStatementPart} from "./builders/WhereBuilder";
 
 export type CypherQueryElement = MatchQueryPart
     | CreateQueryPart
     | ReturnQueryPart
     | SetQueryPart
-    | WhereQueryPart
+    | WhereStatementPart
     | CypherLiteral
     | string;
 

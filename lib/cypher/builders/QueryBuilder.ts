@@ -7,15 +7,16 @@ import {MatchBuilder} from "./MatchBuilder";
 import {CreateBuilder} from "./CreateBuilder";
 import {SetQueryBuilder} from "./SetQueryBuilder";
 import {SetQueryPart, SetQueryPartChildren} from "../update/SetQueryPart";
-import {WhereBuilder, WhereQueryPart} from "./WhereBuilder";
+import {WhereBuilder, WhereStatementPart} from "./WhereBuilder";
 import {WhereLiteralQueryPart} from "../match/WhereLiteralQueryPart";
 import {CypherLiteral} from "../common/CypherLiteral";
 import {AttributesMapperFactory} from "../../mappers/AttributesMapperFactory";
+import {WhereStatement} from "../where/WhereStatement";
 
 
 export type MatchBuilderCallback = (q:MatchBuilder) => MatchableElement[]|MatchableElement;
 export type CreateBuilderCallback = (q:CreateBuilder) => PersistableElement[]|PersistableElement;
-export type WhereBuilderCallback<T> = (q:WhereBuilder<T>) => WhereQueryPart[]|WhereQueryPart;
+export type WhereBuilderCallback<T> = (q:WhereBuilder<T>) => WhereStatementPart[]|WhereStatementPart;
 
 export class QueryBuilder {
     constructor(private elements:CypherQueryElement[] = []) {}
@@ -66,7 +67,7 @@ export class QueryBuilder {
             new WhereLiteralQueryPart(literal);
 
         let elements = _.clone(this.elements);
-        elements.push(..._.castArray(whereElement));
+        elements.push(new WhereStatement(_.castArray(whereElement)));
 
         return new QueryBuilder(elements)
     }
