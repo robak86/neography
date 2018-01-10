@@ -26,11 +26,11 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
     private limitCount:number | undefined;
     private newRelations:ConnectedNodesCollection<R, N> | undefined;
 
-    private get origin():AbstractNode<any> {
+    constructor(private relClass:Type<R>, private nodeClass:Type<N>) {}
+
+    get boundNode():AbstractNode<any> {
         return this.ownerGetter();
     }
-
-    constructor(private relClass:Type<R>, private nodeClass:Type<N>) {}
 
     set(nodes:N[] | N) {
         this.newRelations = new ConnectedNodesCollection<R, N>(this.relClass);
@@ -147,7 +147,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
     private buildQuery(appendReturn:(b:QueryBuilder) => QueryBuilder, skipLimits:boolean = false, skipOrder:boolean = false):QueryBuilder {
         let baseQuery = buildQuery()
             .match(m => [
-                m.node(getClassFromInstance(this.origin)).params({id: this.origin.id}).as('o'),
+                m.node(getClassFromInstance(this.boundNode)).params({id: this.boundNode.id}).as('o'),
                 m.relation(this.relClass).as('relation'),
                 m.node(this.nodeClass).as('node')
             ]);
@@ -189,7 +189,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         let existingConnections = await this.allWithRelations();
 
 
-        if (this.newRelations!.containsNode(this.origin as N)) {
+        if (this.newRelations!.containsNode(this.boundNode as N)) {
             throw new Error('Cannot create self referencing relation')
         }
 
@@ -217,7 +217,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
 
         let query = buildQuery()
             .match(m => [
-                m.node(getClassFromInstance(this.origin)).params({id: this.origin.id} as any).as('from'),
+                m.node(getClassFromInstance(this.boundNode)).params({id: this.boundNode.id} as any).as('from'),
                 m.relation(this.relClass).as('rel'),
                 m.node().as('to')
             ])
@@ -246,7 +246,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         };
 
         const matchPart = (m:MatchBuilder) => [
-            m.node(getClassFromInstance(this.origin)).params({id: this.origin.id} as any).as('from'),
+            m.node(getClassFromInstance(this.boundNode)).params({id: this.boundNode.id} as any).as('from'),
             ...connections.map((connection, idx) => {
                 return m.node(getClassFromInstance(connection.node)).params({id: connection.node.id} as any).as('to' + idx);
             })

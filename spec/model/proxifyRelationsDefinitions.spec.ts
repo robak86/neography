@@ -20,7 +20,7 @@ describe(`proxifyRelationsDefinitions`, () => {
     });
 
     it('intercepts all getters and returns cloned ActiveRelation with bound owner', () => {
-        let boundNode:AbstractNode<any> = relations.others.boundNode();
+        let boundNode:AbstractNode<any> = relations.others.boundNode;
         expect(boundNode).to.eq(owner);
     });
 
