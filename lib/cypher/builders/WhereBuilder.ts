@@ -8,7 +8,7 @@ export type WhereStatementPart = WhereLiteralQueryPart | WhereAttributeQueryPart
 
 
 export class WhereBuilder<T = any> {
-    private _alias:string
+    private _alias:string;
 
     literal(queryPart:string):WhereLiteralQueryPart {
         return new WhereLiteralQueryPart(queryPart)

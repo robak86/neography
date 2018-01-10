@@ -64,12 +64,66 @@ describe.only(`ActiveRelation`, () => {
         });
     });
 
+    describe(`limit`, () => {
+        it('limits the count of returned rows', async () => {
+            let fetchedCars:DummyCarNode[] = await aRel
+                .orderByNode(by => by.attribute('horsePower').asc())
+                .limit(1).all();
+            expect(fetchedCars).to.have.deep.members([graph.vw]);
+        });
+    });
+
+    describe(`skip`, () => {
+        it('skip given amount of rows', async () => {
+            let fetchedCars:DummyCarNode[] = await aRel
+                .orderByNode(by => by.attribute('horsePower').asc())
+                .skip(1)
+                .all();
+            expect(fetchedCars).to.have.deep.members([graph.porsche]);
+        });
+    });
+
     describe(`.first`, () => {
         it('returns first element', async () => {
             // let car:DummyCarNode|null = await aRel.first();
             // expect([graph.vw, graph.porsche])([car]);
         });
     });
+
+    describe(`.orderByNode`, () => {
+        it('order results by node property', async () => {
+            let fetchedCars:DummyCarNode[] = await aRel
+                .orderByRelation(by => by.attribute('isRented').desc())
+                .all();
+
+            expect(fetchedCars.map(c => c.name)).to.eql([graph.vw.name, graph.porsche.name]);
+
+
+            fetchedCars = await aRel
+                .orderByRelation(by => by.attribute('isRented').asc())
+                .all();
+
+            expect(fetchedCars.map(c => c.name)).to.eql([graph.porsche.name, graph.vw.name]);
+        });
+    });
+
+    describe(`.orderByRelation`, () => {
+        it('order results by node property', async () => {
+            let fetchedCars:DummyCarNode[] = await aRel
+                .orderByNode(by => by.attribute('horsePower').asc())
+                .all();
+
+            expect(fetchedCars.map(c => c.name)).to.eql([graph.vw.name, graph.porsche.name]);
+
+
+            fetchedCars = await aRel
+                .orderByNode(by => by.attribute('horsePower').desc())
+                .all();
+
+            expect(fetchedCars.map(c => c.name)).to.eql([graph.porsche.name, graph.vw.name]);
+        });
+    });
+
 
     describe(`.whereNode`, () => {
         let filtered:ActiveRelation<HasVehicleRelation, DummyCarNode>;
@@ -87,13 +141,15 @@ describe.only(`ActiveRelation`, () => {
             });
 
             describe(`.allWithRelations`, async () => {
-                let fetchedCars:ConnectedNode<HasVehicleRelation, DummyCarNode>[] = await filtered.allWithRelations();
-                expect(fetchedCars).to.have.deep.members([{relation: graph.hasVolkswagen, node: graph.vw}]);
+                it('returns all nodes with relations', async () => {
+                    let fetchedCars:ConnectedNode<HasVehicleRelation, DummyCarNode>[] = await filtered.allWithRelations();
+                    expect(fetchedCars).to.have.deep.members([{relation: graph.hasVolkswagen, node: graph.vw}]);
+                });
             });
 
             describe('.first', async () => {
                 it('returns first element', async () => {
-                    let car:DummyCarNode|null = await filtered.first();
+                    let car:DummyCarNode | null = await filtered.first();
                     expect(car).to.eql(graph.vw);
                 });
             });
@@ -117,12 +173,24 @@ describe.only(`ActiveRelation`, () => {
             });
 
             describe(`.allWithRelations`, async () => {
-                let fetchedCars:ConnectedNode<HasVehicleRelation, DummyCarNode>[] = await filtered.allWithRelations();
-                expect(fetchedCars).to.have.deep.members([
-                    {relation: graph.hasVolkswagen, node: graph.vw},
-                    {relation: graph.hasPorsche, node: graph.porsche}
-                ]);
+                it('returns all nodes with relations', async () => {
+                    let fetchedCars:ConnectedNode<HasVehicleRelation, DummyCarNode>[] = await filtered.allWithRelations();
+                    expect(fetchedCars).to.have.deep.members([
+                        {relation: graph.hasVolkswagen, node: graph.vw},
+                        {relation: graph.hasPorsche, node: graph.porsche}
+                    ]);
+                });
             });
+        });
+    });
+
+    describe(`.exist`, () => {
+        it('returns true if given node exists', async () => {
+            let exists:boolean = await aRel
+                .whereNode(w=> w.attribute('horsePower')
+                    .equal(450))
+                .exist();
+            expect(exists).to.eq(true);
         });
     });
 
@@ -142,7 +210,7 @@ describe.only(`ActiveRelation`, () => {
 
         describe(`.first`, () => {
             it('returns first element', async () => {
-                let car:DummyCarNode|null = await filtered.first();
+                let car:DummyCarNode | null = await filtered.first();
                 expect(car).to.eql(graph.porsche);
             });
         });

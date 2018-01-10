@@ -8,6 +8,7 @@ import {SetQueryPart} from "./update/SetQueryPart";
 import {CypherLiteral} from "./common/CypherLiteral";
 import {AttributesMapperFactory} from "../mappers/AttributesMapperFactory";
 import {WhereStatement} from "./where/WhereStatement";
+import {OrderStatement} from "./order/OrderStatement";
 
 //TODO: rename to CypherQueryStatement
 export type CypherQueryElement = MatchQueryPart
@@ -15,6 +16,7 @@ export type CypherQueryElement = MatchQueryPart
     | ReturnQueryPart
     | SetQueryPart
     | WhereStatement
+    | OrderStatement
     | CypherLiteral
     | string;
 
