@@ -8,6 +8,10 @@ export class WhereStatement implements IQueryPart {
 
     constructor(private parts:WhereStatementPart[]) {}
 
+    mergeWithAnd(otherWhereStatement:WhereStatement):WhereStatement {
+        return new WhereStatement(this.parts.concat(otherWhereStatement.parts));
+    }
+
     toCypher(ctx:QueryContext):IBoundQueryPart {
         let params = {};
         let cypherFragments:string[] = [];
@@ -19,7 +23,7 @@ export class WhereStatement implements IQueryPart {
         });
 
         return {
-            cypherString: `WHERE ${cypherFragments.join( 'AND' )}`,
+            cypherString: `WHERE ${cypherFragments.join(' AND ')}`,
             params
         }
     }

@@ -3,14 +3,14 @@ import {QueryContext} from "../../../lib/cypher/common/QueryContext";
 import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 import {expect} from 'chai';
 
-describe.only(`WhereAttributeBuilder`, () => {
+describe(`WhereAttributeBuilder`, () => {
     let builder:WhereAttributeBuilder<string>,
         ctx:QueryContext;
 
 
     beforeEach(() => {
         ctx = getDefaultContext();
-        builder = new WhereAttributeBuilder<string>('someProperty', 'node');
+        builder = new WhereAttributeBuilder<string>('someProperty','node');
     });
 
     describe(`.equal`, () => {

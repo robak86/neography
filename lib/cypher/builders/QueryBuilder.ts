@@ -61,15 +61,20 @@ export class QueryBuilder {
     }
 
     //TODO: we should provide builder for where, but currently we only support literals
-    where(literal:string| WhereBuilderCallback<any>) {
-        let whereElement = _.isFunction(literal) ?
-            literal(new WhereBuilder()) :
-            new WhereLiteralQueryPart(literal);
+    where(literal:string| WhereBuilderCallback<any> | WhereStatement) {
+        if(literal instanceof WhereStatement){
+            let elements = _.clone(this.elements);
+            elements.push(literal);
+            return new QueryBuilder(elements)
+        } else {
+            let whereElement:WhereStatementPart[] | WhereStatementPart = _.isFunction(literal) ?
+                literal(new WhereBuilder()) :
+                new WhereLiteralQueryPart(literal);
 
-        let elements = _.clone(this.elements);
-        elements.push(new WhereStatement(_.castArray(whereElement)));
-
-        return new QueryBuilder(elements)
+            let elements = _.clone(this.elements);
+            elements.push(new WhereStatement(_.castArray(whereElement) as any) as any);
+            return new QueryBuilder(elements)
+        }
     }
 
     set(build:(setBuilder:SetQueryBuilder) => SetQueryPartChildren[]|SetQueryPartChildren):QueryBuilder {
