@@ -5,7 +5,7 @@ import {expect} from 'chai';
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 
-describe.only(`ActiveNodeQuery`, () => {
+describe(`ActiveNodeQuery`, () => {
     const saveUser = (user:DummyUserNode):Promise<DummyUserNode> => {
         return getSharedConnection().runQuery(b => b
             .create(c => [c.node(user).as('user')])

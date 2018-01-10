@@ -18,7 +18,7 @@ export class WhereStatement implements IQueryPart {
 
         this.parts.forEach(part => {
             let c = part.toCypher(ctx);
-            _.extend(params, c.params);
+            _.merge(params, c.params);
             cypherFragments.push(c.cypherString);
         });
 

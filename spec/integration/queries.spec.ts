@@ -74,7 +74,7 @@ describe("Queries", () => {
                 });
 
                 it("equals to matched node", () => {
-                    expect(savedNode).to.eql(matchedNode);
+                    expect(savedNode.attributes).to.deep.eq(matchedNode.attributes);
                 });
             });
         });
@@ -229,7 +229,7 @@ describe("Queries", () => {
                     let matchQuery = neography.query().match(m => m.node(DummyGraphNode).params({attr1: 'a'}).as('n')).returns('n');
                     let matchedNodes:DummyGraphNode[] = await connection.runQuery(matchQuery).pluck('n').toArray();
                     expect(matchedNodes.length).to.eq(1);
-                    expect(matchedNodes[0]).to.eql(node1);
+                    expect(matchedNodes[0].attributes).to.deep.eq(node1.attributes);
                 });
             });
 
@@ -242,8 +242,8 @@ describe("Queries", () => {
 
                     let matchedNodes:DummyGraphNode[] = await connection.runQuery(matchQuery).pluck('n').toArray();
                     expect(matchedNodes.length).to.eq(2);
-                    expect(matchedNodes[0]).to.eql(node2);
-                    expect(matchedNodes[1]).to.eql(node3);
+                    expect(matchedNodes[0].attributes).to.deep.eq(node2.attributes);
+                    expect(matchedNodes[1].attributes).to.deep.eq(node3.attributes);
                 });
             });
 

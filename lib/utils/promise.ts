@@ -11,3 +11,5 @@ export const pfinally = _.curry(<T>(finallyCallback:() => void, prom:Promise<T>)
             return Promise.reject(err);
         });
 });
+
+export const sleep = (ms:number) => new Promise(resolve => setTimeout(resolve, ms));

@@ -107,7 +107,7 @@ describe("NodeInstanceRepository", () => {
         });
     });
 
-    describe(".setConnectedNodes", () => {
+    describe(".updateConnectedNodes", () => {
         it('creates relation for attached nodes', async () => {
             expect(await countRelations(DummyGraphRelation)).to.eq(0);
 

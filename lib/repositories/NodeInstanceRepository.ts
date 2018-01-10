@@ -21,7 +21,8 @@ export class NodeInstanceRepository<FROM extends AbstractNode, R extends Abstrac
     async setConnectedNodes<TO extends AbstractNode>(connectedNodes:(ConnectedNode<R, TO> | TO)[], removeConnectedNodes:boolean = false) {
         let existingConnections = await this.getConnectedNodes();
 
-        let connectedNodesCollection = new ConnectedNodesCollection(this.relationClass, connectedNodes);
+        let connectedNodesCollection = new ConnectedNodesCollection(this.relationClass);
+        connectedNodesCollection.set
         if (connectedNodesCollection.containsNode(this.fromNode as any)) {
             throw new Error('Cannot create self referencing relation')
         }

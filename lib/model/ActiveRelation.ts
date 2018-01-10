@@ -13,6 +13,9 @@ import * as _ from 'lodash';
 import {OrderStatement} from "../cypher/order/OrderStatement";
 import {OrderStatementPart} from "../cypher/order/OrderStatementPart";
 import {OrderBuilder} from "../cypher/builders/OrderBuilder";
+import {ConnectedNodesCollection} from "./ConnectedNodeCollection";
+import {CreateBuilder} from "../cypher/builders/CreateBuilder";
+import {MatchBuilder} from "../cypher/builders/MatchBuilder";
 
 export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<any, any>> {
     private ownerGetter:() => AbstractNode<any>;
@@ -20,7 +23,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
     private orderStatement:OrderStatement;
     private skipCount:number | undefined;
     private limitCount:number | undefined;
-    private newRelations:ConnectedNode<R, N>[];
+    private newRelations:ConnectedNodesCollection<R, N> | undefined;
 
     private get origin():AbstractNode<any> {
         return this.ownerGetter();
@@ -28,16 +31,14 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
 
     constructor(private relClass:Type<R>, private nodeClass:Type<N>) {}
 
-    set(nodes:N[] | N):ActiveRelation<R, N> {
-        return cloned(this, a => {
-            a.newRelations = _.castArray(nodes).map(node => {
-                return {node: node, relation: new this.relClass()}
-            })
-        })
+    set(nodes:N[] | N) {
+        this.newRelations = new ConnectedNodesCollection<R, N>(this.relClass);
+        this.newRelations.setNodes(_.castArray(nodes));
     }
 
-    setWithRelations(nodesWithRelations:{ node:N, relation:R }[]):ActiveRelation<R, N> {
-        return cloned(this, a => a.newRelations = _.castArray(nodesWithRelations));
+    setWithRelations(nodesWithRelations:{ node:N, relation:R }) {
+        this.newRelations = new ConnectedNodesCollection<R, N>(this.relClass);
+        this.newRelations.setConnectedNodes(_.castArray(nodesWithRelations));
     }
 
     first():Promise<N | null> {
@@ -171,15 +172,26 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         return baseQuery;
     }
 
-    bindToNode<N extends AbstractNode<any>>(getter:() => N) {
+    bindToNode<P extends AbstractNode<any>>(getter:() => P):ActiveRelation<R, N> {
         return cloned(this, (a) => a.ownerGetter = getter);
     }
 
 
-    // save():Promise<any> {
-        //TODO: save
+    async save():Promise<any> {
+        if (this.newRelations) {
+            await this.updateConnectedNodes();
+            this.newRelations = undefined;
+        }
+    }
 
-        //and clear  private newRelations:ConnectedNode<R, N>[];
+    bindToNodeId(id:string):ActiveRelation<R, N> {
+        return cloned(this, _.noop)
+    }
+
+    // save():Promise<any> {
+    //TODO: save
+
+    //and clear  private newRelations:ConnectedNode<R, N>[];
     // }
 
     boundNode():AbstractNode<any> {
@@ -194,6 +206,90 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
     _withOriginQuery(query) {}
 
     // save(connection:Connection){} //not sure if save method should be available only on parent node
+
+
+    private async updateConnectedNodes<TO extends AbstractNode>(removeConnectedNodes:boolean = false) {
+        let existingConnections = await this.allWithRelations();
+
+
+        if (this.newRelations!.containsNode(this.origin as N)) {
+            throw new Error('Cannot create self referencing relation')
+        }
+
+        let newConnections:ConnectedNode<R, N>[] = this.newRelations!.getConnectedNodes();
+
+        let unchangedConnections = _.intersectionWith(newConnections, existingConnections, ConnectedNode.isEqual);
+        let connectionsForDetach = _.differenceWith(existingConnections, unchangedConnections, ConnectedNode.isEqual);
+        let connectionsForAttach = _.differenceWith(newConnections, unchangedConnections, ConnectedNode.isEqual);
+
+        await this.detachNodes(connectionsForDetach.map(c => c.node), removeConnectedNodes);
+
+        await Promise.all(connectionsForAttach.map(c => c.node.save()));
+
+        await this.connectToMany(connectionsForAttach);
+
+        return [...unchangedConnections, ...connectionsForAttach];
+    }
+
+    private async detachNodes<N extends AbstractNode>(nodes:N[], removeConnectedNodes:boolean = false):Promise<any> {
+        if (nodes.length === 0) {
+            return;
+        }
+
+        let ids = nodes.map(r => r.id);
+
+        let query = buildQuery()
+            .match(m => [
+                m.node(getClassFromInstance(this.origin)).params({id: this.origin.id} as any).as('from'),
+                m.relation(this.relClass).as('rel'),
+                m.node().as('to')
+            ])
+            .where(w => w.literal('to.id in {ids}').params({ids}))
+            .append(`DELETE rel ${removeConnectedNodes ? ', to' : ''}`);
+
+        return connectionsFactory.checkoutConnection().runQuery(query).toArray();
+    }
+
+    private async connectToMany<TO extends AbstractNode>(to:ConnectedNode<R, TO>[]):Promise<ConnectedNode<R, TO>[]> {
+        let collection = new ConnectedNodesCollection(this.relClass);
+        collection.setConnectedNodes(to);
+        collection.assertAllNodesPersisted();
+        let connections = collection.getConnectedNodes();
+
+        if (connections.length === 0) {
+            return []
+        }
+
+        const createPart = (c:CreateBuilder) => {
+            return _.flatMap(connections, (connection, idx) => [
+                c.matchedNode('from'),
+                c.relation(connection.relation).as('r' + idx),
+                c.matchedNode('to' + idx)
+            ])
+        };
+
+        const matchPart = (m:MatchBuilder) => [
+            m.node(getClassFromInstance(this.origin)).params({id: this.origin.id} as any).as('from'),
+            ...connections.map((connection, idx) => {
+                return m.node(getClassFromInstance(connection.node)).params({id: connection.node.id} as any).as('to' + idx);
+            })
+        ];
+
+
+        let query = buildQuery()
+            .match(matchPart)
+            .create(createPart)
+            .returns(`
+                    [${_.times(connections.length).map((idx) => 'to' + idx)}] as nodes,
+                    [${_.times(connections.length).map((idx) => 'r' + idx)}] as relations
+            `);
+
+        let arr = await connectionsFactory.checkoutConnection().runQuery(query).first();
+        let zipped = _.zipWith(arr.nodes, arr.relations, (node, relation) => {
+            return {node, relation}  as any
+        });
+        return zipped;
+    }
 }
 
 

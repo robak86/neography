@@ -5,7 +5,7 @@ import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {expect} from 'chai';
 import {AbstractNode} from "../../lib/model";
 
-describe.only(`proxifyRelationsDefinitions`, () => {
+describe(`proxifyRelationsDefinitions`, () => {
     class Relations {
         readonly others = new ActiveRelation(DummyGraphRelation, DummyGraphNode);
     }
@@ -22,5 +22,9 @@ describe.only(`proxifyRelationsDefinitions`, () => {
     it('intercepts all getters and returns cloned ActiveRelation with bound owner', () => {
         let boundNode:AbstractNode<any> = relations.others.boundNode();
         expect(boundNode).to.eq(owner);
+    });
+
+    it('caches relations', () => {
+        expect(relations.others).to.eq(relations.others);
     });
 });

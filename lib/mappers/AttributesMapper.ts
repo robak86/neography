@@ -28,7 +28,7 @@ export class AttributesMapper<T extends GraphElement> {
             return transformer.transformInstance(prevVal, attributesMetadata)
         }, record.properties);
 
-        return _.extend(new this.klass(), properties);
+        return _.merge(new this.klass(), properties);
     }
 
     mapToRow(nodeInstance, type:TransformContext) {
