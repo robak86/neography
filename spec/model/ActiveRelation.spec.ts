@@ -46,7 +46,15 @@ describe.only(`ActiveRelation`, () => {
             .returns('vw', 'porsche', 'owner', 'hasVolkswagen', 'hasPorsche')
         ).first();
 
-        aRel = new ActiveRelation(HasVehicleRelation, DummyCarNode)._withOrigin(graph.owner);
+        aRel = new ActiveRelation(HasVehicleRelation, DummyCarNode).bindToNode(() => graph.owner);
+    });
+
+    describe(`accessing active relation from relations definition`, () => {
+        it('returns active relation', async () => {
+            let fetchedCars:DummyCarNode[] = await graph.owner.relations.vehicles.all();
+            expect(fetchedCars).to.have.deep.members([graph.vw, graph.porsche]);
+        });
+
     });
 
     describe(`.all()`, () => {

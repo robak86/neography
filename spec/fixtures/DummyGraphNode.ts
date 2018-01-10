@@ -23,15 +23,47 @@ export class DummyGraphNodeRelations {
 
 
 @node('DummyGraphNode')
-export class DummyGraphNode<P = any> extends AbstractNode<P, DummyGraphNodeRelations> {
+export class DummyGraphNode<P = any> extends AbstractNode<P> {
     @timestamp() createdAt?:Date;
     @timestamp() updatedAt?:Date;
 
     @attribute() attr1?:string;
     @attribute() attr2?:number;
+
+    relations = new DummyGraphNodeRelations();
 }
 
 // let a:DummyGraphNode = new DummyGraphNode();
 //
 // a.eagerLoad(l => [l.awesomeNodes, l.otherDummies]);
 // a.relations.awesomeNodes.whereRelation({})
+
+
+interface Constructor<T> {
+    new (params:Partial<T>): T;
+    prototype: T;
+}
+
+interface Object {
+    constructor: Constructor<this>;
+}
+
+class A implements  Object {
+    constructor(params:Partial<A>){}
+
+}
+
+
+class w {
+    clone():this {
+        return this;
+    }
+}
+
+class Z extends w {
+    someProp:string;
+}
+
+let z = new Z();
+let kur = z.clone();
+

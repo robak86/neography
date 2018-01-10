@@ -4,18 +4,21 @@ import {Type} from "../utils/types";
 import {OrderBuilderCallback} from "../repositories/OrderBuilder";
 import {ConnectedNode} from "./ConnectedNode";
 import {QueryBuilder, WhereBuilderCallback} from "../cypher/builders/QueryBuilder";
-import {cloned, getClassFromInstance, invariant} from "../utils/core";
+import {cloned, getClassFromInstance} from "../utils/core";
 import {buildQuery} from "../cypher";
 import {connectionsFactory} from "../connection/ConnectionFactory";
 import {Connection} from "../";
-import {assertIdExists, assertPersisted} from "./GraphEntity";
 import {WhereStatement} from "../cypher/where/WhereStatement";
 import {WhereBuilder, WhereStatementPart} from "../cypher/builders/WhereBuilder";
 import * as _ from 'lodash';
 
 export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<any, any>> {
-    private origin:AbstractNode;
+    private ownerGetter:() => AbstractNode<any>;
     private whereStatement:WhereStatement;
+
+    private get origin():AbstractNode<any> {
+        return this.ownerGetter();
+    }
 
     constructor(private relClass:Type<R>, private nodeClass:Type<N>) {}
 
@@ -111,7 +114,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
     exist():Promise<boolean> {throw new Error("Implement Me")}
 
 
-    buildQuery():QueryBuilder {
+    private buildQuery():QueryBuilder {
         let baseQuery = buildQuery()
             .match(m => [
                 m.node(getClassFromInstance(this.origin)).params({id: this.origin.id}).as('o'),
@@ -126,10 +129,16 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         return baseQuery;
     }
 
+    bindToNode<N extends AbstractNode<any>>(getter:() => N) {
+        return cloned(this, (a) => a.ownerGetter = getter);
+    }
 
-    _withOrigin(n:AbstractNode) {
-        assertPersisted(n);
-        return cloned(this, (a) => a.origin = n);
+    boundNode():AbstractNode<any> {
+        return this.origin;
+    }
+
+    bindToQuery(queryBuilder:QueryBuilder) {
+
     }
 
     //it will be used for... repository(NodeType).where(ids = 123).eagerLoadRelations(e => [e.children, e.something])

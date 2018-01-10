@@ -1,13 +1,52 @@
 import {AbstractNode} from "../model";
 import {Type} from "../utils/types";
-import {DummyGraphNode} from "../../spec/fixtures/DummyGraphNode";
-import {DummyGraphRelation} from "../../spec/fixtures/DummyGraphRelation";
-import {WhereBuilderCallback} from "../cypher/builders/QueryBuilder";
+import {QueryBuilder, WhereBuilderCallback} from "../cypher/builders/QueryBuilder";
+import {buildQuery} from "../index";
+import {connectionsFactory} from "../connection/ConnectionFactory";
+import {cloned} from "../utils/core";
+import * as _ from "lodash";
+import {WhereStatement} from "../cypher/where/WhereStatement";
+import {WhereBuilder, WhereStatementPart} from "../cypher/builders/WhereBuilder";
+import {ActiveRelation} from "../model/ActiveRelation";
 
 export class ActiveNodeQuery<N extends AbstractNode<any, any>> {
+    protected whereStatement:WhereStatement;
+    protected relationsToLoad:ActiveRelation<any, any>[];
+
     constructor(private nodeClass:Type<N>) {}
 
-    where(builderCallback:WhereBuilderCallback<N>) {}
+    all():Promise<N[]> {
+        let baseQuery = this.buildQuery();
+        baseQuery = baseQuery.returns('node');
+
+        return connectionsFactory.checkoutConnection().runQuery(baseQuery).pluck('node').toArray();
+    }
+
+    where(paramsOrCallback:Partial<N> | WhereBuilderCallback<N>):ActiveNodeQuery<N> {
+        if (_.isFunction(paramsOrCallback)) {
+            let result:WhereStatementPart[] | WhereStatementPart = paramsOrCallback(new WhereBuilder<N>().aliased('node'));
+            let whereStatement = this.whereStatement ?
+                this.whereStatement.mergeWithAnd(new WhereStatement(_.castArray(result))) :
+                new WhereStatement(_.castArray(result));
+
+            return cloned(this, (t) => t.whereStatement = whereStatement);
+        } else {
+            throw new Error("implement me");
+        }
+    }
+
+    private buildQuery():QueryBuilder {
+        let baseQuery = buildQuery()
+            .match(m => [
+                m.node(this.nodeClass).as('node')
+            ]);
+
+        if (this.whereStatement) {
+            baseQuery = baseQuery.where(this.whereStatement)
+        }
+
+        return baseQuery;
+    }
 
     //.orderBy(o => [o.asc('firstName')]) //with callback we can be typesafe!
     orderBy():ActiveNodeQuery<N> {throw new Error("Implement me")}
@@ -16,50 +55,13 @@ export class ActiveNodeQuery<N extends AbstractNode<any, any>> {
 
     limit(count:number):ActiveNodeQuery<N> {throw new Error("Implement me")}
 
-    firstRelation():N['relations'] {throw new Error("Implement me")};
+    // :N['relations'] {throw new Error("Implement me")};
 
-    allRelations():N['relations'][] {throw new Error("Implement me")}; //probably it has to be evaluated eagerly
-}
+    //TODO: this method will have to know how to instantiate relations class (because there won't be node instance)
+    relations():N['relations'][] {throw new Error("Implement me")}; //probably it has to be evaluated eagerly
 
-async function main() {
-    let a = new ActiveNodeQuery(DummyGraphNode);
-
-    a.where(w => [
-        w.attribute('attr1').in(['1', '2', '3'])
-    ]);
-
-    let rel = await a.firstRelation();
-
-    let otherDummies = rel.otherDummies
-        .whereNode({attr1: '1'})
-        .whereNode(w => [
-            w.attribute('attr1').in(['1', '2', '3'])
-        ])
-        .whereRelation({attr2: 2})
-        .whereRelation(w => [
-            w.attribute('attr3').equal(true)
-        ])
-        .orderByNode(o => o.asc('attr1'))
-        .orderByRelation(o => o.desc('attr3'))
-        .skip(1)
-        .limit(10);
-
-    //until this point every call doesn't trigger any query
-
-
-    await otherDummies.exists();
-    await otherDummies.count();
-    await otherDummies.first();
-    await otherDummies.firstWithRelation();
-
-    await otherDummies.all();
-    await otherDummies.allWithRelations();
-
-    await rel.otherDummies.set(new DummyGraphNode());
-    await rel.otherDummies.set([new DummyGraphNode(), new DummyGraphNode()]);
-
-    await rel.otherDummies.setWithRelations([
-        {relation: new DummyGraphRelation(), node: new DummyGraphNode()},
-        {relation: new DummyGraphRelation(), node: new DummyGraphNode()}
-    ]);
+    withRelations(eagerToLoad:(e:N['relations']) => ActiveRelation<any, any>[]):ActiveNodeQuery<N> {
+        //TODO: how to instantiate relations definitions instance here ?!
+        return cloned(this, (a) => a.relationsToLoad = eagerToLoad({}))
+    }
 }
