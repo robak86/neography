@@ -36,7 +36,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         this.newRelations.setNodes(_.castArray(nodes));
     }
 
-    setWithRelations(nodesWithRelations:{ node:N, relation:R }) {
+    setWithRelations(nodesWithRelations:ConnectedNode<R,N>[] | ConnectedNode<R,N>) {
         this.newRelations = new ConnectedNodesCollection<R, N>(this.relClass);
         this.newRelations.setConnectedNodes(_.castArray(nodesWithRelations));
     }
