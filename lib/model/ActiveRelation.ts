@@ -3,22 +3,48 @@ import {AbstractNode} from "./AbstractNode";
 import {Type} from "../utils/types";
 import {OrderBuilderCallback} from "../repositories/OrderBuilder";
 import {ConnectedNode} from "./ConnectedNode";
-import {WhereBuilderCallback} from "../cypher/builders/QueryBuilder";
-import {WhereAttributeBuilder} from "../cypher/builders/WhereAttributeBuilder";
+import {QueryBuilder, WhereBuilderCallback} from "../cypher/builders/QueryBuilder";
+import {cloned, getClassFromInstance, invariant} from "../utils/core";
+import {buildQuery} from "../cypher";
+import {connectionsFactory} from "../connection/ConnectionFactory";
+import {Connection} from "../";
+import {assertIdExists, assertPersisted} from "./GraphEntity";
+import {WhereStatement} from "../cypher/where/WhereStatement";
+import {WhereBuilder, WhereStatementPart} from "../cypher/builders/WhereBuilder";
+import * as _ from 'lodash';
 
 export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<any, any>> {
+    private origin:AbstractNode;
+    private whereStatement:WhereStatement;
 
-    constructor(private relClass:Type<R>, nodeClass:Type<N>) {}
+    constructor(private relClass:Type<R>, private nodeClass:Type<N>) {}
 
     set<N>(nodes:N[] | N) {}
 
     setWithRelations(nodesWithRelations:{ node:N, relation:R }[]) {}
 
-    //It throws null|undefined for no results
-    first():Promise<N | null> {throw new Error("Implement Me")}
+    first():Promise<N | null> {
+        let baseQuery = this.buildQuery();
+        baseQuery = baseQuery
+            .returns('node')
+            .literal('limit 1');
 
-    //It throws NotFound error for no results
-    findOne():Promise<N> {throw new Error("Implement Me")}
+        return connectionsFactory.checkoutConnection().runQuery(baseQuery).pluck('node').first();
+    }
+
+    async findOne():Promise<N> {
+        let baseQuery = this.buildQuery();
+        baseQuery = baseQuery
+            .returns('node')
+            .literal('limit 1');
+
+        let found = connectionsFactory.checkoutConnection().runQuery(baseQuery).pluck('node').first();
+
+        if (!found) {
+            throw new Error('Not found');
+        }
+        return found;
+    }
 
     firstWithRelation():Promise<ConnectedNode<R, N> | undefined> {throw new Error("Implement Me")}
 
@@ -26,14 +52,46 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
     findOneWithRelation():Promise<ConnectedNode<R, N>> {throw new Error("Implement Me")}
 
     //here we don't
-    all():Promise<N[]> {throw new Error("Implement Me")}
+    all(connection?:Connection):Promise<N[]> {
+        let baseQuery = this.buildQuery();
+        baseQuery = baseQuery.returns('node');
 
-    allWithRelations():Promise<ConnectedNode<R, N>[]> {throw new Error("Implement Me")}
+        return connectionsFactory.checkoutConnection().runQuery(baseQuery).pluck('node').toArray();
+    }
+
+    allWithRelations():Promise<ConnectedNode<R, N>[]> {
+        let baseQuery = this.buildQuery();
+        baseQuery = baseQuery.returns('node', 'relation');
+
+        return connectionsFactory.checkoutConnection().runQuery(baseQuery).toArray();
+    }
 
     //TODO: WhereBuilderCallback will have to know of undergoing alias assigned to relation or node - one can use .alias method on WhereAttributeBuilder
-    whereRelation(relationParams:Partial<R> | WhereBuilderCallback<R>):ActiveRelation<R, N> {throw new Error("Implement Me")}
+    whereRelation(paramsOrCallback:Partial<R> | WhereBuilderCallback<R>):ActiveRelation<R, N> {
+        if (_.isFunction(paramsOrCallback)) {
+            let result:WhereStatementPart[] | WhereStatementPart = paramsOrCallback(new WhereBuilder<N>().aliased('relation'));
+            let whereStatement = this.whereStatement ?
+                this.whereStatement.mergeWithAnd(new WhereStatement(_.castArray(result))) :
+                new WhereStatement(_.castArray(result));
 
-    whereNode(nodeParams:Partial<N> | WhereBuilderCallback<N>):ActiveRelation<R, N> {throw new Error("Implement Me")}
+            return cloned(this, (t) => t.whereStatement = whereStatement);
+        } else {
+            throw new Error("implement me");
+        }
+    }
+
+    whereNode(paramsOrCallback:Partial<N> | WhereBuilderCallback<N>):ActiveRelation<R, N> {
+        if (_.isFunction(paramsOrCallback)) {
+            let result:WhereStatementPart[] | WhereStatementPart = paramsOrCallback(new WhereBuilder<N>().aliased('node'));
+            let whereStatement = this.whereStatement ?
+                this.whereStatement.mergeWithAnd(new WhereStatement(_.castArray(result))) :
+                new WhereStatement(_.castArray(result));
+
+            return cloned(this, (t) => t.whereStatement = whereStatement);
+        } else {
+            throw new Error("implement me");
+        }
+    }
 
     orderByNode(b:OrderBuilderCallback<N>):ActiveRelation<R, N> {throw new Error("Implement Me")}
 
@@ -43,10 +101,39 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
 
     limit(count:number):ActiveRelation<R, N> {throw new Error("Implement Me")}
 
-    count():Promise<number> {throw new Error("Implement Me")}
+    count():Promise<number> {
+        let baseQuery = this.buildQuery();
+        baseQuery = baseQuery.returns('count(node) as count');
 
-    exists():Promise<boolean> {throw new Error("Implement Me")}
+        return connectionsFactory.checkoutConnection().runQuery(baseQuery).pluck('count').first();
+    }
 
+    exist():Promise<boolean> {throw new Error("Implement Me")}
+
+
+    buildQuery():QueryBuilder {
+        let baseQuery = buildQuery()
+            .match(m => [
+                m.node(getClassFromInstance(this.origin)).params({id: this.origin.id}).as('o'),
+                m.relation(this.relClass).as('relation'),
+                m.node(this.nodeClass).as('node')
+            ]);
+
+        if (this.whereStatement) {
+            baseQuery = baseQuery.where(this.whereStatement)
+        }
+
+        return baseQuery;
+    }
+
+
+    _withOrigin(n:AbstractNode) {
+        assertPersisted(n);
+        return cloned(this, (a) => a.origin = n);
+    }
+
+    //it will be used for... repository(NodeType).where(ids = 123).eagerLoadRelations(e => [e.children, e.something])
+    _withOriginQuery(query) {}
 
     // save(connection:Connection){} //not sure if save method should be available only on parent node
 }
