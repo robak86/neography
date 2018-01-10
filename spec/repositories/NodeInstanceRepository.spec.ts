@@ -136,6 +136,14 @@ describe("NodeInstanceRepository", () => {
             await expect(thrown).to.eventually.be.rejected;
         });
 
+        it('does nothing for unchanged relations', async () => {
+            await relationRepository.node(u1).setConnectedNodes([u2]);
+            await relationRepository.node(u1).setConnectedNodes([u2]);
+
+            let connected = await relationRepository.node(u1).getConnectedNodes();
+            expect(connected.length).to.eq(1)
+        });
+
         it('modifies only relations attached to given node', async () => {
             await relationRepository.node(u1).setConnectedNodes([u2]);
             await relationRepository.node(u3).setConnectedNodes([u4, u5]);

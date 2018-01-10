@@ -3,6 +3,7 @@ import {Type} from "../utils/types";
 import {isPresent} from "../utils/core";
 import * as _ from 'lodash';
 
+//TODO: rename to BoundNode | LinkedNode | ??
 export type ConnectedNode<R extends AbstractRelation, TO extends AbstractNode> = { relation:R, node:TO };
 
 export function isConnectedNode<R extends AbstractRelation, TO extends AbstractNode>(val:any,

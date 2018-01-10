@@ -1,5 +1,9 @@
 import {WhereLiteralQueryPart} from "../match/WhereLiteralQueryPart";
+import {WhereAttributeBuilder, WhereAttributeQueryPart} from "./WhereAttributeBuilder";
+import {MatchBuilderCallback} from "./QueryBuilder";
 
+
+export type WhereQueryPart = WhereLiteralQueryPart | WhereAttributeQueryPart;
 
 
 export class WhereBuilder<T = any> {
@@ -7,6 +11,10 @@ export class WhereBuilder<T = any> {
         return new WhereLiteralQueryPart(queryPart)
     }
 
-    //TODO:
-    attribute<K extends keyof T>(prop:T) {} // where(w => [w.attribute('id').in([1,2,3,4,])]
+    attribute<K extends keyof T>(prop:K):WhereAttributeBuilder<T[K]> {
+        return new WhereAttributeBuilder();
+    }
+
+    //TODO: investigate matching for queries like WHERE NOT (n)-[:SOME_REL]-(b)
+    path(m:MatchBuilderCallback){}
 }
