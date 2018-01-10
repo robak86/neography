@@ -1,7 +1,7 @@
-import {AbstractNode} from "../model";
+import {AbstractNode, assertAllNew} from "../model";
 import {Type} from "../utils/types";
 import {OrderBuilderCallback, QueryBuilder, WhereBuilderCallback} from "../cypher/builders/QueryBuilder";
-import {buildQuery} from "../index";
+import {buildQuery, Connection} from "../index";
 import {connectionsFactory} from "../connection/ConnectionFactory";
 import {cloned, invariant, isPresent} from "../utils/core";
 import * as _ from "lodash";
@@ -82,13 +82,24 @@ export class ActiveNodeQuery<N extends AbstractNode<any, any>> {
         return cloned(this, a => a.limitCount = count);
     }
 
-    // :N['relations'] {throw new Error("Implement me")};
+    //TODO: should we also add write methods to this class ?
+    // async saveMany(nodes:N[], _connection?:Connection):Promise<N[]> {
+    //     if (Array.isArray(nodes) && nodes.length === 0) {
+    //         return []
+    //     }
+    //     assertAllNew(nodes);
+    //     let query = buildQuery()
+    //         .create(c => nodes.map((node, idx) => c.node(node).as('n' + idx)))
+    //         .returns(`[${nodes.map((n, idx) => 'n' + idx)}] as list`);
+    //
+    //     let connection = _connection || connectionsFactory.checkoutConnection();
+    //     return connection.runQuery(query).pluck('list').first()
+    // };
 
-    //TODO: this method will have to know how to instantiate relations class (because there won't be node instance)
-    relations():N['relations'][] {throw new Error("Implement me")}; //probably it has to be evaluated eagerly
 
     withRelations(eagerToLoad:(e:N['relations']) => ActiveRelation<any, any>[]):ActiveNodeQuery<N> {
-        //TODO: how to instantiate relations definitions instance here ?!
+        //TODO: ....in order to build query for eagerly fetch associated data we need instance of relations definition
+        //HOW to instantiate it ?
         return cloned(this, (a) => a.relationsToLoad = eagerToLoad({}))
     }
 

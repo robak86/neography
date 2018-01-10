@@ -22,14 +22,14 @@ export class NodeInstanceRepository<FROM extends AbstractNode, R extends Abstrac
         let existingConnections = await this.getConnectedNodes();
 
         let connectedNodesCollection = new ConnectedNodesCollection(this.relationClass);
-        connectedNodesCollection.set
+        connectedNodesCollection.setNodes([]);
         if (connectedNodesCollection.containsNode(this.fromNode as any)) {
             throw new Error('Cannot create self referencing relation')
         }
         connectedNodesCollection.assertAllNodesPersisted();
 
 
-        let newConnections:ConnectedNode<R, TO>[] = connectedNodesCollection.getConnectedNodes();
+        let newConnections:ConnectedNode<R, TO>[] = connectedNodesCollection.getConnectedNodes() as any;
 
         let unchangedConnections = _.intersectionWith(newConnections, existingConnections, ConnectedNode.isEqual);
         let connectionsForDetach = _.differenceWith(existingConnections, unchangedConnections, ConnectedNode.isEqual);
@@ -61,7 +61,8 @@ export class NodeInstanceRepository<FROM extends AbstractNode, R extends Abstrac
     }
 
     async connectToMany<TO extends AbstractNode>(to:(ConnectedNode<R, TO> | TO)[]):Promise<ConnectedNode<R, TO>[]> {
-        let collection = new ConnectedNodesCollection(this.relationClass, to);
+        let collection = new ConnectedNodesCollection(this.relationClass);
+        collection.setConnectedNodes(to as any); //TODO: bug
         collection.assertAllNodesPersisted();
         let connections = collection.getConnectedNodes();
 

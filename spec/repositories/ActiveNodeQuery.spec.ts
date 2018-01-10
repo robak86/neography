@@ -2,8 +2,6 @@ import {DummyUserNode} from "../fixtures/DummyUserNode";
 import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {ActiveNodeQuery} from "../../lib/repositories/ActiveNodeQuery";
 import {expect} from 'chai';
-import {DummyGraphNode} from "../fixtures/DummyGraphNode";
-import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 
 describe.only(`ActiveNodeQuery`, () => {
     const saveUser = (user:DummyUserNode):Promise<DummyUserNode> => {
@@ -117,54 +115,9 @@ describe.only(`ActiveNodeQuery`, () => {
 
     describe(`.withRelations`, () => {
         it('eager loads relations', () => {
-            activeNodeQuery.withRelations(r => [r.vehicles]) //It's typesafe!
+            activeNodeQuery.withRelations(r => [r.vehicles])
         });
+
+        it('hits database only once');
     });
-
 });
-
-
-async function main() {
-    let a = new ActiveNodeQuery(DummyGraphNode);
-
-    a.where(w => [
-        w.attribute('attr1').in(['1', '2', '3'])
-    ]);
-
-    let rel = await a.relations();
-
-    // rel[0].
-
-    let otherDummies = rel[0].otherDummies
-        .whereNode({attr1: '1'})
-        .whereNode(w => [
-            w.attribute('attr1').in(['1', '2', '3'])
-        ])
-        .whereRelation({attr2: 2})
-        .whereRelation(w => [
-            w.attribute('attr3').equal(true)
-        ])
-        .orderByNode(o => o.attribute('attr1').desc())
-        .orderByRelation(o => o.attribute('attr3').desc())
-        .skip(1)
-        .limit(10);
-
-    //until this point every call doesn't trigger any query
-
-
-    await otherDummies.exists();
-    await otherDummies.count();
-    await otherDummies.first();
-    await otherDummies.firstWithRelation();
-
-    await otherDummies.all();
-    await otherDummies.allWithRelations();
-
-    await rel[0].otherDummies.set(new DummyGraphNode());
-    await rel[0].otherDummies.set([new DummyGraphNode(), new DummyGraphNode()]);
-
-    await rel[0].otherDummies.setWithRelations([
-        {relation: new DummyGraphRelation(), node: new DummyGraphNode()},
-        {relation: new DummyGraphRelation(), node: new DummyGraphNode()}
-    ]);
-}

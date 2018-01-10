@@ -16,6 +16,7 @@ import {OrderBuilder} from "../cypher/builders/OrderBuilder";
 import {ConnectedNodesCollection} from "./ConnectedNodeCollection";
 import {CreateBuilder} from "../cypher/builders/CreateBuilder";
 import {MatchBuilder} from "../cypher/builders/MatchBuilder";
+import {NodeNotFoundError} from "../errors/NodeNotFoundError";
 
 export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<any, any>> {
     private ownerGetter:() => AbstractNode<any>;
@@ -36,7 +37,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         this.newRelations.setNodes(_.castArray(nodes));
     }
 
-    setWithRelations(nodesWithRelations:ConnectedNode<R,N>[] | ConnectedNode<R,N>) {
+    setWithRelations(nodesWithRelations:ConnectedNode<R, N>[] | ConnectedNode<R, N>) {
         this.newRelations = new ConnectedNodesCollection<R, N>(this.relClass);
         this.newRelations.setConnectedNodes(_.castArray(nodesWithRelations));
     }
@@ -56,7 +57,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         let found = connectionsFactory.checkoutConnection().runQuery(baseQuery).pluck('node').first();
 
         if (!found) {
-            throw new Error('Not found');
+            throw new NodeNotFoundError(this.nodeClass);
         }
         return found;
     }
@@ -177,38 +178,14 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
     }
 
 
-    async save():Promise<any> {
+    async save(_connection?:Connection):Promise<any> {
         if (this.newRelations) {
             await this.updateConnectedNodes();
             this.newRelations = undefined;
         }
     }
 
-    bindToNodeId(id:string):ActiveRelation<R, N> {
-        return cloned(this, _.noop)
-    }
-
-    // save():Promise<any> {
-    //TODO: save
-
-    //and clear  private newRelations:ConnectedNode<R, N>[];
-    // }
-
-    boundNode():AbstractNode<any> {
-        return this.origin;
-    }
-
-    bindToQuery(queryBuilder:QueryBuilder) {
-
-    }
-
-    //it will be used for... repository(NodeType).where(ids = 123).eagerLoadRelations(e => [e.children, e.something])
-    _withOriginQuery(query) {}
-
-    // save(connection:Connection){} //not sure if save method should be available only on parent node
-
-
-    private async updateConnectedNodes<TO extends AbstractNode>(removeConnectedNodes:boolean = false) {
+    private async updateConnectedNodes<TO extends AbstractNode>(_connection?:Connection, removeConnectedNodes:boolean = false) {
         let existingConnections = await this.allWithRelations();
 
 

@@ -22,7 +22,7 @@ export abstract class AbstractNode<T = any, RD extends object = any> extends Abs
         this._relations = proxifyRelationsDefinitions(relations, this);
     }
 
-    get attributes():Partial<this>{
+    get attributes():Partial<this> {
         let attributes = {};
         let meta = AttributesMetadata.getForInstance(this);
         meta.forEachAttribute((attribute, name) => {
