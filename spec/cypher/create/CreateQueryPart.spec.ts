@@ -62,7 +62,7 @@ describe("CreateQueryPart", () => {
         });
     });
 
-    describe("creating two nodes with relation", () => {
+    describe("creating two nodes with relationshipEntity", () => {
         let boundedQueryPart:IBoundQueryPart;
 
         beforeEach(() => {
@@ -85,7 +85,7 @@ describe("CreateQueryPart", () => {
         });
     });
 
-    describe("create relation for two matched nodes", () => {
+    describe("create relationshipEntity for two matched nodes", () => {
         let boundedQueryPart:IBoundQueryPart,
             matchedNode1:MatchedNodeQueryPart,
             matchedNode2:MatchedNodeQueryPart;

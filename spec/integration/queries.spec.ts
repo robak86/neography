@@ -106,7 +106,7 @@ describe("Queries", () => {
             newNode2 = new DummyGraphNode({attr1: 'n2Attr'});
 
         beforeEach(async () => {
-            //create nodes which will be connected by relation
+            //create nodes which will be connected by relationshipEntity
             let nodes = await connection.runQuery(q => q
                 .create(c => c.node(newNode1).as('n1'))
                 .create(c => c.node(newNode2).as('n2'))
@@ -116,7 +116,7 @@ describe("Queries", () => {
             node2 = nodes.n2;
         });
 
-        describe("adding relation to nodes", () => {
+        describe("adding relationshipEntity to nodes", () => {
             let newRelation:DummyGraphRelation,
                 createRelationQuery:QueryBuilder;
 
@@ -132,7 +132,7 @@ describe("Queries", () => {
                     .returns('n1', 'rel1', 'n2');
             });
 
-            it("saves new relation into database", async () => {
+            it("saves new relationshipEntity into database", async () => {
                 const getRelationsCount = () => connection
                     .runQuery(q => q.literal('MATCH(n1)-[rel]->(n2) RETURN count(rel) as relationsCount'))
                     .pluck('relationsCount')
@@ -158,11 +158,11 @@ describe("Queries", () => {
                     matchedRelation = await connection.runQuery(matchRelationQuery).pluck('rel').first();
                 });
 
-                it("maps relation data to proper class", () => {
+                it("maps relationshipEntity data to proper class", () => {
                     expect(matchedRelation).to.be.instanceof(DummyGraphRelation);
                 });
 
-                it("stores relation attributes", () => {
+                it("stores relationshipEntity attributes", () => {
                     expect(matchedRelation.attr1).to.eq(newRelation.attr1);
                 });
 
@@ -309,7 +309,7 @@ describe("Queries", () => {
                 a_rel_c = await saveRelation(a, new DummyGraphRelation({attr2: 1}), c);
             });
 
-            it("all nodes connected by given relation typ", async () => {
+            it("all nodes connected by given relationshipEntity typ", async () => {
                 let matchQuery = neography.query()
                     .match(m => [
                         m.node(DummyGraphNode).as('from'),

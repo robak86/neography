@@ -3,7 +3,7 @@ import {RelationMetadata} from "../metadata/RelationMetadata";
 
 export const relationsTypesRegistry = new RelationsTypesRegistry();
 
-export const relation:(type:string) => ClassDecorator = (type:string) => {
+export const relationshipEntity:(type:string) => ClassDecorator = (type:string) => {
     return <T_FUNCTION>(klass:T_FUNCTION):T_FUNCTION => {
         let relationMetadata:RelationMetadata = RelationMetadata.getOrCreateForClass(klass);
         relationMetadata.setType(type);

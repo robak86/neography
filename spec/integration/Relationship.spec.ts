@@ -1,4 +1,4 @@
-import {attribute, nodeEntity, relation, timestamp} from "../../lib/annotations";
+import {attribute, nodeEntity, relationshipEntity, timestamp} from "../../lib/annotations";
 import {NodeEntity, RelationshipEntity} from "../../lib/model";
 import {Connection} from "../../lib";
 import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
@@ -8,13 +8,13 @@ import {Relationship} from "../../lib/model/Relationship";
 import {relationship, relationshipThunk} from "../../lib/annotations/RelationshipAnnotations";
 
 describe(`Relationship`, () => {
-    @relation('__IS_TAGGED')
+    @relationshipEntity('__IS_TAGGED')
     class IsTaggedRelation extends RelationshipEntity<IsTaggedRelation> {
         @timestamp() createdAt:Date;
         @timestamp() updatedAt:Date;
     }
 
-    @relation('__BELONGS_TO_CATEGORY')
+    @relationshipEntity('__BELONGS_TO_CATEGORY')
     class HasCategory extends RelationshipEntity<HasCategory> {
         @timestamp() createdAt:Date;
         @timestamp() updatedAt:Date;

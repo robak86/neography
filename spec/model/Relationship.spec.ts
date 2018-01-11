@@ -50,7 +50,7 @@ describe(`Relationship`, () => {
     });
 
     describe(`accessing active relation from relations definition`, () => {
-        it('returns active relation', async () => {
+        it('returns active relationshipEntity', async () => {
             let fetchedCars:DummyCarNode[] = await graph.owner.vehicles.all();
             expect(fetchedCars).to.have.deep.members([graph.vw, graph.porsche]);
         });
@@ -234,7 +234,7 @@ describe(`Relationship`, () => {
         });
 
         describe(`.whereRelation combined with .whereNode`, () => {
-            it('returns nodes filtered by node and relation params ex.1', async () => {
+            it('returns nodes filtered by node and relationshipEntity params ex.1', async () => {
                 let fetchedCars:DummyCarNode[] = await aRel
                     .whereRelation(w => w.attribute('isRented').equal(false))
                     .whereNode(w => w.attribute('name').equal('Porsche Macan Turbo'))
@@ -244,7 +244,7 @@ describe(`Relationship`, () => {
         });
 
         describe(`.allWithRelations`, () => {
-            it('returns all connected nodes with relation', async () => {
+            it('returns all connected nodes with relationshipEntity', async () => {
                 let cars:ConnectedNode<HasVehicleRelation, DummyCarNode>[] = await aRel.allWithRelations();
                 expect(cars).to.have.deep.members([
                     {relation: graph.hasPorsche, node: graph.porsche},

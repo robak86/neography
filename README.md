@@ -58,7 +58,7 @@ class AddressNode extends NodeEntity<AddressNode> {
 
 //Relations definitions
 
-@relation('KNOWS') //relation name
+@relation('KNOWS') relationshipEntity
 class KnowsRelation extends RelationshipEntity<KnowsRelation> {
     @timestamp() since:Date;
 }

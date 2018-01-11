@@ -52,7 +52,7 @@ export class Relationship<R extends RelationshipEntity, N extends NodeEntity<any
         return connectionsFactory.checkoutConnection().runQuery(baseQuery).pluck('node').first();
     }
 
-    //TODO: returns true if nodeEntity is connected by R relation
+    //TODO: returns true if nodeEntity is connected by R relationshipEntity
     // has(n:Node):Promise<any> {}
 
     async findOne():Promise<N> {
@@ -207,7 +207,7 @@ export class Relationship<R extends RelationshipEntity, N extends NodeEntity<any
         let existingConnections = await this.allWithRelations(connection);
 
         if (this.newRelations!.containsNode(this.boundNode as N)) {
-            throw new Error('Cannot create self referencing relation')
+            throw new Error('Cannot create self referencing relationshipEntity')
         }
 
         let newConnections:ConnectedNode<R, N>[] = this.newRelations!.getConnectedNodes();

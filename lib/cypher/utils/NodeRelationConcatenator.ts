@@ -37,7 +37,7 @@ export class NodeRelationConcatenator {
                 let next = this.parts[idx + 1];
 
                 if ((prev && prev.isRelation) || (next && next.isRelation)) {
-                    throw new Error('Cannot fetch relation without related nodes');
+                    throw new Error('Cannot fetch relationshipEntity without related nodes');
                 }
             }
         })
