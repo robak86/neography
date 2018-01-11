@@ -1,5 +1,6 @@
 import {ILogger} from "./ILogger";
 
+/* istanbul ignore next */
 export class SimpleDebugLogger implements ILogger {
     info(message?:any, ...optionalParams:any[]):void {
         console.info(message, ...optionalParams);

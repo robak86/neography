@@ -67,5 +67,10 @@
   },
   "peerDependencies": {
     "reflect-metadata": "^0.1.10"
+  },
+  "nyc": {
+    "exclude": [
+      "dist/spec/**/*.js"
+    ]
   }
 }

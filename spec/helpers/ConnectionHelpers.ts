@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import {Connection, Neography} from "../../lib";
 import * as _ from 'lodash';
 import {someOrThrow} from "../../lib/utils/core";
@@ -8,7 +10,7 @@ import {buildQuery} from "../../lib/cypher";
 import {TimestampsExtension} from "../../lib/extensions";
 import {connectionsFactory} from "../../lib/connection/ConnectionFactory";
 
-const DEBUG_ENABLED = true;
+const DEBUG_ENABLED = false;
 
 export const getDefaultNeography = _.memoize(():Neography => {
     let neography = new Neography({

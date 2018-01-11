@@ -1,5 +1,6 @@
 import {ILogger} from "./ILogger";
 
+/* istanbul ignore next */
 export class MutedLogger implements ILogger {
     info(message?:any, ...optionalParams:any[]):void {}
 
