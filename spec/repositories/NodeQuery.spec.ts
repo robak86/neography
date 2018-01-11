@@ -1,9 +1,9 @@
 import {DummyUserNode} from "../fixtures/DummyUserNode";
 import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
-import {ActiveNodeQuery} from "../../lib/repositories/ActiveNodeQuery";
+import {NodeQuery} from "../../lib/repositories/NodeQuery";
 import {expect} from 'chai';
 
-describe(`ActiveNodeQuery`, () => {
+describe(`NodeQuery`, () => {
     const saveUser = (user:DummyUserNode):Promise<DummyUserNode> => {
         return getSharedConnection().runQuery(b => b
             .create(c => [c.node(user).as('user')])
@@ -13,7 +13,7 @@ describe(`ActiveNodeQuery`, () => {
 
 
     let users:DummyUserNode[],
-        activeNodeQuery:ActiveNodeQuery<DummyUserNode>;
+        activeNodeQuery:NodeQuery<DummyUserNode>;
 
     beforeEach(async () => {
         await cleanDatabase();
@@ -23,7 +23,7 @@ describe(`ActiveNodeQuery`, () => {
         users.push(await saveUser(new DummyUserNode({experience: 2, firstName: 'Angela'})));
         users.push(await saveUser(new DummyUserNode({experience: 3, firstName: 'Jessica'})));
         users.push(await saveUser(new DummyUserNode({experience: 4, firstName: 'Dan'})));
-        activeNodeQuery = new ActiveNodeQuery(DummyUserNode);
+        activeNodeQuery = new NodeQuery(DummyUserNode);
     });
 
 

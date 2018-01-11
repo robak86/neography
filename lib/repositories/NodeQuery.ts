@@ -13,7 +13,7 @@ import {OrderBuilder} from "../cypher/builders/OrderBuilder";
 import {OrderStatementPart} from "../cypher/order/OrderStatementPart";
 import {NodeNotFoundError} from "../errors/NodeNotFoundError";
 
-export class ActiveNodeQuery<N extends NodeEntity<any>> {
+export class NodeQuery<N extends NodeEntity<any>> {
     private whereStatement:WhereStatement | undefined;
     private orderStatement:OrderStatement | undefined;
     private skipCount:number | undefined;
@@ -76,7 +76,7 @@ export class ActiveNodeQuery<N extends NodeEntity<any>> {
         return cloned(this, (t) => t.whereStatement = undefined);
     }
 
-    where(paramsOrCallback:Partial<N> | WhereBuilderCallback<N>):ActiveNodeQuery<N> {
+    where(paramsOrCallback:Partial<N> | WhereBuilderCallback<N>):NodeQuery<N> {
         if (_.isFunction(paramsOrCallback)) {
             let result:WhereStatementPart[] | WhereStatementPart = paramsOrCallback(new WhereBuilder<N>().aliased('node'));
             let whereStatement = this.whereStatement ?
@@ -89,7 +89,7 @@ export class ActiveNodeQuery<N extends NodeEntity<any>> {
         }
     }
 
-    orderBy(callback:OrderBuilderCallback<N>):ActiveNodeQuery<N> {
+    orderBy(callback:OrderBuilderCallback<N>):NodeQuery<N> {
         let builder = new OrderBuilder<N>().aliased('node');
         let result:OrderStatementPart[] | OrderStatementPart = callback(builder);
         let orderStatement = this.orderStatement ?
@@ -99,16 +99,16 @@ export class ActiveNodeQuery<N extends NodeEntity<any>> {
         return cloned(this, (t) => t.orderStatement = orderStatement);
     }
 
-    skip(count:number):ActiveNodeQuery<N> {
+    skip(count:number):NodeQuery<N> {
         return cloned(this, a => a.skipCount = count);
     }
 
-    limit(count:number):ActiveNodeQuery<N> {
+    limit(count:number):NodeQuery<N> {
         return cloned(this, a => a.limitCount = count);
     }
 
     //or just use keyof
-    withRelations(eagerToLoad:(e:N) => Relationship<any, any>[]):ActiveNodeQuery<N> {
+    withRelations(eagerToLoad:(e:N) => Relationship<any, any>[]):NodeQuery<N> {
         throw new Error("Eager loading is not yet implemented");
         //TODO: ....in order to build query for eagerly fetch associated data we need instance of relations definition
         //HOW to instantiate it ?

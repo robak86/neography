@@ -10,7 +10,7 @@ import {NodeBatchRepository} from "../repositories/NodeBatchRepository";
 import {GraphResponseFactory} from "../response/GraphResponseFactory";
 import {QueryRunner} from "./QueryRunner";
 
-import {ActiveNodeQuery} from "../repositories/ActiveNodeQuery";
+import {NodeQuery} from "../repositories/NodeQuery";
 
 export class Connection {
 
@@ -37,8 +37,8 @@ export class Connection {
         return new NodeBatchRepository(nodeClass, this);
     }
 
-    nodeQuery<N extends NodeEntity>(nodeClass:Type<N>):ActiveNodeQuery<N> {
-        return new ActiveNodeQuery(nodeClass);
+    nodeQuery<N extends NodeEntity>(nodeClass:Type<N>):NodeQuery<N> {
+        return new NodeQuery(nodeClass);
     }
 
     private execQuery(cypherQuery:string, params?:any):GraphResponse {
