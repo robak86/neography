@@ -7,7 +7,7 @@ import {sleep} from "../../lib/utils/promise";
 import {ActiveRelation} from "../../lib/model/ActiveRelation";
 import {relationship, relationshipThunk} from "../../lib/annotations/RelationshipAnnotations";
 
-describe(`ActiveRelations`, () => {
+describe.only(`ActiveRelations`, () => {
     @relation('__IS_TAGGED')
     class IsTaggedRelation extends AbstractRelation<IsTaggedRelation> {
         @timestamp() createdAt:Date;
@@ -191,6 +191,68 @@ describe(`ActiveRelations`, () => {
 
                 let itemsForTag = await tags[0].items.all();
                 expect(itemsForTag.map(i => i.id)).to.eql([item.id]);
+            });
+
+            it(`relation mutated from one side is reflected on the other ex.1`, async () => {
+                item.categories.set(categories);
+                item.tags.set(tags);
+                await item.save();
+                tags[0].items.set([]);
+                await tags[0].save();
+
+
+                let allTags = await item.tags.all();
+                expect(allTags.map(t => t.id)).to.eql([tags[1].id]);
+            });
+
+            it(`relation mutated from one side is reflected on the other ex.2`, async () => {
+                let item1 = new ItemNode({itemName: 'item1'});
+                let item2 = new ItemNode({itemName: 'item2'});
+
+                item1.tags.set(tags[0]);
+                item2.tags.set(tags[0]);
+
+                await item1.save();
+                await item2.save();
+
+
+                let item1Tags = await item1.tags.all();
+                let item2Tags = await item2.tags.all();
+                let tagItems = await tags[0].items.all();
+
+                //check if relations were created|each item have the same tag
+                expect(item1Tags.map(t => t.id)).to.have.members([tags[0].id]);
+                expect(item2Tags.map(t => t.id)).to.have.members([tags[0].id]);
+                expect(tagItems.map(t => t.id)).to.have.members([item1.id, item2.id]);
+
+
+
+                // remove tag from item1
+                item1.tags.set([]);
+                await item1.save();
+
+                item1Tags = await item1.tags.all();
+                item2Tags = await item2.tags.all();
+                tagItems = await tags[0].items.all();
+
+                //check if relations were created|each item have the same tag
+                expect(item1Tags.map(t => t.id)).to.have.members([]);
+                expect(item2Tags.map(t => t.id)).to.have.members([tags[0].id]);
+                expect(tagItems.map(t => t.id)).to.have.members([item2.id]);
+
+
+                // remove tag from item2
+                item2.tags.set([]);
+                await item2.save();
+
+                item1Tags = await item1.tags.all();
+                item2Tags = await item2.tags.all();
+                tagItems = await tags[0].items.all();
+
+                //check if relations were created|each item have the same tag
+                expect(item1Tags.map(t => t.id)).to.have.members([]);
+                expect(item2Tags.map(t => t.id)).to.have.members([]);
+                expect(tagItems.map(t => t.id)).to.have.members([]);
             });
         });
 

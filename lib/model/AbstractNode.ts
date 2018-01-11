@@ -41,11 +41,6 @@ export abstract class AbstractNode<T = any> extends AbstractEntity<T> {
         return isPresent(this.id);
     }
 
-    private get relations():ActiveRelation<any, any>[] {
-        let attributesMetadata = AttributesMetadata.getForInstance(this);
-        return attributesMetadata.getRelationshipsNames().map(name => this[name]);
-    }
-
     save(_connection?:Connection):Promise<this> {
         let connection = _connection || connectionsFactory.checkoutConnection();
         //TODO: if there is no relations or any of existing relations is not dirty don't save in transaction
@@ -85,6 +80,11 @@ export abstract class AbstractNode<T = any> extends AbstractEntity<T> {
         let result = await connection.runQuery(query).toArray();
         (this as any).id = undefined;
         return result;
+    }
+
+    private get relations():ActiveRelation<any, any>[] {
+        let attributesMetadata = AttributesMetadata.getForInstance(this);
+        return attributesMetadata.getRelationshipsNames().map(name => this[name]);
     }
 
 
