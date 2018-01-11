@@ -136,7 +136,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         return cloned(this, a => a.direction = RelationshipDirection.Incoming);
     }
 
-    outgoing(count:number):ActiveRelation<R, N> {
+    outgoing():ActiveRelation<R, N> {
         return cloned(this, a => a.direction = RelationshipDirection.Outgoing);
     }
 
@@ -165,7 +165,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         let baseQuery = buildQuery()
             .match(m => [
                 m.node(getClassFromInstance(this.boundNode)).params({id: this.boundNode.id}).as('o'),
-                m.relation(this.relClass).as('relation'),
+                m.relation(this.relClass).as('relation').direction(this.direction),
                 m.node(this.nodeClass).as('node')
             ]);
 
@@ -235,7 +235,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         let query = buildQuery()
             .match(m => [
                 m.node(getClassFromInstance(this.boundNode)).params({id: this.boundNode.id} as any).as('from'),
-                m.relation(this.relClass).as('rel'),
+                m.relation(this.relClass).as('rel').direction(this.direction),
                 m.node().as('to')
             ])
             .where(w => w.literal('to.id in {ids}').params({ids}))

@@ -35,8 +35,8 @@ describe(`ActiveRelations`, () => {
         @timestamp() updatedAt:Date;
         @attribute() tagName:string;
 
-        // @relationshipThunk(() => IsTaggedRelation, () => TagNode, rel => rel.incoming())
-        // items:ActiveRelation<IsTaggedRelation, TagNode>;
+        @relationshipThunk(() => IsTaggedRelation, () => ItemNode, rel => rel.incoming())
+        items:ActiveRelation<IsTaggedRelation, TagNode>;
     }
 
     @node('__Item')
@@ -45,9 +45,9 @@ describe(`ActiveRelations`, () => {
         @timestamp() updatedAt:Date;
         @attribute() itemName:string;
 
-        @relationship(HasCategory, CategoryNode)
+        @relationship(HasCategory, CategoryNode, rel => rel.outgoing())
         categories:ActiveRelation<HasCategory, CategoryNode>;
-        @relationshipThunk(() => IsTaggedRelation, () => TagNode)
+        @relationshipThunk(() => IsTaggedRelation, () => TagNode, rel => rel.outgoing())
         tags:ActiveRelation<IsTaggedRelation, TagNode>;
     }
 
@@ -151,7 +151,8 @@ describe(`ActiveRelations`, () => {
                 expect(await connection.nodeQuery(TagNode).count()).to.eq(2);
                 expect(await connection.nodeQuery(ItemNode).count()).to.eq(1);
                 expect(await item.categories.all()).to.have.deep.members(categories);
-                expect(await item.tags.all()).to.have.deep.members(tags);
+                let all = await item.tags.all();
+                expect(all.map((e) => e.id)).to.have.deep.members(tags.map(e => e.id));
             });
 
             it(`adds id property for each category`, async () => {
@@ -181,6 +182,18 @@ describe(`ActiveRelations`, () => {
             });
         });
 
+
+        describe(`accessing connected nodes from both side of relations`, () => {
+            it(`is accessible from both side`, async () => {
+                item.categories.set(categories);
+                item.tags.set(tags);
+                await item.save();
+
+                let itemsForTag = await tags[0].items.all();
+                expect(itemsForTag.map(i => i.id)).to.eql([item.id]);
+            });
+        });
+
         describe(`detaching all nodes connected by single relation`, () => {
             it(`doesn't remove detached nodes`, async () => {
                 item.categories.set(categories);
@@ -194,7 +207,8 @@ describe(`ActiveRelations`, () => {
                 expect(await connection.nodeQuery(TagNode).count()).to.eq(2);
                 expect(await connection.nodeQuery(ItemNode).count()).to.eq(1);
                 expect(await item.categories.all()).to.eql([]);
-                expect(await item.tags.all()).to.have.deep.members(tags);
+                let all = await item.tags.all();
+                expect(all.map((e) => e.id)).to.have.deep.members(tags.map(e => e.id));
             });
         });
 
@@ -232,7 +246,8 @@ describe(`ActiveRelations`, () => {
                 expect(await connection.nodeQuery(TagNode).count()).to.eq(3);
                 expect(await connection.nodeQuery(ItemNode).count()).to.eq(1);
                 expect(await item.categories.all()).to.have.deep.members(categories);
-                expect(await item.tags.all()).to.have.deep.members([newTagNode]);
+                let all = await item.tags.all();
+                expect(all.map(t => t.id)).to.have.deep.members([newTagNode.id]);
             });
         });
 
