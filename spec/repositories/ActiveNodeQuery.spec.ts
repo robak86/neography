@@ -83,6 +83,15 @@ describe(`ActiveNodeQuery`, () => {
         });
     });
 
+    describe(".findByIds", () => {
+        it('fetches all nodes with given ids preserving order', async () => {
+            let usersToBeFound = [users[4], users[0], users[3]];
+            let fetched = await activeNodeQuery.findByIds(usersToBeFound.map(u => u.id));
+            expect(fetched.length).to.eq(3);
+            expect(fetched.map(u => u.attributes)).to.eql(usersToBeFound.map(u => u .attributes));
+        });
+    });
+
     describe(`.first`, () => {
         it('returns node with given id', async () => {
             let foundNode = await activeNodeQuery
@@ -114,7 +123,7 @@ describe(`ActiveNodeQuery`, () => {
     });
 
     describe(`.withRelations`, () => {
-        it('eager loads relations', () => {
+        it.skip('eager loads relations', () => {
             activeNodeQuery.withRelations(r => [r.vehicles])
         });
 

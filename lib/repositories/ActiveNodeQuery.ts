@@ -1,4 +1,4 @@
-import {AbstractNode} from "../model";
+import {AbstractNode, assertIdExists} from "../model";
 import {Type} from "../utils/types";
 import {OrderBuilderCallback, QueryBuilder, WhereBuilderCallback} from "../cypher/builders/QueryBuilder";
 import {buildQuery, Connection} from "../index";
@@ -47,6 +47,23 @@ export class ActiveNodeQuery<N extends AbstractNode<any, any>> {
         return node;
     }
 
+    async findByIds(ids:(string | undefined)[], _connection?:Connection):Promise<N[]> {
+        ids.forEach(assertIdExists);
+        let connection = _connection || connectionsFactory.checkoutConnection();
+
+        let query = buildQuery()
+            .match(m => m.node(this.nodeClass as Type<AbstractNode>).as('n'))
+            .where(w => w.literal('n.id in {ids}').params({ids}))
+            .returns('n');
+
+        let nodes:N[] = await connection.runQuery(query).pluck('n').toArray();
+
+        let nodesByIds = _.keyBy(nodes, n => n.id);
+        let result:N[] = [];
+
+        ids.forEach((id:string) => nodesByIds[id] && result.push(nodesByIds[id]));
+        return result;
+    }
 
     count(_connection?:Connection):Promise<number> {
         let connection = _connection || connectionsFactory.checkoutConnection();
@@ -90,25 +107,11 @@ export class ActiveNodeQuery<N extends AbstractNode<any, any>> {
         return cloned(this, a => a.limitCount = count);
     }
 
-    //TODO: should we also add write methods to this class ?
-    // async saveMany(nodes:N[], _connection?:Connection):Promise<N[]> {
-    //     if (Array.isArray(nodes) && nodes.length === 0) {
-    //         return []
-    //     }
-    //     assertAllNew(nodes);
-    //     let query = buildQuery()
-    //         .create(c => nodes.map((node, idx) => c.node(node).as('n' + idx)))
-    //         .returns(`[${nodes.map((n, idx) => 'n' + idx)}] as list`);
-    //
-    //     let connection = _connection || connectionsFactory.checkoutConnection();
-    //     return connection.runQuery(query).pluck('list').first()
-    // };
-
-
     withRelations(eagerToLoad:(e:N['relations']) => ActiveRelation<any, any>[]):ActiveNodeQuery<N> {
+        throw new Error("Eager loading is not yet implemented");
         //TODO: ....in order to build query for eagerly fetch associated data we need instance of relations definition
         //HOW to instantiate it ?
-        return cloned(this, (a) => a.relationsToLoad = eagerToLoad({}))
+        // return cloned(this, (a) => a.relationsToLoad = eagerToLoad({}))
     }
 
     private buildQuery(appendReturn:(b:QueryBuilder) => QueryBuilder, skipLimits:boolean = false, skipOrder:boolean = false):QueryBuilder {

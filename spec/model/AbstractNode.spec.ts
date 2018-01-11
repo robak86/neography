@@ -4,7 +4,7 @@ import {expect} from 'chai';
 import {sleep} from "../../lib/utils/promise";
 import {buildQuery} from "../../lib/cypher";
 
-describe.only(`AbstractNode`, () => {
+describe(`AbstractNode`, () => {
 
     const countDummyNodes = () => getSharedConnection().runQuery(q => q
         .match(m => [
