@@ -2,8 +2,9 @@ import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {expect} from 'chai';
 import {sleep} from "../../lib/utils/promise";
+import {buildQuery} from "../../lib/cypher";
 
-describe(`AbstractNode`, () => {
+describe.only(`AbstractNode`, () => {
 
     const countDummyNodes = () => getSharedConnection().runQuery(q => q
         .match(m => [
@@ -37,16 +38,46 @@ describe(`AbstractNode`, () => {
 
             expect(count).to.eq(1);
         });
+
+        it("creates new buildNode", async () => {
+            let node = new DummyGraphNode({attr1: 'some data'});
+            await node.save();
+
+            let query = buildQuery().literal(`MATCH(n {id: {id}}) return n`, {id: node.id});
+            let nodes = await getSharedConnection().runQuery(query).pluck('n').toArray();
+
+            expect(nodes[0].id).to.eql(node.id);
+            expect(nodes[0].createdAt).to.eql(node.createdAt);
+            expect(nodes[0].updatedAt).to.eql(node.updatedAt);
+            expect(nodes[0].attr1).to.eql(node.attr1);
+        });
+
+        it("return created entity having Persisted", async () => {
+            let node = new DummyGraphNode({attr1: 'some data'});
+            await node.save();
+
+            expect(node.id).to.be.a('string');
+            expect(node.createdAt).to.be.a('Date');
+            expect(node.updatedAt).to.be.a('Date');
+        });
+
+        it("does not store additional params", async () => {
+            let node = new DummyGraphNode({attr1: 'some data'});
+            await node.save();
+
+            expect(Object.keys(node.attributes).sort())
+                .to.eql(['attr1', 'attr2', 'id', 'createdAt', 'updatedAt'].sort());
+        });
     });
 
     describe(`.remove`, () => {
         it('removes itself', async () => {
-             let createdNode:DummyGraphNode = await getSharedConnection().runQuery(q => q
-                 .create(c => [
-                     c.node(new DummyGraphNode({attr1: 123})).as('n')
-                 ])
-                 .returns('n')
-             ).pluck('n').first();
+            let createdNode:DummyGraphNode = await getSharedConnection().runQuery(q => q
+                .create(c => [
+                    c.node(new DummyGraphNode({attr1: 123})).as('n')
+                ])
+                .returns('n')
+            ).pluck('n').first();
 
             expect(await countDummyNodes()).to.eq(1);
             expect(createdNode.isPersisted()).to.eq(true);
@@ -65,7 +96,7 @@ describe(`AbstractNode`, () => {
             expect(count).to.eq(1);
             node.attr2 = 123;
 
-            let updatedAt= node.updatedAt;
+            let updatedAt = node.updatedAt;
 
             await sleep(200);
             await node.save();
@@ -84,7 +115,7 @@ describe(`AbstractNode`, () => {
         });
     });
 
-    describe('.remove',() => {
+    describe('.remove', () => {
         it(`removes given node`);
         it(`removes id from entity instance`);
     })

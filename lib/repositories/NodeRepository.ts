@@ -23,7 +23,7 @@ export class NodeRepository<T extends AbstractNode> {
 
         return this.connection.runQuery(query)
             .pluck('nodesCount')
-            .map(integer => integer  > 0)
+            .map(integer => integer > 0)
             .first();
     }
 

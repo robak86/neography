@@ -50,6 +50,9 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         return connectionsFactory.checkoutConnection().runQuery(baseQuery).pluck('node').first();
     }
 
+    //TODO: returns true if node is connected by R relation
+    // has(n:Node):Promise<any> {}
+
     async findOne():Promise<N> {
         let baseQuery = this.buildQuery(b => b.returns('node'));
         baseQuery = baseQuery.literal('limit 1');
