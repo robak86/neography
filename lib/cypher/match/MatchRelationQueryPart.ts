@@ -1,5 +1,5 @@
 import {Type} from "../../utils/types";
-import {AbstractRelation} from "../../model";
+import {RelationshipEntity} from "../../model";
 import {RelationMetadata} from "../../metadata/RelationMetadata";
 import {IBoundQueryPart} from "../abstract/IBoundQueryPart";
 import {QueryContext} from "../common/QueryContext";
@@ -9,7 +9,7 @@ import {IQueryPart} from "../abstract/IQueryPart";
 import {cloned} from "../../utils/core";
 
 
-export class MatchRelationQueryPart<G extends AbstractRelation> implements IRelationMatchQueryPart<G>, IQueryPart {
+export class MatchRelationQueryPart<G extends RelationshipEntity> implements IRelationMatchQueryPart<G>, IQueryPart {
     protected _params:any;
     protected _alias:string;
     protected _direction:RelationDirectionType = '<->';

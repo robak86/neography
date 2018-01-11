@@ -56,7 +56,7 @@ describe("Connection", () => {
             expect(_.keys(p1.properties).sort()).to.eql(['firstName', 'lastName', 'id', 'age'].sort());
         });
 
-        it("maps neo4j's Relationship to AbstractRelation", async () => {
+        it("maps neo4j's Relationship to RelationshipEntity", async () => {
             let u1Params = {firstName: "John", id: genId()};
             let u2Params = {firstName: "Glen", id: genId()};
             let r1Params = {since: int(12345)};

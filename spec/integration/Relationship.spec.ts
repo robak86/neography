@@ -1,5 +1,5 @@
 import {attribute, node, relation, timestamp} from "../../lib/annotations";
-import {AbstractNode, AbstractRelation} from "../../lib/model";
+import {AbstractNode, RelationshipEntity} from "../../lib/model";
 import {Connection} from "../../lib";
 import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {expect} from 'chai';
@@ -9,13 +9,13 @@ import {relationship, relationshipThunk} from "../../lib/annotations/Relationshi
 
 describe(`Relationship`, () => {
     @relation('__IS_TAGGED')
-    class IsTaggedRelation extends AbstractRelation<IsTaggedRelation> {
+    class IsTaggedRelation extends RelationshipEntity<IsTaggedRelation> {
         @timestamp() createdAt:Date;
         @timestamp() updatedAt:Date;
     }
 
     @relation('__BELONGS_TO_CATEGORY')
-    class HasCategory extends AbstractRelation<HasCategory> {
+    class HasCategory extends RelationshipEntity<HasCategory> {
         @timestamp() createdAt:Date;
         @timestamp() updatedAt:Date;
         @attribute() order:number = 0;

@@ -34,12 +34,12 @@ neography.registerExtension(TimestampsExtension.getDefault());
 
 Neography provides mapping layer over persisted neo4j data. In order to create mappable class 
 you have to decorate it with ```@node('NodeLabel')``` or ```@relation('RELATION_TYPE')``` decorators. Additionally each 
-entity class have to inherit consequently from ```AbstractNode``` or ```AbstractRelation``` class. ```AbstractNode``` class
+entity class have to inherit consequently from ```AbstractNode``` or ```RelationshipEntity``` class. ```AbstractNode``` class
 provides auto generated unique ```id``` property.
 
  
 ```typescript
-import {AbstractNode, AbstractRelation} from 'neography/model';
+import {AbstractNode, RelationshipEntity} from 'neography/model';
 import {node, relation, timestamp} from 'neography/annotations';
 
 //Nodes definitions
@@ -59,16 +59,16 @@ class AddressNode extends AbstractNode<AddressNode> {
 //Relations definitions
 
 @relation('KNOWS') //relation name
-class KnowsRelation extends AbstractRelation<KnowsRelation> {
+class KnowsRelation extends RelationshipEntity<KnowsRelation> {
     @timestamp() since:Date;
 }
 
 @relation('HAS_HOME_ADDRESS')
-class HasHomeAddressRelation extends AbstractRelation<HasHomeAddressRelation>{}
+class HasHomeAddressRelation extends RelationshipEntity<HasHomeAddressRelation>{}
 
 ```
 
-Passing generic types for ```AbstractRelation``` and ```AbstractNode``` is optional (starting from typescript ^2.3).
+Passing generic types for ```RelationshipEntity``` and ```AbstractNode``` is optional (starting from typescript ^2.3).
 Generic types were introduced in order to enable type safety for constructors.
 
 ```typescript

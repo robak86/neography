@@ -1,4 +1,4 @@
 export * from './AbstractNode';
-export * from './AbstractRelation';
+export * from './RelationshipEntity';
 export * from './GraphEntity';
 export * from '../driver/Integer';

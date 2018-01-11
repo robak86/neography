@@ -1,6 +1,6 @@
 import {AttributesMapper} from "../../mappers/AttributesMapper";
 import {Type} from "../../utils/types";
-import {AbstractNode, AbstractRelation} from "../../model";
+import {AbstractNode, RelationshipEntity} from "../../model";
 import {isPresent, someOrThrow} from "../../utils/core";
 import {AttributesMapperFactory} from "../../mappers/AttributesMapperFactory";
 
@@ -43,7 +43,7 @@ export class QueryContext {
         return isPresent(mapper);
     }
 
-    hasMapperForRelationClass<T extends AbstractRelation>(relationClass:Type<T>):boolean {
+    hasMapperForRelationClass<T extends RelationshipEntity>(relationClass:Type<T>):boolean {
         let mapper = this.attributesMapperFactory.getRelationMapperForClass(relationClass);
         return isPresent(mapper);
     }
@@ -57,7 +57,7 @@ export class QueryContext {
         return this.attributesMapperFactory.getNodeAttributesMapper(labels)
     }
 
-    getMapperForRelationClass<T extends AbstractRelation>(relationClass:Type<T>):AttributesMapper<T> {
+    getMapperForRelationClass<T extends RelationshipEntity>(relationClass:Type<T>):AttributesMapper<T> {
         return someOrThrow(this.attributesMapperFactory.getRelationMapperForClass(relationClass), `Cannot find relation mapper for ${relationClass}`)
     }
 

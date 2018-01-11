@@ -1,4 +1,4 @@
-import {AbstractNode, AbstractRelation} from "../../model";
+import {AbstractNode, RelationshipEntity} from "../../model";
 import {MatchNodeQueryPart} from "../match/MatchNodeQueryPart";
 import {MatchRelationQueryPart} from "../match/MatchRelationQueryPart";
 import {MatchUntypedNodeQueryPart} from "../match/MatchUntypedNodeQueryPart";
@@ -30,7 +30,7 @@ export class MatchBuilder {
         return new MatchedNodeQueryPart().as(alias);
     }
 
-    relation<R extends AbstractRelation>(klass?:Type<R>):IRelationMatchQueryPart<R> {
+    relation<R extends RelationshipEntity>(klass?:Type<R>):IRelationMatchQueryPart<R> {
         if (klass) {
             return new MatchRelationQueryPart(klass);
         } else {

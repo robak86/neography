@@ -1,9 +1,9 @@
 import {attribute, relation, timestamp} from "../../lib/annotations";
-import {AbstractRelation} from "../../lib/model";
+import {RelationshipEntity} from "../../lib/model";
 
 
 @relation('HAS_AWESOME_NODE_RELATION')
-export class HasAwesomeNodeRelation extends AbstractRelation<HasAwesomeNodeRelation> {
+export class HasAwesomeNodeRelation extends RelationshipEntity<HasAwesomeNodeRelation> {
     @timestamp() createdAt?:Date;
     @timestamp() updatedAt?:Date;
 

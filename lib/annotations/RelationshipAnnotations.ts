@@ -1,13 +1,13 @@
-import {AbstractNode, AbstractRelation} from "../model";
+import {AbstractNode, RelationshipEntity} from "../model";
 import {Type} from "../utils/types";
 import {Relationship} from "../model/Relationship";
 import {invariant} from "../utils/core";
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
 import * as _ from 'lodash';
 
-export function relationshipThunk<R extends AbstractRelation, N extends AbstractNode>(relThunk: () => Type<R>,
-                                                                                      nodeClassThunk:() => Type<N>,
-                                                                                      modifier: (rel:Relationship<R,N>) => Relationship<R,N> = _.identity):PropertyDecorator {
+export function relationshipThunk<R extends RelationshipEntity, N extends AbstractNode>(relThunk: () => Type<R>,
+                                                                                        nodeClassThunk:() => Type<N>,
+                                                                                        modifier: (rel:Relationship<R,N>) => Relationship<R,N> = _.identity):PropertyDecorator {
     return (classPrototype:Object, propertyKey:string) => {
         invariant(AbstractNode.isPrototypeOf(classPrototype.constructor),
             `Class ${classPrototype.constructor.name} has to inherit from AbstractNode in order to use @relationship() decorator`);
@@ -41,9 +41,9 @@ export function relationshipThunk<R extends AbstractRelation, N extends Abstract
 
 
 
-export function relationship<R extends AbstractRelation, N extends AbstractNode>(relClass:Type<R>,
-                                                                                 nodeClass:Type<N>,
-                                                                                 modifier: (rel:Relationship<R,N>) => Relationship<R,N> = _.identity):PropertyDecorator {
+export function relationship<R extends RelationshipEntity, N extends AbstractNode>(relClass:Type<R>,
+                                                                                   nodeClass:Type<N>,
+                                                                                   modifier: (rel:Relationship<R,N>) => Relationship<R,N> = _.identity):PropertyDecorator {
     return (classPrototype:Object, propertyKey:string) => {
         invariant(AbstractNode.isPrototypeOf(classPrototype.constructor),
             `Class ${classPrototype.constructor.name} has to inherit from AbstractNode in order to use @relationship() decorator`);

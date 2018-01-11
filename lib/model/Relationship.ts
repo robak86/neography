@@ -1,4 +1,4 @@
-import {AbstractRelation} from "./AbstractRelation";
+import {RelationshipEntity} from "./RelationshipEntity";
 import {AbstractNode} from "./AbstractNode";
 import {Type} from "../utils/types";
 import {ConnectedNode} from "./ConnectedNode";
@@ -19,7 +19,7 @@ import {MatchBuilder} from "../cypher/builders/MatchBuilder";
 import {NodeNotFoundError} from "../errors/NodeNotFoundError";
 import {RelationshipDirection} from "../cypher/enum/RelationshipDirection";
 
-export class Relationship<R extends AbstractRelation, N extends AbstractNode<any>> {
+export class Relationship<R extends RelationshipEntity, N extends AbstractNode<any>> {
     private ownerGetter:() => AbstractNode<any>;
     private whereStatement:WhereStatement;
     private orderStatement:OrderStatement;

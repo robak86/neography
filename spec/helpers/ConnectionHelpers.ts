@@ -2,7 +2,7 @@ import {Connection, Neography} from "../../lib";
 import * as _ from 'lodash';
 import {someOrThrow} from "../../lib/utils/core";
 import {QueryContext} from "../../lib/cypher/common/QueryContext";
-import {AbstractRelation} from "../../lib/model";
+import {RelationshipEntity} from "../../lib/model";
 import {Type} from "../../lib/utils/types";
 import {buildQuery} from "../../lib/cypher";
 import {TimestampsExtension} from "../../lib/extensions";
@@ -38,7 +38,7 @@ export const cleanDatabase = ():Promise<any> => {
     return getSharedConnection().runQuery(q => q.literal(`MATCH (n) DETACH DELETE n`)).toArray();
 };
 
-export const countRelations = (rel:Type<AbstractRelation>):Promise<number> => {
+export const countRelations = (rel:Type<RelationshipEntity>):Promise<number> => {
     let query = buildQuery()
         .match(m => [
             m.node(),

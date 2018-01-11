@@ -1,24 +1,24 @@
-import {AbstractNode, AbstractRelation} from "./index";
+import {AbstractNode, RelationshipEntity} from "./index";
 import {Type} from "../utils/types";
 import {isPresent} from "../utils/core";
 import * as _ from 'lodash';
 
 //TODO: rename to BoundNode | LinkedNode | ??
-export type ConnectedNode<R extends AbstractRelation, TO extends AbstractNode> = { relation:R, node:TO };
+export type ConnectedNode<R extends RelationshipEntity, TO extends AbstractNode> = { relation:R, node:TO };
 
-export function isConnectedNode<R extends AbstractRelation, TO extends AbstractNode>(val:any,
-                                                                                     relation:Type<R>):val is ConnectedNode<R, TO> {
+export function isConnectedNode<R extends RelationshipEntity, TO extends AbstractNode>(val:any,
+                                                                                       relation:Type<R>):val is ConnectedNode<R, TO> {
 
     return (val.relation instanceof relation && val.node instanceof AbstractNode);
 }
 
 
 export const ConnectedNode = {
-    isEqual<R extends AbstractRelation, TO extends AbstractNode>(c1:ConnectedNode<R, TO>, c2:ConnectedNode<R, TO>):boolean {
+    isEqual<R extends RelationshipEntity, TO extends AbstractNode>(c1:ConnectedNode<R, TO>, c2:ConnectedNode<R, TO>):boolean {
         return c1.node.id === c2.node.id && _.isEqual(c1.relation, c2.relation);
     },
 
-    isPersisted<R extends AbstractRelation, TO extends AbstractNode>(c1:ConnectedNode<R, TO>):boolean {
+    isPersisted<R extends RelationshipEntity, TO extends AbstractNode>(c1:ConnectedNode<R, TO>):boolean {
         return isPresent(c1.node.id);
     }
 };

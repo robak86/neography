@@ -1,5 +1,5 @@
 import {CreateNodeQueryPart} from "../create/CreateNodeQueryPart";
-import {AbstractNode, AbstractRelation} from "../../model";
+import {AbstractNode, RelationshipEntity} from "../../model";
 import {CreateRelationQueryPart} from "../create/CreateRelationQueryPart";
 import {MatchedNodeQueryPart} from "../common/MatchedNodeQueryPart";
 
@@ -13,7 +13,7 @@ export class CreateBuilder {
         return new CreateNodeQueryPart(node);
     }
 
-    relation<R extends AbstractRelation>(relation:R) {
+    relation<R extends RelationshipEntity>(relation:R) {
         return new CreateRelationQueryPart(relation).direction('->');
     }
 }
