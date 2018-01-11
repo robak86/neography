@@ -41,4 +41,8 @@ describe(`proxifyRelationsDefinitions`, () => {
         expect(iterated[0]).to.eq(relations.others);
         expect((iterated[0] as any).someData).to.eq(123);
     });
+
+    it.skip(`they are equal`, async () => {
+        expect(proxifyRelationsDefinitions(new Relations(), owner)).to.deep.eq(proxifyRelationsDefinitions(new Relations(), owner));
+    });
 });

@@ -320,8 +320,13 @@ describe("Queries", () => {
                     .literal('ORDER BY rel.attr2');
 
                 let rows:CreatedRelation[] = await connection.runQuery(matchQuery).toArray();
-                expect(rows[0]).to.eql(a_rel_c);
-                expect(rows[1]).to.eql(a_rel_b);
+
+                expect(rows[0].to.attributes).to.eql(a_rel_c.to.attributes);
+                expect(rows[0].from.attributes).to.eql(a_rel_c.from.attributes);
+                expect(rows[0].rel).to.eql(a_rel_c.rel);
+                expect(rows[1].to.attributes).to.eql(a_rel_b.to.attributes);
+                expect(rows[1].from.attributes).to.eql(a_rel_b.from.attributes);
+                expect(rows[1].rel).to.eql(a_rel_b.rel);
             });
         });
     });

@@ -45,8 +45,8 @@ describe("NodeRepository", () => {
         });
 
         it("does not store additional params", () => {
-            expect(Object.keys(createdGenericNode).sort())
-                .to.eql(['attr1', 'id', 'createdAt', 'updatedAt'].sort());
+            expect(Object.keys(createdGenericNode.attributes).sort())
+                .to.eql(['attr1', 'attr2', 'id', 'createdAt', 'updatedAt'].sort());
         });
 
         it("creates new buildNode", async () => {
@@ -96,11 +96,11 @@ describe("NodeRepository", () => {
         });
 
         it("does not store additional params", () => {
-            expect(Object.keys(savedNodes[0]).sort())
-                .to.eql(['attr1', 'id', 'createdAt', 'updatedAt'].sort());
+            expect(Object.keys(savedNodes[0].attributes).sort())
+                .to.eql(['attr1', 'attr2', 'id', 'createdAt', 'updatedAt'].sort());
 
-            expect(Object.keys(savedNodes[1]).sort())
-                .to.eql(['attr1', 'id', 'createdAt', 'updatedAt'].sort());
+            expect(Object.keys(savedNodes[1].attributes).sort())
+                .to.eql(['attr1', 'attr2', 'id', 'createdAt', 'updatedAt'].sort());
         });
 
         it("creates nodes", async () => {
@@ -147,7 +147,8 @@ describe("NodeRepository", () => {
             fetched = <any>_.sortBy(fetched, (e) => (<any>e.createdAt).getTime()); //TODO: we should not sort result. Elements should be returned in correct order
 
             expect(fetched.length).to.eq(2);
-            expect(fetched).to.eql([n1, n2])
+            expect(fetched[0].attributes).to.eql(n1.attributes);
+            expect(fetched[1].attributes).to.eql(n2.attributes);
         });
     });
 
@@ -167,7 +168,7 @@ describe("NodeRepository", () => {
         it("returns fetched dummyNode if exists", async () => {
             let createdGenericNode = await nodeRepository.save(dummyNode);
             let retrievedGenericNodes:DummyGraphNode | null = await nodeRepository.first({id: createdGenericNode.id as string});
-            expect(retrievedGenericNodes).to.eql(createdGenericNode);
+            expect(retrievedGenericNodes.attributes).to.eql(createdGenericNode.attributes);
         });
 
         it("returns null if dummyNode does not exist", async () => {
@@ -191,13 +192,13 @@ describe("NodeRepository", () => {
             await relationRepository.node(from).connectTo(to);
             expect(await nodeRepository.exists(from.id)).to.eq(true);
             expect(await nodeRepository.exists(to.id)).to.eq(true);
-            expect(await relationRepository.nodes(from,to).areConnected()).to.eq(true);
+            expect(await relationRepository.nodes(from, to).areConnected()).to.eq(true);
 
             await nodeRepository.remove(from.id);
 
             expect(await nodeRepository.exists(from.id)).to.eq(false);
             expect(await nodeRepository.exists(to.id)).to.eq(true);
-            expect(await relationRepository.nodes(from,to).areConnected()).to.eq(false);
+            expect(await relationRepository.nodes(from, to).areConnected()).to.eq(false);
         });
     });
 
@@ -231,7 +232,7 @@ describe("NodeRepository", () => {
             edited.attr1 = 'updateFirstName';
             edited.attr2 = 123;
             let result = await nodeRepository.update(edited);
-            expect(_.omit(result, 'updatedAt')).to.eql(_.omit(edited, 'updatedAt'))
+            expect(_.omit(result.attributes, 'updatedAt')).to.eql(_.omit(edited.attributes, 'updatedAt'))
         });
 
         it("updates updatedAt property", async () => {
@@ -280,11 +281,11 @@ describe("NodeRepository", () => {
         });
 
         it("does not store additional params", () => {
-            expect(Object.keys(savedNodes[0]).sort())
-                .to.eql(['attr1', 'id', 'createdAt', 'updatedAt'].sort());
+            expect(Object.keys(savedNodes[0].attributes).sort())
+                .to.eql(['attr1', 'attr2', 'id', 'createdAt', 'updatedAt'].sort());
 
-            expect(Object.keys(savedNodes[1]).sort())
-                .to.eql(['attr1', 'id', 'createdAt', 'updatedAt'].sort());
+            expect(Object.keys(savedNodes[1].attributes).sort())
+                .to.eql(['attr1', 'attr2', 'id', 'createdAt', 'updatedAt'].sort());
         });
 
         it("creates nodes", async () => {

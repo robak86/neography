@@ -6,7 +6,7 @@ import {expect} from 'chai';
 import {sleep} from "../../lib/utils/promise";
 import {ActiveRelation} from "../../lib/model/ActiveRelation";
 
-describe.only(`ActiveRelations`, () => {
+describe(`ActiveRelations`, () => {
     @node('__Category')
     class CategoryNode extends AbstractNode<CategoryNode> {
         @timestamp() createdAt:Date;

@@ -7,7 +7,6 @@ export function proxifyRelationsDefinitions<T extends object>(target:T, owner:Ab
 
     return new Proxy(target, {
         get(target:T, p:PropertyKey, receiver:any) {
-            console.log('Proxy get', target, p);
             if (target[p] instanceof ActiveRelation) {
                 return cache[p] ?
                     cache[p] :

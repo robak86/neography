@@ -76,8 +76,8 @@ describe("NodeInstanceRepository", () => {
 
             expect(rel[0].relation).to.eql(relations[0]);
             expect(rel[1].relation).to.eql(relations[1]);
-            expect(rel[0].node).to.eql(u2);
-            expect(rel[1].node).to.eql(u3);
+            expect(rel[0].node.attributes).to.eql(u2.attributes);
+            expect(rel[1].node.attributes).to.eql(u3.attributes);
         });
 
         it('allows for setting own instance of relation', async () => {
@@ -94,8 +94,8 @@ describe("NodeInstanceRepository", () => {
 
             expect(rel[0].relation).to.eql(relations[0]);
             expect(rel[1].relation).to.eql(relations[1]);
-            expect(rel[0].node).to.eql(u2);
-            expect(rel[1].node).to.eql(u3);
+            expect(rel[0].node.attributes).to.eql(u2.attributes);
+            expect(rel[1].node.attributes).to.eql(u3.attributes);
         });
 
         it('throws while connecting to not persisted node', async () => {
