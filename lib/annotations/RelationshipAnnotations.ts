@@ -5,7 +5,7 @@ import {invariant} from "../utils/core";
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
 
 
-export function relationshipThunk<R extends AbstractRelation, N extends AbstractNode>(relClass:Type<R>, nodeClass:Type<N>):PropertyDecorator {
+export function relationshipThunk<R extends AbstractRelation, N extends AbstractNode>(relThunk: () => Type<R>, nodeClassThunk:() => Type<N>):PropertyDecorator {
     return (classPrototype:Object, propertyKey:string) => {
         invariant(AbstractNode.isPrototypeOf(classPrototype.constructor),
             `Class ${classPrototype.constructor.name} has to inherit from AbstractNode in order to use @relationship() decorator`);
@@ -18,7 +18,7 @@ export function relationshipThunk<R extends AbstractRelation, N extends Abstract
             let self = this;
 
             return (<any>this)._relationsCache[propertyKey]
-                || ((<any>this)._relationsCache[propertyKey] = new ActiveRelation(relClass, nodeClass).bindToNode(() => self));
+                || ((<any>this)._relationsCache[propertyKey] = new ActiveRelation(relThunk(), nodeClassThunk()).bindToNode(() => self));
         };
 
         // don't use fat arrow function - because we lose this context

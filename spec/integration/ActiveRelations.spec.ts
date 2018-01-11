@@ -5,7 +5,7 @@ import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {expect} from 'chai';
 import {sleep} from "../../lib/utils/promise";
 import {ActiveRelation} from "../../lib/model/ActiveRelation";
-import {relationship} from "../../lib/annotations/RelationshipAnnotations";
+import {relationship, relationshipThunk} from "../../lib/annotations/RelationshipAnnotations";
 
 describe(`ActiveRelations`, () => {
 
@@ -45,7 +45,7 @@ describe(`ActiveRelations`, () => {
 
         @relationship(HasCategory, CategoryNode)
         categories:ActiveRelation<HasCategory, CategoryNode>;
-        @relationship(IsTaggedRelation, TagNode)
+        @relationshipThunk(() => IsTaggedRelation, () => TagNode)
         tags:ActiveRelation<IsTaggedRelation, TagNode>;
     }
     
