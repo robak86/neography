@@ -7,7 +7,7 @@ import {cloned, invariant, isPresent} from "../utils/core";
 import * as _ from "lodash";
 import {WhereStatement} from "../cypher/where/WhereStatement";
 import {WhereBuilder, WhereStatementPart} from "../cypher/builders/WhereBuilder";
-import {ActiveRelation} from "../model/ActiveRelation";
+import {Relationship} from "../model/Relationship";
 import {OrderStatement} from "../cypher/order/OrderStatement";
 import {OrderBuilder} from "../cypher/builders/OrderBuilder";
 import {OrderStatementPart} from "../cypher/order/OrderStatementPart";
@@ -18,7 +18,7 @@ export class ActiveNodeQuery<N extends AbstractNode<any>> {
     private orderStatement:OrderStatement | undefined;
     private skipCount:number | undefined;
     private limitCount:number | undefined;
-    private relationsToLoad:ActiveRelation<any, any>[];
+    private relationsToLoad:Relationship<any, any>[];
 
     constructor(private nodeClass:Type<N>) {}
 
@@ -108,7 +108,7 @@ export class ActiveNodeQuery<N extends AbstractNode<any>> {
     }
 
     //or just use keyof
-    withRelations(eagerToLoad:(e:N) => ActiveRelation<any, any>[]):ActiveNodeQuery<N> {
+    withRelations(eagerToLoad:(e:N) => Relationship<any, any>[]):ActiveNodeQuery<N> {
         throw new Error("Eager loading is not yet implemented");
         //TODO: ....in order to build query for eagerly fetch associated data we need instance of relations definition
         //HOW to instantiate it ?

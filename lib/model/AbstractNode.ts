@@ -6,7 +6,7 @@ import {connectionsFactory} from "../connection/ConnectionFactory";
 import {buildQuery} from "../cypher";
 import * as _ from 'lodash';
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
-import {ActiveRelation} from "./ActiveRelation";
+import {Relationship} from "./Relationship";
 import {assertPersisted} from "./GraphEntity";
 
 
@@ -14,7 +14,7 @@ export abstract class AbstractNode<T = any> extends AbstractEntity<T> {
     @attribute() readonly id?:string;
 
     private _entityType:'Node';
-    private _relationsCache:{ [propertyName:string]:ActiveRelation<any, any> } = {};
+    private _relationsCache:{ [propertyName:string]:Relationship<any, any> } = {};
 
     get attributes():Partial<this> {
         let attributes = {};
@@ -54,7 +54,7 @@ export abstract class AbstractNode<T = any> extends AbstractEntity<T> {
                     await this.create(connection);
 
                 await Promise.all(this.relations.map(rel => {
-                    return <any>rel instanceof ActiveRelation ?
+                    return <any>rel instanceof Relationship ?
                         (rel as any).save(connection) :
                         Promise.resolve();
                 }));
@@ -82,7 +82,7 @@ export abstract class AbstractNode<T = any> extends AbstractEntity<T> {
         return result;
     }
 
-    private get relations():ActiveRelation<any, any>[] {
+    private get relations():Relationship<any, any>[] {
         let attributesMetadata = AttributesMetadata.getForInstance(this);
         return attributesMetadata.getRelationshipsNames().map(name => this[name]);
     }

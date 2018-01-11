@@ -1,13 +1,13 @@
 import {AbstractNode, AbstractRelation} from "../model";
 import {Type} from "../utils/types";
-import {ActiveRelation} from "../model/ActiveRelation";
+import {Relationship} from "../model/Relationship";
 import {invariant} from "../utils/core";
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
 import * as _ from 'lodash';
 
 export function relationshipThunk<R extends AbstractRelation, N extends AbstractNode>(relThunk: () => Type<R>,
                                                                                       nodeClassThunk:() => Type<N>,
-                                                                                      modifier: (rel:ActiveRelation<R,N>) => ActiveRelation<R,N> = _.identity):PropertyDecorator {
+                                                                                      modifier: (rel:Relationship<R,N>) => Relationship<R,N> = _.identity):PropertyDecorator {
     return (classPrototype:Object, propertyKey:string) => {
         invariant(AbstractNode.isPrototypeOf(classPrototype.constructor),
             `Class ${classPrototype.constructor.name} has to inherit from AbstractNode in order to use @relationship() decorator`);
@@ -24,7 +24,7 @@ export function relationshipThunk<R extends AbstractRelation, N extends Abstract
             let self = this;
 
             return (<any>this)._relationsCache[propertyKey]
-                || ((<any>this)._relationsCache[propertyKey] = modifier(new ActiveRelation(relThunk(), nodeClassThunk()).bindToNode(() => self)));
+                || ((<any>this)._relationsCache[propertyKey] = modifier(new Relationship(relThunk(), nodeClassThunk()).bindToNode(() => self)));
         };
 
         // don't use fat arrow function - because we lose this context
@@ -43,7 +43,7 @@ export function relationshipThunk<R extends AbstractRelation, N extends Abstract
 
 export function relationship<R extends AbstractRelation, N extends AbstractNode>(relClass:Type<R>,
                                                                                  nodeClass:Type<N>,
-                                                                                 modifier: (rel:ActiveRelation<R,N>) => ActiveRelation<R,N> = _.identity):PropertyDecorator {
+                                                                                 modifier: (rel:Relationship<R,N>) => Relationship<R,N> = _.identity):PropertyDecorator {
     return (classPrototype:Object, propertyKey:string) => {
         invariant(AbstractNode.isPrototypeOf(classPrototype.constructor),
             `Class ${classPrototype.constructor.name} has to inherit from AbstractNode in order to use @relationship() decorator`);
@@ -60,7 +60,7 @@ export function relationship<R extends AbstractRelation, N extends AbstractNode>
             let self = this;
 
             return (<any>this)._relationsCache[propertyKey]
-                || ((<any>this)._relationsCache[propertyKey] = modifier(new ActiveRelation(relClass, nodeClass).bindToNode(() => self)));
+                || ((<any>this)._relationsCache[propertyKey] = modifier(new Relationship(relClass, nodeClass).bindToNode(() => self)));
         };
 
         // don't use fat arrow function - because we lose this context

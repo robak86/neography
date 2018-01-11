@@ -4,10 +4,10 @@ import {Connection} from "../../lib";
 import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {expect} from 'chai';
 import {sleep} from "../../lib/utils/promise";
-import {ActiveRelation} from "../../lib/model/ActiveRelation";
+import {Relationship} from "../../lib/model/Relationship";
 import {relationship, relationshipThunk} from "../../lib/annotations/RelationshipAnnotations";
 
-describe.only(`ActiveRelations`, () => {
+describe(`Relationship`, () => {
     @relation('__IS_TAGGED')
     class IsTaggedRelation extends AbstractRelation<IsTaggedRelation> {
         @timestamp() createdAt:Date;
@@ -36,7 +36,7 @@ describe.only(`ActiveRelations`, () => {
         @attribute() tagName:string;
 
         @relationshipThunk(() => IsTaggedRelation, () => ItemNode, rel => rel.incoming())
-        items:ActiveRelation<IsTaggedRelation, TagNode>;
+        items:Relationship<IsTaggedRelation, TagNode>;
     }
 
     @node('__Item')
@@ -46,9 +46,9 @@ describe.only(`ActiveRelations`, () => {
         @attribute() itemName:string;
 
         @relationship(HasCategory, CategoryNode, rel => rel.outgoing())
-        categories:ActiveRelation<HasCategory, CategoryNode>;
+        categories:Relationship<HasCategory, CategoryNode>;
         @relationshipThunk(() => IsTaggedRelation, () => TagNode, rel => rel.outgoing())
-        tags:ActiveRelation<IsTaggedRelation, TagNode>;
+        tags:Relationship<IsTaggedRelation, TagNode>;
     }
 
 
@@ -224,7 +224,6 @@ describe.only(`ActiveRelations`, () => {
                 expect(item1Tags.map(t => t.id)).to.have.members([tags[0].id]);
                 expect(item2Tags.map(t => t.id)).to.have.members([tags[0].id]);
                 expect(tagItems.map(t => t.id)).to.have.members([item1.id, item2.id]);
-
 
 
                 // remove tag from item1

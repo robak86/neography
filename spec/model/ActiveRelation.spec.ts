@@ -1,4 +1,4 @@
-import {ActiveRelation} from "../../lib/model/ActiveRelation";
+import {Relationship} from "../../lib/model/Relationship";
 import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {Connection} from "../../lib";
 import {DummyUserNode} from "../fixtures/DummyUserNode";
@@ -9,7 +9,7 @@ import * as _ from 'lodash';
 import {ConnectedNode} from "../../lib/model/ConnectedNode";
 
 describe(`ActiveRelation`, () => {
-    let aRel:ActiveRelation<HasVehicleRelation, DummyCarNode>,
+    let aRel:Relationship<HasVehicleRelation, DummyCarNode>,
         connection:Connection,
         graph:{
             vw:DummyCarNode,
@@ -46,7 +46,7 @@ describe(`ActiveRelation`, () => {
             .returns('vw', 'porsche', 'owner', 'hasVolkswagen', 'hasPorsche')
         ).first();
 
-        aRel = new ActiveRelation(HasVehicleRelation, DummyCarNode).bindToNode(() => graph.owner);
+        aRel = new Relationship(HasVehicleRelation, DummyCarNode).bindToNode(() => graph.owner);
     });
 
     describe(`accessing active relation from relations definition`, () => {
@@ -127,7 +127,7 @@ describe(`ActiveRelation`, () => {
 
 
         describe(`.whereNode`, () => {
-            let filtered:ActiveRelation<HasVehicleRelation, DummyCarNode>;
+            let filtered:Relationship<HasVehicleRelation, DummyCarNode>;
 
             describe(`ex.1`, () => {
                 beforeEach(() => {
@@ -196,7 +196,7 @@ describe(`ActiveRelation`, () => {
         });
 
         describe(`.whereRelation`, () => {
-            let filtered:ActiveRelation<HasVehicleRelation, DummyCarNode>;
+            let filtered:Relationship<HasVehicleRelation, DummyCarNode>;
 
             beforeEach(() => {
                 filtered = aRel.whereRelation(w => w.attribute('isRented').equal(false))

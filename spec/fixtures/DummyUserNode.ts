@@ -1,6 +1,6 @@
 import {attribute, node, timestamp} from "../../lib/annotations";
 import {AbstractNode} from "../../lib/model";
-import {ActiveRelation} from "../../lib/model/ActiveRelation";
+import {Relationship} from "../../lib/model/Relationship";
 import {HasVehicleRelation} from "./HasVehicleRelation";
 import {DummyCarNode} from "./DummyCarNode";
 import {relationship} from "../../lib/annotations/RelationshipAnnotations";
@@ -18,7 +18,7 @@ export class DummyUserNode extends AbstractNode<DummyUserNode> {
     @attribute() experience:number;
 
     @relationship(HasVehicleRelation,DummyCarNode)
-    vehicles:ActiveRelation<HasVehicleRelation,DummyCarNode>;
+    vehicles:Relationship<HasVehicleRelation,DummyCarNode>;
 }
 
 
@@ -26,7 +26,7 @@ export class DummyUserNode extends AbstractNode<DummyUserNode> {
 
 //
 // export class DummyUserRelations2 {
-//     readonly vehicles = new ActiveRelation(HasVehicleRelation, DummyCarNode);
+//     readonly vehicles = new Relationship(HasVehicleRelation, DummyCarNode);
 // }
 //
 // let relations;
@@ -44,6 +44,6 @@ export class DummyUserNode extends AbstractNode<DummyUserNode> {
 //
 //     //but this won't give us
 //     relations = relations({
-//         vehicles: new ActiveRelation(HasVehicleRelation, DummyCarNode)
+//         vehicles: new Relationship(HasVehicleRelation, DummyCarNode)
 //     })
 // }

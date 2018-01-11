@@ -19,7 +19,7 @@ import {MatchBuilder} from "../cypher/builders/MatchBuilder";
 import {NodeNotFoundError} from "../errors/NodeNotFoundError";
 import {RelationshipDirection} from "../cypher/enum/RelationshipDirection";
 
-export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<any>> {
+export class Relationship<R extends AbstractRelation, N extends AbstractNode<any>> {
     private ownerGetter:() => AbstractNode<any>;
     private whereStatement:WhereStatement;
     private orderStatement:OrderStatement;
@@ -86,7 +86,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         return connection.runQuery(baseQuery).toArray();
     }
 
-    whereRelation(paramsOrCallback:Partial<R> | WhereBuilderCallback<R>):ActiveRelation<R, N> {
+    whereRelation(paramsOrCallback:Partial<R> | WhereBuilderCallback<R>):Relationship<R, N> {
         if (_.isFunction(paramsOrCallback)) {
             let result:WhereStatementPart[] | WhereStatementPart = paramsOrCallback(new WhereBuilder<N>().aliased('relation'));
             let whereStatement = this.whereStatement ?
@@ -99,7 +99,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         }
     }
 
-    whereNode(paramsOrCallback:Partial<N> | WhereBuilderCallback<N>):ActiveRelation<R, N> {
+    whereNode(paramsOrCallback:Partial<N> | WhereBuilderCallback<N>):Relationship<R, N> {
         if (_.isFunction(paramsOrCallback)) {
             let result:WhereStatementPart[] | WhereStatementPart = paramsOrCallback(new WhereBuilder<N>().aliased('node'));
             let whereStatement = this.whereStatement ?
@@ -112,7 +112,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         }
     }
 
-    orderByNode(callback:OrderBuilderCallback<N>):ActiveRelation<R, N> {
+    orderByNode(callback:OrderBuilderCallback<N>):Relationship<R, N> {
         let builder = new OrderBuilder<N>().aliased('node');
         let result:OrderStatementPart[] | OrderStatementPart = callback(builder);
         let orderStatement = this.orderStatement ?
@@ -122,7 +122,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         return cloned(this, (t) => t.orderStatement = orderStatement);
     }
 
-    orderByRelation(callback:OrderBuilderCallback<R>):ActiveRelation<R, N> {
+    orderByRelation(callback:OrderBuilderCallback<R>):Relationship<R, N> {
         let builder = new OrderBuilder<N>().aliased('relation');
         let result:OrderStatementPart[] | OrderStatementPart = callback(builder);
         let orderStatement = this.orderStatement ?
@@ -132,19 +132,19 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         return cloned(this, (t) => t.orderStatement = orderStatement);
     }
 
-    incoming():ActiveRelation<R, N> {
+    incoming():Relationship<R, N> {
         return cloned(this, a => a.direction = RelationshipDirection.Incoming);
     }
 
-    outgoing():ActiveRelation<R, N> {
+    outgoing():Relationship<R, N> {
         return cloned(this, a => a.direction = RelationshipDirection.Outgoing);
     }
 
-    limit(count:number):ActiveRelation<R, N> {
+    limit(count:number):Relationship<R, N> {
         return cloned(this, a => a.limitCount = count);
     }
 
-    skip(count:number):ActiveRelation<R, N> {
+    skip(count:number):Relationship<R, N> {
         return cloned(this, a => a.skipCount = count);
     }
 
@@ -190,7 +190,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         return baseQuery;
     }
 
-    bindToNode<P extends AbstractNode<any>>(getter:() => P):ActiveRelation<R, N> {
+    bindToNode<P extends AbstractNode<any>>(getter:() => P):Relationship<R, N> {
         return cloned(this, (a) => a.ownerGetter = getter);
     }
 

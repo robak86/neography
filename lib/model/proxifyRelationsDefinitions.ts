@@ -1,5 +1,5 @@
 import {AbstractNode} from "./AbstractNode";
-import {ActiveRelation} from "./ActiveRelation";
+import {Relationship} from "./Relationship";
 
 
 export function proxifyRelationsDefinitions<T extends object>(target:T, owner:AbstractNode):T {
@@ -7,7 +7,7 @@ export function proxifyRelationsDefinitions<T extends object>(target:T, owner:Ab
 
     return new Proxy(target, {
         get(target:T, p:PropertyKey, receiver:any) {
-            if (target[p] instanceof ActiveRelation) {
+            if (target[p] instanceof Relationship) {
                 return cache[p] ?
                     cache[p] :
                     cache[p] = target[p].bindToNode(() => owner);

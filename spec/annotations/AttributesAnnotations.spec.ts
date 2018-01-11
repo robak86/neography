@@ -5,7 +5,7 @@ import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import {DummyCarNode} from "../fixtures/DummyCarNode";
 import {relationship} from "../../lib/annotations/RelationshipAnnotations";
 import {AbstractNode} from "../../lib/model";
-import {ActiveRelation} from "../../lib/model/ActiveRelation";
+import {Relationship} from "../../lib/model/Relationship";
 
 describe("Attributes annotations", () => {
 
@@ -53,7 +53,7 @@ describe("Attributes annotations", () => {
         });
 
         it(`decorates getter and returns instance of ActiveRelation`, async () => {
-            expect(s1.someRel).to.be.instanceOf(ActiveRelation);
+            expect(s1.someRel).to.be.instanceOf(Relationship);
         });
 
         it(`caches relation`, async () => {

@@ -1,5 +1,5 @@
 import {proxifyRelationsDefinitions} from "../../lib/model/proxifyRelationsDefinitions";
-import {ActiveRelation} from "../../lib/model/ActiveRelation";
+import {Relationship} from "../../lib/model/Relationship";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {expect} from 'chai';
@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 
 describe(`proxifyRelationsDefinitions`, () => {
     class Relations {
-        readonly others = new ActiveRelation(DummyGraphRelation, DummyGraphNode);
+        readonly others = new Relationship(DummyGraphRelation, DummyGraphNode);
     }
 
     let relations:Relations,
@@ -20,7 +20,7 @@ describe(`proxifyRelationsDefinitions`, () => {
         relations = proxifyRelationsDefinitions(new Relations(), owner);
     });
 
-    it('intercepts all getters and returns cloned ActiveRelation with bound owner', () => {
+    it('intercepts all getters and returns cloned Relationship with bound owner', () => {
         let boundNode:AbstractNode<any> = relations.others.boundNode;
         expect(boundNode).to.eq(owner);
     });
@@ -32,7 +32,7 @@ describe(`proxifyRelationsDefinitions`, () => {
     it('returns cached relations for iteration', () => {
         (relations.others as any).someData = 123;
 
-        let iterated:ActiveRelation<DummyGraphRelation, DummyGraphNode>[] = [];
+        let iterated:Relationship<DummyGraphRelation, DummyGraphNode>[] = [];
         _.forOwn(relations, (rel) => {
             iterated.push(rel);
         });
