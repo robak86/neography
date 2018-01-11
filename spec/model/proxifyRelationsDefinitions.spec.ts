@@ -3,7 +3,7 @@ import {Relationship} from "../../lib/model/Relationship";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {expect} from 'chai';
-import {AbstractNode} from "../../lib/model";
+import {NodeEntity} from "../../lib/model";
 import * as _ from 'lodash';
 
 describe(`proxifyRelationsDefinitions`, () => {
@@ -21,7 +21,7 @@ describe(`proxifyRelationsDefinitions`, () => {
     });
 
     it('intercepts all getters and returns cloned Relationship with bound owner', () => {
-        let boundNode:AbstractNode<any> = relations.others.boundNode;
+        let boundNode:NodeEntity<any> = relations.others.boundNode;
         expect(boundNode).to.eq(owner);
     });
 

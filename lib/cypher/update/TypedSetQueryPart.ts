@@ -1,4 +1,4 @@
-import {AbstractNode, RelationshipEntity} from "../../model";
+import {NodeEntity, RelationshipEntity} from "../../model";
 import {IQueryPart} from "../abstract/IQueryPart";
 import {QueryContext} from "../common/QueryContext";
 import {IBoundQueryPart} from "../abstract/IBoundQueryPart";
@@ -12,7 +12,7 @@ const SET_OPERATORS = {
 };
 
 
-export class TypedSetQueryPart<T extends AbstractNode | RelationshipEntity> implements IQueryPart {
+export class TypedSetQueryPart<T extends NodeEntity | RelationshipEntity> implements IQueryPart {
 
     constructor(private klass:Type<T>,
                 private _params:Partial<T>,
@@ -26,7 +26,7 @@ export class TypedSetQueryPart<T extends AbstractNode | RelationshipEntity> impl
 
 
         let mapper;
-        if (context.hasMapperForNodeClass(this.klass as Type<AbstractNode>)) {
+        if (context.hasMapperForNodeClass(this.klass as Type<NodeEntity>)) {
             mapper = context.getMapperForNodeClass(this.klass as any);
         }
 

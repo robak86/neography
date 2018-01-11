@@ -1,6 +1,6 @@
 import {AttributesMapper} from "../../mappers/AttributesMapper";
 import {Type} from "../../utils/types";
-import {AbstractNode, RelationshipEntity} from "../../model";
+import {NodeEntity, RelationshipEntity} from "../../model";
 import {isPresent, someOrThrow} from "../../utils/core";
 import {AttributesMapperFactory} from "../../mappers/AttributesMapperFactory";
 
@@ -38,7 +38,7 @@ export class QueryContext {
         return `r${this._relationsCounter += 1}`;
     }
 
-    hasMapperForNodeClass<T extends AbstractNode>(nodeClass:Type<T>):boolean {
+    hasMapperForNodeClass<T extends NodeEntity>(nodeClass:Type<T>):boolean {
         let mapper = this.attributesMapperFactory.getNodeMapperForClass(nodeClass);
         return isPresent(mapper);
     }
@@ -48,7 +48,7 @@ export class QueryContext {
         return isPresent(mapper);
     }
 
-    getMapperForNodeClass<T extends AbstractNode>(nodeClass:Type<T>):AttributesMapper<T> {
+    getMapperForNodeClass<T extends NodeEntity>(nodeClass:Type<T>):AttributesMapper<T> {
         return someOrThrow(this.attributesMapperFactory.getNodeMapperForClass(nodeClass), `Cannot find node mapper for ${nodeClass}`);
     }
 

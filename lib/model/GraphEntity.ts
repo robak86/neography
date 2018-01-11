@@ -1,9 +1,9 @@
-import {AbstractNode} from "./AbstractNode";
+import {NodeEntity} from "./NodeEntity";
 import {RelationshipEntity} from "./RelationshipEntity";
 import {invariant, isPresent} from "../utils/core";
 
-export type GraphElement = AbstractNode | RelationshipEntity;
-export type GraphEntity = AbstractNode ;
+export type GraphElement = NodeEntity | RelationshipEntity;
+export type GraphEntity = NodeEntity ;
 
 export function assertPersisted(entity:GraphEntity) {
     invariant(entity.isPersisted(), `Expected entity to be persisted: ${entity}`);

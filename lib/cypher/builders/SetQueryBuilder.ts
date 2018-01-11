@@ -1,5 +1,5 @@
 import {TypedSetQueryPart} from "../update/TypedSetQueryPart";
-import {AbstractNode, RelationshipEntity} from "../../model";
+import {NodeEntity, RelationshipEntity} from "../../model";
 import {UntypedSetQueryPart} from "../update/UntypedSetQueryPart";
 import {LiteralSetQueryPart} from "../update/LiteralSetQueryPart";
 import {Type} from "../../utils/types";
@@ -23,7 +23,7 @@ export class AliasedSetQueryBuilder {
     constructor(private alias:string, private mode) {
     }
 
-    typed<T extends AbstractNode | RelationshipEntity >(klass:Type<T>, params:Partial<T>):TypedSetQueryPart<T> {
+    typed<T extends NodeEntity | RelationshipEntity >(klass:Type<T>, params:Partial<T>):TypedSetQueryPart<T> {
         return new TypedSetQueryPart(klass, params, this.alias, this.mode);
     }
 

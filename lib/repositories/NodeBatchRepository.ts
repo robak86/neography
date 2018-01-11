@@ -1,11 +1,11 @@
-import {AbstractNode, assertAllNew, assertAllPersisted} from "../model";
+import {NodeEntity, assertAllNew, assertAllPersisted} from "../model";
 import {Connection} from "../connection/Connection";
 import {Type} from "../utils/types";
 import {MatchBuilder} from "../cypher/builders/MatchBuilder";
 import {SetQueryBuilder} from "../cypher/builders/SetQueryBuilder";
 import {buildQuery} from "../cypher";
 
-export class NodeBatchRepository<T extends AbstractNode> {
+export class NodeBatchRepository<T extends NodeEntity> {
     constructor(private klass:Type<T>,
                 private connection:Connection) {
     }

@@ -1,5 +1,5 @@
 import {attribute, node, relation, timestamp} from "../../lib/annotations";
-import {AbstractNode, RelationshipEntity} from "../../lib/model";
+import {NodeEntity, RelationshipEntity} from "../../lib/model";
 import {Connection} from "../../lib";
 import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {expect} from 'chai';
@@ -22,7 +22,7 @@ describe(`Relationship`, () => {
     }
 
     @node('__Category')
-    class CategoryNode extends AbstractNode<CategoryNode> {
+    class CategoryNode extends NodeEntity<CategoryNode> {
         @timestamp() createdAt:Date;
         @timestamp() updatedAt:Date;
         @attribute() categoryName:string;
@@ -30,7 +30,7 @@ describe(`Relationship`, () => {
     }
 
     @node('__Tag')
-    class TagNode extends AbstractNode<TagNode> {
+    class TagNode extends NodeEntity<TagNode> {
         @timestamp() createdAt:Date;
         @timestamp() updatedAt:Date;
         @attribute() tagName:string;
@@ -40,7 +40,7 @@ describe(`Relationship`, () => {
     }
 
     @node('__Item')
-    class ItemNode extends AbstractNode<ItemNode> {
+    class ItemNode extends NodeEntity<ItemNode> {
         @timestamp() createdAt:Date;
         @timestamp() updatedAt:Date;
         @attribute() itemName:string;

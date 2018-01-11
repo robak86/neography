@@ -4,7 +4,7 @@ import {GraphResponse} from "../response/GraphResponse";
 import {BoundCypherQuery} from "../cypher/CypherQuery";
 import {QueryBuilder} from "../cypher/builders/QueryBuilder";
 import {TransactionRunner} from "./TransactionRunner";
-import {AbstractNode} from "../model";
+import {NodeEntity} from "../model";
 import {Type} from "../utils/types";
 import {NodeBatchRepository} from "../repositories/NodeBatchRepository";
 import {GraphResponseFactory} from "../response/GraphResponseFactory";
@@ -33,11 +33,11 @@ export class Connection {
         return this.transactionRunner.withTransaction(fn)
     }
 
-    nodeBatchRepository<T extends AbstractNode>(nodeClass:Type<T>):NodeBatchRepository<T> {
+    nodeBatchRepository<T extends NodeEntity>(nodeClass:Type<T>):NodeBatchRepository<T> {
         return new NodeBatchRepository(nodeClass, this);
     }
 
-    nodeQuery<N extends AbstractNode>(nodeClass:Type<N>):ActiveNodeQuery<N> {
+    nodeQuery<N extends NodeEntity>(nodeClass:Type<N>):ActiveNodeQuery<N> {
         return new ActiveNodeQuery(nodeClass);
     }
 

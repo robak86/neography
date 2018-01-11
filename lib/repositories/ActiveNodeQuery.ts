@@ -1,4 +1,4 @@
-import {AbstractNode, assertIdExists} from "../model";
+import {NodeEntity, assertIdExists} from "../model";
 import {Type} from "../utils/types";
 import {OrderBuilderCallback, QueryBuilder, WhereBuilderCallback} from "../cypher/builders/QueryBuilder";
 import {buildQuery, Connection} from "../index";
@@ -13,7 +13,7 @@ import {OrderBuilder} from "../cypher/builders/OrderBuilder";
 import {OrderStatementPart} from "../cypher/order/OrderStatementPart";
 import {NodeNotFoundError} from "../errors/NodeNotFoundError";
 
-export class ActiveNodeQuery<N extends AbstractNode<any>> {
+export class ActiveNodeQuery<N extends NodeEntity<any>> {
     private whereStatement:WhereStatement | undefined;
     private orderStatement:OrderStatement | undefined;
     private skipCount:number | undefined;
@@ -52,7 +52,7 @@ export class ActiveNodeQuery<N extends AbstractNode<any>> {
         let connection = _connection || connectionsFactory.checkoutConnection();
 
         let query = buildQuery()
-            .match(m => m.node(this.nodeClass as Type<AbstractNode>).as('n'))
+            .match(m => m.node(this.nodeClass as Type<NodeEntity>).as('n'))
             .where(w => w.literal('n.id in {ids}').params({ids}))
             .returns('n');
 

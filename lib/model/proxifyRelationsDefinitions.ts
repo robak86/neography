@@ -1,8 +1,8 @@
-import {AbstractNode} from "./AbstractNode";
+import {NodeEntity} from "./NodeEntity";
 import {Relationship} from "./Relationship";
 
 
-export function proxifyRelationsDefinitions<T extends object>(target:T, owner:AbstractNode):T {
+export function proxifyRelationsDefinitions<T extends object>(target:T, owner:NodeEntity):T {
     let cache:{} = {};
 
     return new Proxy(target, {

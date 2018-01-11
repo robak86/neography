@@ -1,10 +1,10 @@
 import {ConnectedNode, isConnectedNode} from "./ConnectedNode";
-import {AbstractNode} from "./index";
+import {NodeEntity} from "./index";
 import {Type} from "../utils/types";
 import {RelationshipEntity} from "./RelationshipEntity";
 import {assertAllPersisted} from "./GraphEntity";
 
-export class ConnectedNodesCollection<R extends RelationshipEntity, TO extends AbstractNode> {
+export class ConnectedNodesCollection<R extends RelationshipEntity, TO extends NodeEntity> {
     private connectedNodes:ConnectedNode<R, TO>[] = [];
 
     constructor(private relationClass:Type<R>) {

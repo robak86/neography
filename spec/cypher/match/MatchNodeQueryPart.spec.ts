@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import {attribute, node} from "../../../lib/annotations";
-import {AbstractNode} from "../../../lib/model";
+import {NodeEntity} from "../../../lib/model";
 import {MatchNodeQueryPart} from "../../../lib/cypher/match/MatchNodeQueryPart";
 import {QueryContext} from "../../../lib/cypher/common/QueryContext";
 import {getDefaultContext} from "../../helpers/ConnectionHelpers";
@@ -8,7 +8,7 @@ import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 
 describe("MatchNodeQueryPart", () => {
     @node('SpecNode1')
-    class SomeDummyNodeParent extends AbstractNode {
+    class SomeDummyNodeParent extends NodeEntity {
     }
 
 

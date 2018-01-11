@@ -10,7 +10,7 @@ import {Relationship} from "./Relationship";
 import {assertPersisted} from "./GraphEntity";
 
 
-export abstract class AbstractNode<T = any> extends AbstractEntity<T> {
+export abstract class NodeEntity<T = any> extends AbstractEntity<T> {
     @attribute() readonly id?:string;
 
     private _entityType:'Node';

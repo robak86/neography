@@ -2,7 +2,7 @@ import {AttributesMapper} from "./AttributesMapper";
 import {Type} from "../utils/types";
 import {NodesTypesRegistryEntry} from "../annotations/NodeTypesRegistry";
 import {isPresent} from "../utils/core";
-import {AbstractNode, GraphEntity} from "../model";
+import {NodeEntity, GraphEntity} from "../model";
 import {NodeMetadata} from "../metadata/NodeMetadata";
 import {RelationsTypesRegistryEntry} from "../annotations/RelationsTypesRegistry";
 import {RelationMetadata} from "../metadata/RelationMetadata";
@@ -55,7 +55,7 @@ export class AttributesMapperFactory {
         return this.getMapper<T>(entry.klass as any)
     }
 
-    getNodeMapperForClass<K extends AbstractNode>(klass:Type<K>):AttributesMapper<K> | null {
+    getNodeMapperForClass<K extends NodeEntity>(klass:Type<K>):AttributesMapper<K> | null {
         let nodeMetadata = NodeMetadata.getForClass(klass);
 
         return isPresent(nodeMetadata) ?

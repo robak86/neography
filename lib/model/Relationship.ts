@@ -1,5 +1,5 @@
 import {RelationshipEntity} from "./RelationshipEntity";
-import {AbstractNode} from "./AbstractNode";
+import {NodeEntity} from "./NodeEntity";
 import {Type} from "../utils/types";
 import {ConnectedNode} from "./ConnectedNode";
 import {OrderBuilderCallback, QueryBuilder, WhereBuilderCallback} from "../cypher/builders/QueryBuilder";
@@ -19,8 +19,8 @@ import {MatchBuilder} from "../cypher/builders/MatchBuilder";
 import {NodeNotFoundError} from "../errors/NodeNotFoundError";
 import {RelationshipDirection} from "../cypher/enum/RelationshipDirection";
 
-export class Relationship<R extends RelationshipEntity, N extends AbstractNode<any>> {
-    private ownerGetter:() => AbstractNode<any>;
+export class Relationship<R extends RelationshipEntity, N extends NodeEntity<any>> {
+    private ownerGetter:() => NodeEntity<any>;
     private whereStatement:WhereStatement;
     private orderStatement:OrderStatement;
     private skipCount:number | undefined;
@@ -30,7 +30,7 @@ export class Relationship<R extends RelationshipEntity, N extends AbstractNode<a
 
     constructor(private relClass:Type<R>, private nodeClass:Type<N>) {}
 
-    get boundNode():AbstractNode<any> {
+    get boundNode():NodeEntity<any> {
         return this.ownerGetter();
     }
 
@@ -190,7 +190,7 @@ export class Relationship<R extends RelationshipEntity, N extends AbstractNode<a
         return baseQuery;
     }
 
-    bindToNode<P extends AbstractNode<any>>(getter:() => P):Relationship<R, N> {
+    bindToNode<P extends NodeEntity<any>>(getter:() => P):Relationship<R, N> {
         return cloned(this, (a) => a.ownerGetter = getter);
     }
 
@@ -203,7 +203,7 @@ export class Relationship<R extends RelationshipEntity, N extends AbstractNode<a
         }
     }
 
-    private async updateConnectedNodes<TO extends AbstractNode>(connection:Connection, removeConnectedNodes:boolean = false) {
+    private async updateConnectedNodes<TO extends NodeEntity>(connection:Connection, removeConnectedNodes:boolean = false) {
         let existingConnections = await this.allWithRelations(connection);
 
         if (this.newRelations!.containsNode(this.boundNode as N)) {
@@ -225,7 +225,7 @@ export class Relationship<R extends RelationshipEntity, N extends AbstractNode<a
         return [...unchangedConnections, ...connectionsForAttach];
     }
 
-    private async detachNodes<N extends AbstractNode>(nodes:N[], removeConnectedNodes:boolean = false, connection:Connection):Promise<any> {
+    private async detachNodes<N extends NodeEntity>(nodes:N[], removeConnectedNodes:boolean = false, connection:Connection):Promise<any> {
         if (nodes.length === 0) {
             return;
         }
@@ -244,7 +244,7 @@ export class Relationship<R extends RelationshipEntity, N extends AbstractNode<a
         return connection.runQuery(query).toArray();
     }
 
-    private async connectToMany<TO extends AbstractNode>(to:ConnectedNode<R, TO>[], connection:Connection):Promise<ConnectedNode<R, TO>[]> {
+    private async connectToMany<TO extends NodeEntity>(to:ConnectedNode<R, TO>[], connection:Connection):Promise<ConnectedNode<R, TO>[]> {
         let collection = new ConnectedNodesCollection(this.relClass);
         collection.setConnectedNodes(to);
         collection.assertAllNodesPersisted();

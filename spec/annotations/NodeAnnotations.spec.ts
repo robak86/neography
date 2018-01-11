@@ -1,11 +1,11 @@
 import {node} from "../../lib/annotations";
 import {expect} from 'chai';
 import {NodeMetadata} from "../../lib/metadata/NodeMetadata";
-import {AbstractNode} from "../../lib/model";
+import {NodeEntity} from "../../lib/model";
 
 describe("NodeAnnotations", () => {
     @node('DummyVehicle')
-    class DummyVehicle extends AbstractNode {
+    class DummyVehicle extends NodeEntity {
     }
 
     @node('DummyCar')

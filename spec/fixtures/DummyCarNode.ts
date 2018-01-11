@@ -1,12 +1,12 @@
 import {attribute, node, timestamp} from "../../lib/annotations";
-import {AbstractNode} from "../../lib/model";
+import {NodeEntity} from "../../lib/model";
 
 
 
 
 
 @node('DummyCar')
-export class DummyCarNode extends AbstractNode<DummyCarNode> {
+export class DummyCarNode extends NodeEntity<DummyCarNode> {
     @timestamp() createdAt?:Date;
     @timestamp() updatedAt?:Date;
 

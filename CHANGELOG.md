@@ -1,6 +1,6 @@
 ## 0.0.3
 - Add ```PersistedAggregate``` type 
-- Fix bug occurring when user was declaring his own abstract classes inheriting from ```AbstractNode``` or ```RelationshipEntity```
+- Fix bug occurring when user was declaring his own abstract classes inheriting from ```NodeEntity``` or ```RelationshipEntity```
 - Add ```NodeRelationsRepository``` accessible by ```getNodeRelationsRepository```
 
  ## 0.0.4 
@@ -10,7 +10,7 @@
  - remove ```Persisted``` type. Repositories accept now nodes with optional ```id``` property
   and throw error if ```id``` is missing while it was expected
  - remove ```createFactoryMethod``` used for generating static ```build``` methods. This functionality was moved to
-  constructor of ```RelationshipEntity``` and ```AbstractNode```.
+  constructor of ```RelationshipEntity``` and ```NodeEntity```.
  - rename ```pickOne``` method of GraphResponse to more intuitive ```pluck```
  - allow user to pass logger instance in configuration 
  - add saveMany, updateMany for NodeBatchRepository

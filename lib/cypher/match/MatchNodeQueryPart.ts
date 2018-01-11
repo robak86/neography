@@ -1,5 +1,5 @@
 import {Type} from "../../utils/types";
-import {AbstractNode} from "../../model";
+import {NodeEntity} from "../../model";
 import {NodeMetadata} from "../../metadata/NodeMetadata";
 import {QueryContext} from "../common/QueryContext";
 import {generateMatchAssignments} from "../utils/QueryHelpers";
@@ -9,7 +9,7 @@ import {IQueryPart} from "../abstract/IQueryPart";
 import {cloned} from "../../utils/core";
 
 
-export class MatchNodeQueryPart<N extends AbstractNode> implements INodeMatchQueryPart<N>, IQueryPart {
+export class MatchNodeQueryPart<N extends NodeEntity> implements INodeMatchQueryPart<N>, IQueryPart {
     protected _alias:string;
     protected _params:any;
 

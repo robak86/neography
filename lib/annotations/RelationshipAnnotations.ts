@@ -1,15 +1,15 @@
-import {AbstractNode, RelationshipEntity} from "../model";
+import {NodeEntity, RelationshipEntity} from "../model";
 import {Type} from "../utils/types";
 import {Relationship} from "../model/Relationship";
 import {invariant} from "../utils/core";
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
 import * as _ from 'lodash';
 
-export function relationshipThunk<R extends RelationshipEntity, N extends AbstractNode>(relThunk: () => Type<R>,
-                                                                                        nodeClassThunk:() => Type<N>,
-                                                                                        modifier: (rel:Relationship<R,N>) => Relationship<R,N> = _.identity):PropertyDecorator {
+export function relationshipThunk<R extends RelationshipEntity, N extends NodeEntity>(relThunk: () => Type<R>,
+                                                                                      nodeClassThunk:() => Type<N>,
+                                                                                      modifier: (rel:Relationship<R,N>) => Relationship<R,N> = _.identity):PropertyDecorator {
     return (classPrototype:Object, propertyKey:string) => {
-        invariant(AbstractNode.isPrototypeOf(classPrototype.constructor),
+        invariant(NodeEntity.isPrototypeOf(classPrototype.constructor),
             `Class ${classPrototype.constructor.name} has to inherit from AbstractNode in order to use @relationship() decorator`);
 
         invariant(nodeClassThunk() !== classPrototype.constructor,
@@ -20,7 +20,7 @@ export function relationshipThunk<R extends RelationshipEntity, N extends Abstra
         attributesMetadata.addRelationship(propertyKey);
 
         // don't use fat arrow function- because we lose this context
-        let getter = function (this:AbstractNode) {
+        let getter = function (this:NodeEntity) {
             let self = this;
 
             return (<any>this)._relationsCache[propertyKey]
@@ -41,11 +41,11 @@ export function relationshipThunk<R extends RelationshipEntity, N extends Abstra
 
 
 
-export function relationship<R extends RelationshipEntity, N extends AbstractNode>(relClass:Type<R>,
-                                                                                   nodeClass:Type<N>,
-                                                                                   modifier: (rel:Relationship<R,N>) => Relationship<R,N> = _.identity):PropertyDecorator {
+export function relationship<R extends RelationshipEntity, N extends NodeEntity>(relClass:Type<R>,
+                                                                                 nodeClass:Type<N>,
+                                                                                 modifier: (rel:Relationship<R,N>) => Relationship<R,N> = _.identity):PropertyDecorator {
     return (classPrototype:Object, propertyKey:string) => {
-        invariant(AbstractNode.isPrototypeOf(classPrototype.constructor),
+        invariant(NodeEntity.isPrototypeOf(classPrototype.constructor),
             `Class ${classPrototype.constructor.name} has to inherit from AbstractNode in order to use @relationship() decorator`);
 
         invariant(nodeClass !== classPrototype.constructor,
@@ -56,7 +56,7 @@ export function relationship<R extends RelationshipEntity, N extends AbstractNod
         attributesMetadata.addRelationship(propertyKey);
 
         // don't use fat arrow function- because we lose this context
-        let getter = function (this:AbstractNode) {
+        let getter = function (this:NodeEntity) {
             let self = this;
 
             return (<any>this)._relationsCache[propertyKey]

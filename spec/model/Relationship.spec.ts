@@ -8,7 +8,7 @@ import {expect} from 'chai';
 import * as _ from 'lodash';
 import {ConnectedNode} from "../../lib/model/ConnectedNode";
 
-describe(`ActiveRelation`, () => {
+describe(`Relationship`, () => {
     let aRel:Relationship<HasVehicleRelation, DummyCarNode>,
         connection:Connection,
         graph:{

@@ -4,7 +4,7 @@ import {expect} from 'chai';
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import {DummyCarNode} from "../fixtures/DummyCarNode";
 import {relationship} from "../../lib/annotations/RelationshipAnnotations";
-import {AbstractNode} from "../../lib/model";
+import {NodeEntity} from "../../lib/model";
 import {Relationship} from "../../lib/model/Relationship";
 
 describe("Attributes annotations", () => {
@@ -42,7 +42,7 @@ describe("Attributes annotations", () => {
 
 
     describe(`@relationship`, () => {
-        class SomeClass extends AbstractNode{
+        class SomeClass extends NodeEntity{
             @relationship(DummyGraphRelation, DummyCarNode)
             someRel:any;
         }

@@ -2,11 +2,11 @@ import {IQueryPart} from "../abstract/IQueryPart";
 import {IBoundQueryPart} from "../abstract/IBoundQueryPart";
 import {QueryContext} from "../common/QueryContext";
 import {NodeMetadata} from "../../metadata/NodeMetadata";
-import {AbstractNode} from "../../model";
+import {NodeEntity} from "../../model";
 import {cloned} from "../../utils/core";
 
 
-export class CreateNodeQueryPart<N extends AbstractNode> implements IQueryPart {
+export class CreateNodeQueryPart<N extends NodeEntity> implements IQueryPart {
     protected _alias:string;
 
     constructor(private nodeInstance:N) {}
