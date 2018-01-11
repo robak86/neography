@@ -6,7 +6,7 @@ import {QueryBuilder} from "../cypher/builders/QueryBuilder";
 import {TransactionRunner} from "./TransactionRunner";
 import {AbstractNode} from "../model";
 import {Type} from "../utils/types";
-import {NodeRepository} from "../repositories/NodeRepository";
+import {NodeBatchRepository} from "../repositories/NodeBatchRepository";
 import {GraphResponseFactory} from "../response/GraphResponseFactory";
 import {QueryRunner} from "./QueryRunner";
 
@@ -33,12 +33,11 @@ export class Connection {
         return this.transactionRunner.withTransaction(fn)
     }
 
-    nodeType<T extends AbstractNode>(nodeClass:Type<T>):NodeRepository<T> {
-        return new NodeRepository(nodeClass, this);
+    nodeBatchRepository<T extends AbstractNode>(nodeClass:Type<T>):NodeBatchRepository<T> {
+        return new NodeBatchRepository(nodeClass, this);
     }
 
-
-    getRepository<N extends AbstractNode>(nodeClass:Type<N>):ActiveNodeQuery<N> {
+    nodeQuery<N extends AbstractNode>(nodeClass:Type<N>):ActiveNodeQuery<N> {
         return new ActiveNodeQuery(nodeClass);
     }
 

@@ -62,7 +62,7 @@ describe(`ActiveRelations`, () => {
             it('creates new node', async () => {
                 let category = new CategoryNode({categoryName: 'FirstCategory', price: 100});
                 await category.save();
-                expect(await connection.getRepository(CategoryNode).count()).to.eq(1);
+                expect(await connection.nodeQuery(CategoryNode).count()).to.eq(1);
             });
 
             it(`doesn't set id if error was thrown for new entity`, async () => {
@@ -87,7 +87,7 @@ describe(`ActiveRelations`, () => {
                 category.price = 50;
                 await category.save();
 
-                expect(await connection.getRepository(CategoryNode).count()).to.eq(1);
+                expect(await connection.nodeQuery(CategoryNode).count()).to.eq(1);
             });
 
             it(`updates attributes`, async () => {
@@ -97,7 +97,7 @@ describe(`ActiveRelations`, () => {
                 category.price = 50;
                 await category.save();
 
-                let updated = await connection.getRepository(CategoryNode).first();
+                let updated = await connection.nodeQuery(CategoryNode).first();
                 expect(updated!.attributes).to.deep.eq(category.attributes);
             });
 
@@ -145,9 +145,9 @@ describe(`ActiveRelations`, () => {
 
                 await item.save();
 
-                expect(await connection.getRepository(CategoryNode).count()).to.eq(2);
-                expect(await connection.getRepository(TagNode).count()).to.eq(2);
-                expect(await connection.getRepository(ItemNode).count()).to.eq(1);
+                expect(await connection.nodeQuery(CategoryNode).count()).to.eq(2);
+                expect(await connection.nodeQuery(TagNode).count()).to.eq(2);
+                expect(await connection.nodeQuery(ItemNode).count()).to.eq(1);
                 expect(await item.relations.categories.all()).to.have.deep.members(categories);
                 expect(await item.relations.tags.all()).to.have.deep.members(tags);
             });
@@ -188,9 +188,9 @@ describe(`ActiveRelations`, () => {
                 item.relations.categories.set([]);
                 await item.save();
 
-                expect(await connection.getRepository(CategoryNode).count()).to.eq(2);
-                expect(await connection.getRepository(TagNode).count()).to.eq(2);
-                expect(await connection.getRepository(ItemNode).count()).to.eq(1);
+                expect(await connection.nodeQuery(CategoryNode).count()).to.eq(2);
+                expect(await connection.nodeQuery(TagNode).count()).to.eq(2);
+                expect(await connection.nodeQuery(ItemNode).count()).to.eq(1);
                 expect(await item.relations.categories.all()).to.eql([]);
                 expect(await item.relations.tags.all()).to.have.deep.members(tags);
             });
@@ -206,9 +206,9 @@ describe(`ActiveRelations`, () => {
                 item.relations.tags.set([]);
                 await item.save();
 
-                expect(await connection.getRepository(CategoryNode).count()).to.eq(2);
-                expect(await connection.getRepository(TagNode).count()).to.eq(2);
-                expect(await connection.getRepository(ItemNode).count()).to.eq(1);
+                expect(await connection.nodeQuery(CategoryNode).count()).to.eq(2);
+                expect(await connection.nodeQuery(TagNode).count()).to.eq(2);
+                expect(await connection.nodeQuery(ItemNode).count()).to.eq(1);
                 expect(await item.relations.categories.all()).to.eql([]);
                 expect(await item.relations.tags.all()).to.eql([]);
             });
@@ -226,9 +226,9 @@ describe(`ActiveRelations`, () => {
 
                 await item.save();
 
-                expect(await connection.getRepository(CategoryNode).count()).to.eq(2);
-                expect(await connection.getRepository(TagNode).count()).to.eq(3);
-                expect(await connection.getRepository(ItemNode).count()).to.eq(1);
+                expect(await connection.nodeQuery(CategoryNode).count()).to.eq(2);
+                expect(await connection.nodeQuery(TagNode).count()).to.eq(3);
+                expect(await connection.nodeQuery(ItemNode).count()).to.eq(1);
                 expect(await item.relations.categories.all()).to.have.deep.members(categories);
                 expect(await item.relations.tags.all()).to.have.deep.members([newTagNode]);
             });
@@ -253,9 +253,9 @@ describe(`ActiveRelations`, () => {
                 await item.save();
                 await item.remove(true);
 
-                expect(await connection.getRepository(CategoryNode).count()).to.eq(2);
-                expect(await connection.getRepository(TagNode).count()).to.eq(2);
-                expect(await connection.getRepository(ItemNode).count()).to.eq(0);
+                expect(await connection.nodeQuery(CategoryNode).count()).to.eq(2);
+                expect(await connection.nodeQuery(TagNode).count()).to.eq(2);
+                expect(await connection.nodeQuery(ItemNode).count()).to.eq(0);
             });
         });
     });

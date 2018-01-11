@@ -88,8 +88,8 @@ const neography = new Neography({host: 'localhost', username: 'neo4j', password:
 const connection = neography.checkoutConnection();
 
 //Create repository for given nodes types
-const usersRepository = connection.nodeType(UserNode);
-const addressesRepository = connection.nodeType(AddressNode);
+const usersRepository = connection.nodeBatchRepository(UserNode);
+const addressesRepository = connection.nodeBatchRepository(AddressNode);
 
 //Create repository for given relations types
 const knowsRelationsRepository = connection.relationType(KnowsRelation);

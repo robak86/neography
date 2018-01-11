@@ -5,7 +5,7 @@ import {MatchBuilder} from "../cypher/builders/MatchBuilder";
 import {SetQueryBuilder} from "../cypher/builders/SetQueryBuilder";
 import {buildQuery} from "../cypher";
 
-export class NodeRepository<T extends AbstractNode> {
+export class NodeBatchRepository<T extends AbstractNode> {
     constructor(private klass:Type<T>,
                 private connection:Connection) {
     }

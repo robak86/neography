@@ -13,7 +13,7 @@
   constructor of ```AbstractRelation``` and ```AbstractNode```.
  - rename ```pickOne``` method of GraphResponse to more intuitive ```pluck```
  - allow user to pass logger instance in configuration 
- - add saveMany, updateMany for NodeRepository
+ - add saveMany, updateMany for NodeBatchRepository
  - reorganize, rewrite repositories in order to cover most frequent use cases
  - @timestamp maps neo4j integer value to javascript Date object
  - fix bug related to closing driver sessions

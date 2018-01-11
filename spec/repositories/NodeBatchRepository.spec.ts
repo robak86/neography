@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import * as _ from 'lodash';
-import {NodeRepository} from "../../lib/repositories/NodeRepository";
+import {NodeBatchRepository} from "../../lib/repositories/NodeBatchRepository";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 
@@ -9,15 +9,15 @@ import {buildQuery} from "../../lib/cypher";
 import {assertAllPersisted} from "../../lib/model";
 
 
-describe("NodeRepository", () => {
-    let nodeRepository:NodeRepository<DummyGraphNode>,
+describe("NodeBatchRepository", () => {
+    let nodeRepository:NodeBatchRepository<DummyGraphNode>,
         dummyNode:DummyGraphNode,
         connection:Connection;
 
     beforeEach(async () => {
         await cleanDatabase();
         connection = getSharedConnection();
-        nodeRepository = connection.nodeType(DummyGraphNode);
+        nodeRepository = connection.nodeBatchRepository(DummyGraphNode);
         dummyNode = new DummyGraphNode({attr1: "John"});
     });
 
@@ -102,9 +102,9 @@ describe("NodeRepository", () => {
             let n2 = new DummyGraphNode();
             await n2.save();
 
-            expect(await connection.getRepository(DummyGraphNode).count()).to.eq(2);
+            expect(await connection.nodeQuery(DummyGraphNode).count()).to.eq(2);
             await nodeRepository.removeMany([n1, n2]);
-            expect(await connection.getRepository(DummyGraphNode).count()).to.eq(0);
+            expect(await connection.nodeQuery(DummyGraphNode).count()).to.eq(0);
         });
 
         it("removes all related relations");
