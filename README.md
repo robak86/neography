@@ -44,7 +44,7 @@ import {node, relation, timestamp} from 'neography/annotations';
 
 //Nodes definitions
 
-@node('User') //node label
+@node('User') nodeEntity
 class UserNode extends NodeEntity<UserNode> { 
     @attribute() firstName:string;
     @attribute() lastName:string;

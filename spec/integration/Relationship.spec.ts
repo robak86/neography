@@ -1,4 +1,4 @@
-import {attribute, node, relation, timestamp} from "../../lib/annotations";
+import {attribute, nodeEntity, relation, timestamp} from "../../lib/annotations";
 import {NodeEntity, RelationshipEntity} from "../../lib/model";
 import {Connection} from "../../lib";
 import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
@@ -21,7 +21,7 @@ describe(`Relationship`, () => {
         @attribute() order:number = 0;
     }
 
-    @node('__Category')
+    @nodeEntity('__Category')
     class CategoryNode extends NodeEntity<CategoryNode> {
         @timestamp() createdAt:Date;
         @timestamp() updatedAt:Date;
@@ -29,7 +29,7 @@ describe(`Relationship`, () => {
         @attribute() price:number;
     }
 
-    @node('__Tag')
+    @nodeEntity('__Tag')
     class TagNode extends NodeEntity<TagNode> {
         @timestamp() createdAt:Date;
         @timestamp() updatedAt:Date;
@@ -39,7 +39,7 @@ describe(`Relationship`, () => {
         items:Relationship<IsTaggedRelation, TagNode>;
     }
 
-    @node('__Item')
+    @nodeEntity('__Item')
     class ItemNode extends NodeEntity<ItemNode> {
         @timestamp() createdAt:Date;
         @timestamp() updatedAt:Date;

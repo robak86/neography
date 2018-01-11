@@ -4,7 +4,7 @@ import {NodeMetadata} from "../metadata/NodeMetadata";
 
 export const nodeTypesRegistry = new NodesTypesRegistry();
 
-export const node:(label:string) => ClassDecorator = (label:string) => {
+export const nodeEntity:(label:string) => ClassDecorator = (label:string) => {
     return <TFunction extends Function>(klass:TFunction):TFunction => {
         let nodeMetadata:NodeMetadata = NodeMetadata.getOrCreateForClass(klass as any);
         nodeMetadata.setOwnLabel(label);

@@ -1,4 +1,4 @@
-import {attribute, node, timestamp} from "../../lib/annotations";
+import {attribute, nodeEntity, timestamp} from "../../lib/annotations";
 import {NodeEntity} from "../../lib/model";
 import {Relationship} from "../../lib/model/Relationship";
 import {HasVehicleRelation} from "./HasVehicleRelation";
@@ -8,7 +8,7 @@ import {relationship} from "../../lib/annotations/RelationshipAnnotations";
 
 
 
-@node('DummyUser')
+@nodeEntity('DummyUser')
 export class DummyUserNode extends NodeEntity<DummyUserNode> {
     @timestamp() createdAt?:Date;
     @timestamp() updatedAt?:Date;
@@ -31,7 +31,7 @@ export class DummyUserNode extends NodeEntity<DummyUserNode> {
 //
 // let relations;
 //
-// @node('DummyUser')
+// @nodeEntity('DummyUser')
 // export class DummyUserNode2 extends NodeEntity<DummyUserNode> {
 //     @timestamp() createdAt?:Date;
 //     @timestamp() updatedAt?:Date;

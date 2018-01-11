@@ -1,8 +1,8 @@
-import {attribute, node, timestamp} from "../../lib/annotations";
+import {attribute, nodeEntity, timestamp} from "../../lib/annotations";
 import {NodeEntity} from "../../lib/model";
 
 
-@node('DummyGraphNode')
+@nodeEntity('DummyGraphNode')
 export class DummyGraphNode<P = any> extends NodeEntity<P> {
     @timestamp() createdAt?:Date;
     @timestamp() updatedAt?:Date;

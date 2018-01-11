@@ -52,7 +52,7 @@ export class Relationship<R extends RelationshipEntity, N extends NodeEntity<any
         return connectionsFactory.checkoutConnection().runQuery(baseQuery).pluck('node').first();
     }
 
-    //TODO: returns true if node is connected by R relation
+    //TODO: returns true if nodeEntity is connected by R relation
     // has(n:Node):Promise<any> {}
 
     async findOne():Promise<N> {
