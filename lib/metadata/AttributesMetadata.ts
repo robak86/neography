@@ -12,7 +12,6 @@ export type AttributeAnnotationParams = {
 
 
 export class AttributesMetadata {
-    private parent:AttributesMetadata;
     private static ATTRIBUTES_METADATA_KEY:string = 'ATTRIBUTES_METADATA';
 
     static getOrCreateForClass(klass):AttributesMetadata {
@@ -40,7 +39,10 @@ export class AttributesMetadata {
         return this.getForClass(instance.constructor);
     }
 
+    private parent:AttributesMetadata;
     private _ownAttributes:{ [attributeName:string]:AttributeAnnotationParams } = {};
+    private _ownRelationships:{ [attributeName:string]:any } = {};
+
 
     private setParent(parentAttributesMetadata:AttributesMetadata) {
         this.parent = parentAttributesMetadata;
@@ -56,6 +58,15 @@ export class AttributesMetadata {
             ...parentAttributes,
             ...this._ownAttributes
         }
+    }
+
+    addRelationship(key) {
+        this._ownRelationships[key] = true;
+    }
+
+    getRelationshipsNames():string[]{
+        let parentRelationshipsNames = this.parent ? this.parent.getRelationshipsNames() : [];
+        return parentRelationshipsNames.concat(Object.keys(this._ownRelationships));
     }
 
     addAttribute(attribute:AttributeAnnotationParams) {
@@ -74,7 +85,7 @@ export class AttributesMetadata {
         let propertiesNames = this.getAttributesNames();
         propertiesNames.forEach(prop => {
             let attributeMetadata = this.getAttributeMetadata(prop);
-            iterFn(attributeMetadata,prop)
+            iterFn(attributeMetadata, prop)
         });
     }
 

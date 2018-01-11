@@ -4,12 +4,8 @@ import {ActiveRelation} from "../../lib/model/ActiveRelation";
 import {DummyGraphRelation} from "./DummyGraphRelation";
 import {HasAwesomeNodeRelation} from "./HasAwesomeNodeRelation";
 import {AwesomeGraphNode} from "./AwesomeGraphNode";
+import {relationship} from "../../lib/annotations/RelationshipAnnotations";
 
-
-export class DummyGraphNodeRelations {
-    readonly otherDummies = new ActiveRelation(DummyGraphRelation, DummyGraphNode);
-    readonly awesomeNodes = new ActiveRelation(HasAwesomeNodeRelation, AwesomeGraphNode);
-}
 
 @node('DummyGraphNode')
 export class DummyGraphNode<P = any> extends AbstractNode<P> {
@@ -19,7 +15,6 @@ export class DummyGraphNode<P = any> extends AbstractNode<P> {
     @attribute() attr1?:string;
     @attribute() attr2?:number;
 
-    relations = new DummyGraphNodeRelations();
+    @relationship(DummyGraphRelation, DummyGraphNode) otherDummies:ActiveRelation<DummyGraphRelation, DummyGraphNode>;
+    @relationship(HasAwesomeNodeRelation, AwesomeGraphNode) awesomeNodes:ActiveRelation<HasAwesomeNodeRelation, AwesomeGraphNode>;
 }
-
-

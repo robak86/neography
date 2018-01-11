@@ -5,35 +5,14 @@ import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {expect} from 'chai';
 import {sleep} from "../../lib/utils/promise";
 import {ActiveRelation} from "../../lib/model/ActiveRelation";
+import {relationship} from "../../lib/annotations/RelationshipAnnotations";
 
 describe(`ActiveRelations`, () => {
-    @node('__Category')
-    class CategoryNode extends AbstractNode<CategoryNode> {
+
+    @relation('__IS_TAGGED')
+    class IsTaggedRelation extends AbstractRelation<IsTaggedRelation> {
         @timestamp() createdAt:Date;
         @timestamp() updatedAt:Date;
-        @attribute() categoryName:string;
-        @attribute() price:number;
-    }
-
-    class ItemRelations {
-        readonly categories = new ActiveRelation(HasCategory, CategoryNode);
-        readonly tags = new ActiveRelation(IsTaggedRelation, TagNode);
-    }
-
-    @node('__Item')
-    class ItemNode extends AbstractNode<ItemNode> {
-        @timestamp() createdAt:Date;
-        @timestamp() updatedAt:Date;
-        @attribute() itemName:string;
-
-        relations = new ItemRelations()
-    }
-
-    @node('__Tag')
-    class TagNode extends AbstractNode<TagNode> {
-        @timestamp() createdAt:Date;
-        @timestamp() updatedAt:Date;
-        @attribute() tagName:string;
     }
 
     @relation('__BELONGS_TO_CATEGORY')
@@ -43,11 +22,33 @@ describe(`ActiveRelations`, () => {
         @attribute() order:number = 0;
     }
 
-    @relation('__IS_TAGGED')
-    class IsTaggedRelation extends AbstractRelation<IsTaggedRelation> {
+    @node('__Category')
+    class CategoryNode extends AbstractNode<CategoryNode> {
         @timestamp() createdAt:Date;
         @timestamp() updatedAt:Date;
+        @attribute() categoryName:string;
+        @attribute() price:number;
     }
+
+    @node('__Tag')
+    class TagNode extends AbstractNode<TagNode> {
+        @timestamp() createdAt:Date;
+        @timestamp() updatedAt:Date;
+        @attribute() tagName:string;
+    }
+
+    @node('__Item')
+    class ItemNode extends AbstractNode<ItemNode> {
+        @timestamp() createdAt:Date;
+        @timestamp() updatedAt:Date;
+        @attribute() itemName:string;
+
+        @relationship(HasCategory, CategoryNode)
+        categories:ActiveRelation<HasCategory, CategoryNode>;
+        @relationship(IsTaggedRelation, TagNode)
+        tags:ActiveRelation<IsTaggedRelation, TagNode>;
+    }
+    
 
     let connection:Connection;
 
@@ -140,21 +141,21 @@ describe(`ActiveRelations`, () => {
 
         describe(`Writing node with connected relations`, () => {
             it('creates nodes and relations', async () => {
-                item.relations.categories.set(categories);
-                item.relations.tags.set(tags);
+                item.categories.set(categories);
+                item.tags.set(tags);
 
                 await item.save();
 
                 expect(await connection.nodeQuery(CategoryNode).count()).to.eq(2);
                 expect(await connection.nodeQuery(TagNode).count()).to.eq(2);
                 expect(await connection.nodeQuery(ItemNode).count()).to.eq(1);
-                expect(await item.relations.categories.all()).to.have.deep.members(categories);
-                expect(await item.relations.tags.all()).to.have.deep.members(tags);
+                expect(await item.categories.all()).to.have.deep.members(categories);
+                expect(await item.tags.all()).to.have.deep.members(tags);
             });
 
             it(`adds id property for each category`, async () => {
-                item.relations.categories.set(categories);
-                item.relations.tags.set(tags);
+                item.categories.set(categories);
+                item.tags.set(tags);
 
                 await item.save();
 
@@ -168,7 +169,7 @@ describe(`ActiveRelations`, () => {
 
             it(`does all operations in transaction and rollbacks if error was thrown`, async () => {
                 let wrongTag = new TagNode({tagName: {objects: 'cannot be stored'} as any});
-                item.relations.tags.set(wrongTag);
+                item.tags.set(wrongTag);
 
                 try {
                     await item.save();
@@ -181,63 +182,63 @@ describe(`ActiveRelations`, () => {
 
         describe(`detaching all nodes connected by single relation`, () => {
             it(`doesn't remove detached nodes`, async () => {
-                item.relations.categories.set(categories);
-                item.relations.tags.set(tags);
+                item.categories.set(categories);
+                item.tags.set(tags);
 
                 await item.save();
-                item.relations.categories.set([]);
+                item.categories.set([]);
                 await item.save();
 
                 expect(await connection.nodeQuery(CategoryNode).count()).to.eq(2);
                 expect(await connection.nodeQuery(TagNode).count()).to.eq(2);
                 expect(await connection.nodeQuery(ItemNode).count()).to.eq(1);
-                expect(await item.relations.categories.all()).to.eql([]);
-                expect(await item.relations.tags.all()).to.have.deep.members(tags);
+                expect(await item.categories.all()).to.eql([]);
+                expect(await item.tags.all()).to.have.deep.members(tags);
             });
         });
 
         describe(`detaching all connected nodes`, () => {
             it(`doesn't remove nodes`, async () => {
-                item.relations.categories.set(categories);
-                item.relations.tags.set(tags);
+                item.categories.set(categories);
+                item.tags.set(tags);
 
                 await item.save();
-                item.relations.categories.set([]);
-                item.relations.tags.set([]);
+                item.categories.set([]);
+                item.tags.set([]);
                 await item.save();
 
                 expect(await connection.nodeQuery(CategoryNode).count()).to.eq(2);
                 expect(await connection.nodeQuery(TagNode).count()).to.eq(2);
                 expect(await connection.nodeQuery(ItemNode).count()).to.eq(1);
-                expect(await item.relations.categories.all()).to.eql([]);
-                expect(await item.relations.tags.all()).to.eql([]);
+                expect(await item.categories.all()).to.eql([]);
+                expect(await item.tags.all()).to.eql([]);
             });
         });
 
         describe(`replacing nodes connected with single relation`, () => {
             it(`doesn't removes any nodes but creates new`, async () => {
-                item.relations.categories.set(categories);
-                item.relations.tags.set(tags);
+                item.categories.set(categories);
+                item.tags.set(tags);
 
                 await item.save();
 
                 let newTagNode = new TagNode({tagName: 'NewTag'});
-                item.relations.tags.set([newTagNode]);
+                item.tags.set([newTagNode]);
 
                 await item.save();
 
                 expect(await connection.nodeQuery(CategoryNode).count()).to.eq(2);
                 expect(await connection.nodeQuery(TagNode).count()).to.eq(3);
                 expect(await connection.nodeQuery(ItemNode).count()).to.eq(1);
-                expect(await item.relations.categories.all()).to.have.deep.members(categories);
-                expect(await item.relations.tags.all()).to.have.deep.members([newTagNode]);
+                expect(await item.categories.all()).to.have.deep.members(categories);
+                expect(await item.tags.all()).to.have.deep.members([newTagNode]);
             });
         });
 
         describe(`removing node having other connected nodes`, () => {
             it(`throws if no true parameter for detach was passed`, async () => {
-                item.relations.categories.set(categories);
-                item.relations.tags.set(tags);
+                item.categories.set(categories);
+                item.tags.set(tags);
 
                 await item.save();
 
@@ -247,8 +248,8 @@ describe(`ActiveRelations`, () => {
             });
 
             it(`detaches node if true flag was passed and doesn't remove connected nodes`, async () => {
-                item.relations.categories.set(categories);
-                item.relations.tags.set(tags);
+                item.categories.set(categories);
+                item.tags.set(tags);
 
                 await item.save();
                 await item.remove(true);

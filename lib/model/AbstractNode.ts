@@ -11,21 +11,11 @@ import {ActiveRelation} from "./ActiveRelation";
 import {assertPersisted} from "./GraphEntity";
 import {AbstractRelation} from "./AbstractRelation";
 
-export abstract class AbstractNode<T = any, RD extends object = any> extends AbstractEntity<T> {
+export abstract class AbstractNode<T = any> extends AbstractEntity<T> {
     @attribute() readonly id?:string;
 
     private _entityType:'Node';
-    private _relations:RD;
-
     private _relationsCache:{ [propertyName:string]:ActiveRelation<any, any> } = {};
-
-    get relations():RD {
-        return this._relations;
-    }
-
-    set relations(relations:RD) {
-        this._relations = proxifyRelationsDefinitions(relations, this);
-    }
 
     get attributes():Partial<this> {
         let attributes = {};
@@ -48,6 +38,11 @@ export abstract class AbstractNode<T = any, RD extends object = any> extends Abs
         return isPresent(this.id);
     }
 
+    private get relations():ActiveRelation<any, any>[] {
+        let attributesMetadata = AttributesMetadata.getForInstance(this);
+        return attributesMetadata.getRelationshipsNames().map(name => this[name]);
+    }
+
     save(_connection?:Connection):Promise<this> {
         let connection = _connection || connectionsFactory.checkoutConnection();
         //TODO: if there is no relations or any of existing relations is not dirty don't save in transaction
@@ -60,7 +55,7 @@ export abstract class AbstractNode<T = any, RD extends object = any> extends Abs
                     await this.update(connection) :
                     await this.create(connection);
 
-                await Promise.all(_.values(this._relations).map(rel => {
+                await Promise.all(this.relations.map(rel => {
                     return <any>rel instanceof ActiveRelation ?
                         (rel as any).save(connection) :
                         Promise.resolve();

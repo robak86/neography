@@ -3,11 +3,10 @@ import {AbstractNode} from "../../lib/model";
 import {ActiveRelation} from "../../lib/model/ActiveRelation";
 import {HasVehicleRelation} from "./HasVehicleRelation";
 import {DummyCarNode} from "./DummyCarNode";
+import {relationship} from "../../lib/annotations/RelationshipAnnotations";
 
 
-export class DummyUserRelations {
-    readonly vehicles = new ActiveRelation(HasVehicleRelation, DummyCarNode);
-}
+
 
 @node('DummyUser')
 export class DummyUserNode extends AbstractNode<DummyUserNode> {
@@ -18,7 +17,8 @@ export class DummyUserNode extends AbstractNode<DummyUserNode> {
     @attribute() firstName:string;
     @attribute() experience:number;
 
-    relations = new DummyUserRelations()
+    @relationship(HasVehicleRelation,DummyCarNode)
+    vehicles:ActiveRelation<HasVehicleRelation,DummyCarNode>;
 }
 
 

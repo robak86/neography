@@ -18,7 +18,7 @@ import {CreateBuilder} from "../cypher/builders/CreateBuilder";
 import {MatchBuilder} from "../cypher/builders/MatchBuilder";
 import {NodeNotFoundError} from "../errors/NodeNotFoundError";
 
-export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<any, any>> {
+export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<any>> {
     private ownerGetter:() => AbstractNode<any>;
     private whereStatement:WhereStatement;
     private orderStatement:OrderStatement;

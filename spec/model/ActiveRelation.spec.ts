@@ -51,7 +51,7 @@ describe(`ActiveRelation`, () => {
 
     describe(`accessing active relation from relations definition`, () => {
         it('returns active relation', async () => {
-            let fetchedCars:DummyCarNode[] = await graph.owner.relations.vehicles.all();
+            let fetchedCars:DummyCarNode[] = await graph.owner.vehicles.all();
             expect(fetchedCars).to.have.deep.members([graph.vw, graph.porsche]);
         });
 
@@ -265,10 +265,10 @@ describe(`ActiveRelation`, () => {
         describe(`.set`, () => {
             it('sets new nodes for save', async () => {
                 let car = new DummyCarNode({name: 'Subaru', horsePower: 290});
-                graph.owner.relations.vehicles.set(car);
-                await graph.owner.relations.vehicles.save();
+                graph.owner.vehicles.set(car);
+                await graph.owner.vehicles.save();
 
-                let cars = await graph.owner.relations.vehicles.all();
+                let cars = await graph.owner.vehicles.all();
                 expect(cars.length).to.eq(1);
             });
 
@@ -283,10 +283,10 @@ describe(`ActiveRelation`, () => {
                 let car = new DummyCarNode({name: 'Subaru', horsePower: 290});
                 let hasVehicleRelation = new HasVehicleRelation({isRented: true});
 
-                graph.owner.relations.vehicles.setWithRelations({node: car, relation: hasVehicleRelation});
-                await graph.owner.relations.vehicles.save();
+                graph.owner.vehicles.setWithRelations({node: car, relation: hasVehicleRelation});
+                await graph.owner.vehicles.save();
 
-                let relations = await graph.owner.relations.vehicles.allWithRelations();
+                let relations = await graph.owner.vehicles.allWithRelations();
                 expect(relations.length).to.eq(1);
 
                 expect(relations[0].node).to.deep.eq(car);

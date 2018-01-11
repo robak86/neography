@@ -41,7 +41,7 @@ describe("Attributes annotations", () => {
     });
 
 
-    describe.only(`@relationship`, () => {
+    describe(`@relationship`, () => {
         class SomeClass extends AbstractNode{
             @relationship(DummyGraphRelation, DummyCarNode)
             someRel:any;
