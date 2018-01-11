@@ -4,6 +4,7 @@ import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import {DummyGraphNode} from "../fixtures/DummyGraphNode";
 import {expect} from 'chai';
 import {AbstractNode} from "../../lib/model";
+import * as _ from 'lodash';
 
 describe(`proxifyRelationsDefinitions`, () => {
     class Relations {
@@ -26,5 +27,18 @@ describe(`proxifyRelationsDefinitions`, () => {
 
     it('caches relations', () => {
         expect(relations.others).to.eq(relations.others);
+    });
+
+    it('returns cached relations for iteration', () => {
+        (relations.others as any).someData = 123;
+
+        let iterated:ActiveRelation<DummyGraphRelation, DummyGraphNode>[] = [];
+        _.forOwn(relations, (rel) => {
+            iterated.push(rel);
+        });
+
+        expect(iterated.length).to.eq(1);
+        expect(iterated[0]).to.eq(relations.others);
+        expect((iterated[0] as any).someData).to.eq(123);
     });
 });

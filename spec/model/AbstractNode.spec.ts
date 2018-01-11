@@ -17,8 +17,6 @@ describe(`AbstractNode`, () => {
         await cleanDatabase();
     });
 
-
-
     describe(`.save`, () => {
         it(`inserts new node if entity doesn't have id`, async () => {
             let node = new DummyGraphNode({attr1: 'some data'});
@@ -38,6 +36,23 @@ describe(`AbstractNode`, () => {
             ).pluck('count').first();
 
             expect(count).to.eq(1);
+        });
+    });
+
+    describe(`.remove`, () => {
+        it('removes itself', async () => {
+             let createdNode:DummyGraphNode = await getSharedConnection().runQuery(q => q
+                 .create(c => [
+                     c.node(new DummyGraphNode({attr1: 123})).as('n')
+                 ])
+                 .returns('n')
+             ).pluck('n').first();
+
+            expect(await countDummyNodes()).to.eq(1);
+            expect(createdNode.isPersisted()).to.eq(true);
+
+            await createdNode.remove();
+            expect(createdNode.isPersisted()).to.eq(false);
         });
     });
 

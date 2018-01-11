@@ -68,15 +68,17 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
     findOneWithRelation():Promise<ConnectedNode<R, N>> {throw new Error("Implement Me")}
 
     //here we don't
-    all(connection?:Connection):Promise<N[]> {
+    all(_connection?:Connection):Promise<N[]> {
+        let connection = _connection || connectionsFactory.checkoutConnection();
         let baseQuery = this.buildQuery(b => b.returns('node'));
-        return connectionsFactory.checkoutConnection().runQuery(baseQuery).pluck('node').toArray();
+        return connection.runQuery(baseQuery).pluck('node').toArray();
     }
 
-    allWithRelations():Promise<ConnectedNode<R, N>[]> {
+    allWithRelations(_connection?:Connection):Promise<ConnectedNode<R, N>[]> {
+        let connection = _connection || connectionsFactory.checkoutConnection();
         let baseQuery = this.buildQuery(b => b.returns('node', 'relation'));
 
-        return connectionsFactory.checkoutConnection().runQuery(baseQuery).toArray();
+        return connection.runQuery(baseQuery).toArray();
     }
 
     whereRelation(paramsOrCallback:Partial<R> | WhereBuilderCallback<R>):ActiveRelation<R, N> {
@@ -133,14 +135,16 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         return cloned(this, a => a.limitCount = count);
     }
 
-    count():Promise<number> {
+    count(_connection?:Connection):Promise<number> {
+        let connection = _connection || connectionsFactory.checkoutConnection();
         let baseQuery = this.buildQuery(b => b.returns('count(node) as count'));
-        return connectionsFactory.checkoutConnection().runQuery(baseQuery).pluck('count').first();
+        return connection.runQuery(baseQuery).pluck('count').first();
     }
 
-    async exist():Promise<boolean> {
+    async exist(_connection?:Connection):Promise<boolean> {
+        let connection = _connection || connectionsFactory.checkoutConnection();
         let baseQuery = this.buildQuery(b => b.returns('count(node) as count'), true);
-        let count:number = await connectionsFactory.checkoutConnection().runQuery(baseQuery).pluck('count').first();
+        let count:number = await connection.runQuery(baseQuery).pluck('count').first();
         return count > 0;
     }
 
@@ -180,14 +184,14 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
 
     async save(_connection?:Connection):Promise<any> {
         if (this.newRelations) {
-            await this.updateConnectedNodes();
+            let connection = _connection || connectionsFactory.checkoutConnection();
+            await this.updateConnectedNodes(connection);
             this.newRelations = undefined;
         }
     }
 
-    private async updateConnectedNodes<TO extends AbstractNode>(_connection?:Connection, removeConnectedNodes:boolean = false) {
-        let existingConnections = await this.allWithRelations();
-
+    private async updateConnectedNodes<TO extends AbstractNode>(connection:Connection, removeConnectedNodes:boolean = false) {
+        let existingConnections = await this.allWithRelations(connection);
 
         if (this.newRelations!.containsNode(this.boundNode as N)) {
             throw new Error('Cannot create self referencing relation')
@@ -199,16 +203,16 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         let connectionsForDetach = _.differenceWith(existingConnections, unchangedConnections, ConnectedNode.isEqual);
         let connectionsForAttach = _.differenceWith(newConnections, unchangedConnections, ConnectedNode.isEqual);
 
-        await this.detachNodes(connectionsForDetach.map(c => c.node), removeConnectedNodes);
+        await this.detachNodes(connectionsForDetach.map(c => c.node), removeConnectedNodes, connection);
 
         await Promise.all(connectionsForAttach.map(c => c.node.save()));
 
-        await this.connectToMany(connectionsForAttach);
+        await this.connectToMany(connectionsForAttach, connection);
 
         return [...unchangedConnections, ...connectionsForAttach];
     }
 
-    private async detachNodes<N extends AbstractNode>(nodes:N[], removeConnectedNodes:boolean = false):Promise<any> {
+    private async detachNodes<N extends AbstractNode>(nodes:N[], removeConnectedNodes:boolean = false, connection:Connection):Promise<any> {
         if (nodes.length === 0) {
             return;
         }
@@ -224,10 +228,10 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
             .where(w => w.literal('to.id in {ids}').params({ids}))
             .append(`DELETE rel ${removeConnectedNodes ? ', to' : ''}`);
 
-        return connectionsFactory.checkoutConnection().runQuery(query).toArray();
+        return connection.runQuery(query).toArray();
     }
 
-    private async connectToMany<TO extends AbstractNode>(to:ConnectedNode<R, TO>[]):Promise<ConnectedNode<R, TO>[]> {
+    private async connectToMany<TO extends AbstractNode>(to:ConnectedNode<R, TO>[], connection:Connection):Promise<ConnectedNode<R, TO>[]> {
         let collection = new ConnectedNodesCollection(this.relClass);
         collection.setConnectedNodes(to);
         collection.assertAllNodesPersisted();
@@ -261,7 +265,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
                     [${_.times(connections.length).map((idx) => 'r' + idx)}] as relations
             `);
 
-        let arr = await connectionsFactory.checkoutConnection().runQuery(query).first();
+        let arr = await connection.runQuery(query).first();
         let zipped = _.zipWith(arr.nodes, arr.relations, (node, relation) => {
             return {node, relation}  as any
         });

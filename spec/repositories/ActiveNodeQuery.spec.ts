@@ -3,7 +3,7 @@ import {cleanDatabase, getSharedConnection} from "../helpers/ConnectionHelpers";
 import {ActiveNodeQuery} from "../../lib/repositories/ActiveNodeQuery";
 import {expect} from 'chai';
 
-describe.only(`ActiveNodeQuery`, () => {
+describe(`ActiveNodeQuery`, () => {
     const saveUser = (user:DummyUserNode):Promise<DummyUserNode> => {
         return getSharedConnection().runQuery(b => b
             .create(c => [c.node(user).as('user')])

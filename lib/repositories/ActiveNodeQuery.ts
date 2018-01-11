@@ -1,7 +1,7 @@
 import {AbstractNode} from "../model";
 import {Type} from "../utils/types";
 import {OrderBuilderCallback, QueryBuilder, WhereBuilderCallback} from "../cypher/builders/QueryBuilder";
-import {buildQuery} from "../index";
+import {buildQuery, Connection} from "../index";
 import {connectionsFactory} from "../connection/ConnectionFactory";
 import {cloned, invariant, isPresent} from "../utils/core";
 import * as _ from "lodash";
@@ -46,6 +46,14 @@ export class ActiveNodeQuery<N extends AbstractNode<any, any>> {
 
         return node;
     }
+
+
+    count(_connection?:Connection):Promise<number> {
+        let connection = _connection || connectionsFactory.checkoutConnection();
+        let baseQuery = this.buildQuery(b => b.returns('count(node) as count'));
+        return connection.runQuery(baseQuery).pluck('count').first();
+    }
+
 
     unwhere() {
         return cloned(this, (t) => t.whereStatement = undefined);

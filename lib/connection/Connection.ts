@@ -10,6 +10,7 @@ import {NodeRepository} from "../repositories/NodeRepository";
 import {GraphResponseFactory} from "../response/GraphResponseFactory";
 import {QueryRunner} from "./QueryRunner";
 import {UnboundRelationRepository} from "../repositories/UnboundRelationRepository";
+import {ActiveNodeQuery} from "../repositories/ActiveNodeQuery";
 
 export class Connection {
 
@@ -40,6 +41,9 @@ export class Connection {
         return new UnboundRelationRepository(relationClass, this);
     }
 
+    getRepository<N extends AbstractNode>(nodeClass:Type<N>):ActiveNodeQuery<N> {
+        return new ActiveNodeQuery(nodeClass);
+    }
 
     private execQuery(cypherQuery:string, params?:any):GraphResponse {
         let resultStatementQuery = this.transactionRunner.isTransactionOpened() ?

@@ -2,9 +2,7 @@ import {AbstractNode} from "./AbstractNode";
 import {AbstractRelation} from "./AbstractRelation";
 import {invariant, isPresent} from "../utils/core";
 
-
 export type GraphElement = AbstractNode | AbstractRelation;
-
 export type GraphEntity = AbstractNode ;
 
 export function assertPersisted(entity:GraphEntity) {
