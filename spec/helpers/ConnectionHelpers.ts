@@ -8,7 +8,7 @@ import {buildQuery} from "../../lib/cypher";
 import {TimestampsExtension} from "../../lib/extensions";
 import {connectionsFactory} from "../../lib/connection/ConnectionFactory";
 
-const DEBUG_ENABLED = false;
+const DEBUG_ENABLED = true;
 
 export const getDefaultNeography = _.memoize(():Neography => {
     let neography = new Neography({

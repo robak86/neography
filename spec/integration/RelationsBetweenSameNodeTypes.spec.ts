@@ -6,7 +6,7 @@ import {Relationship} from "../../lib/model/Relationship";
 import {relationship} from "../../lib/annotations/RelationshipAnnotations";
 import {expect} from 'chai';
 
-describe.only(`Relations between the same node types`, () => {
+describe(`Relations between the same node types`, () => {
     @relationshipEntity('__HAS_REVISION')
     class HasRevision extends RelationshipEntity<HasRevision> {
         @timestamp() createdAt:Date;
