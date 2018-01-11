@@ -12,10 +12,6 @@ export function relationshipThunk<R extends RelationshipEntity, N extends NodeEn
         invariant(NodeEntity.isPrototypeOf(classPrototype.constructor),
             `Class ${classPrototype.constructor.name} has to inherit from AbstractNode in order to use @relationship() decorator`);
 
-        invariant(nodeClassThunk() !== classPrototype.constructor,
-            `Self referencing relationships are not supported. Class ${classPrototype.constructor.name} cannot have relationship [${propertyKey}] to itself!`
-        );
-
         let attributesMetadata:AttributesMetadata = AttributesMetadata.getOrCreateForClass(classPrototype.constructor);
         attributesMetadata.addRelationship(propertyKey);
 
@@ -47,10 +43,6 @@ export function relationship<R extends RelationshipEntity, N extends NodeEntity>
     return (classPrototype:Object, propertyKey:string) => {
         invariant(NodeEntity.isPrototypeOf(classPrototype.constructor),
             `Class ${classPrototype.constructor.name} has to inherit from AbstractNode in order to use @relationship() decorator`);
-
-        invariant(nodeClass !== classPrototype.constructor,
-            `Self referencing relationships are not supported. Class ${classPrototype.constructor.name} cannot have relationship [${propertyKey}] to itself!`
-        );
 
         let attributesMetadata:AttributesMetadata = AttributesMetadata.getOrCreateForClass(classPrototype.constructor);
         attributesMetadata.addRelationship(propertyKey);

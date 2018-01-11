@@ -51,7 +51,6 @@ describe(`Relationship`, () => {
         tags:Relationship<IsTaggedRelation, TagNode>;
     }
 
-
     let connection:Connection;
 
     beforeEach(async () => {

@@ -55,7 +55,7 @@ export class Relationship<R extends RelationshipEntity, N extends NodeEntity<any
     //TODO: returns true if nodeEntity is connected by R relationshipEntity
     // has(n:Node):Promise<any> {}
 
-    async findOne():Promise<N> {
+    async findOne():Promise<N|never> {
         let baseQuery = this.buildQuery(b => b.returns('node'));
         baseQuery = baseQuery.literal('limit 1');
 
