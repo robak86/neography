@@ -2,14 +2,13 @@ import {AbstractEntity} from "./AbstractEntity";
 import {attribute} from "../annotations";
 import {getClassFromInstance, isPresent} from "../utils/core";
 import {Connection} from "../connection/Connection";
-import {proxifyRelationsDefinitions} from "./proxifyRelationsDefinitions";
 import {connectionsFactory} from "../connection/ConnectionFactory";
 import {buildQuery} from "../cypher";
 import * as _ from 'lodash';
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
 import {ActiveRelation} from "./ActiveRelation";
 import {assertPersisted} from "./GraphEntity";
-import {AbstractRelation} from "./AbstractRelation";
+
 
 export abstract class AbstractNode<T = any> extends AbstractEntity<T> {
     @attribute() readonly id?:string;
@@ -25,6 +24,10 @@ export abstract class AbstractNode<T = any> extends AbstractEntity<T> {
         });
 
         return attributes;
+    }
+
+    isEqual(other:this):boolean {
+        return _.isEqual(this.attributes, other.attributes);
     }
 
     mergeAttributes(other:Partial<T>) {
