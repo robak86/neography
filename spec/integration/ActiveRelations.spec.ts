@@ -8,7 +8,6 @@ import {ActiveRelation} from "../../lib/model/ActiveRelation";
 import {relationship, relationshipThunk} from "../../lib/annotations/RelationshipAnnotations";
 
 describe(`ActiveRelations`, () => {
-
     @relation('__IS_TAGGED')
     class IsTaggedRelation extends AbstractRelation<IsTaggedRelation> {
         @timestamp() createdAt:Date;
@@ -35,6 +34,9 @@ describe(`ActiveRelations`, () => {
         @timestamp() createdAt:Date;
         @timestamp() updatedAt:Date;
         @attribute() tagName:string;
+
+        // @relationshipThunk(() => IsTaggedRelation, () => TagNode, rel => rel.incoming())
+        // items:ActiveRelation<IsTaggedRelation, TagNode>;
     }
 
     @node('__Item')
@@ -48,7 +50,7 @@ describe(`ActiveRelations`, () => {
         @relationshipThunk(() => IsTaggedRelation, () => TagNode)
         tags:ActiveRelation<IsTaggedRelation, TagNode>;
     }
-    
+
 
     let connection:Connection;
 
@@ -56,7 +58,6 @@ describe(`ActiveRelations`, () => {
         connection = getSharedConnection();
         await cleanDatabase();
     });
-
 
     describe(`Writing single node`, () => {
         describe(`saving single nodes`, () => {

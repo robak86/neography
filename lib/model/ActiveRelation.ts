@@ -17,6 +17,7 @@ import {ConnectedNodesCollection} from "./ConnectedNodeCollection";
 import {CreateBuilder} from "../cypher/builders/CreateBuilder";
 import {MatchBuilder} from "../cypher/builders/MatchBuilder";
 import {NodeNotFoundError} from "../errors/NodeNotFoundError";
+import {RelationshipDirection} from "../cypher/enum/RelationshipDirection";
 
 export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<any>> {
     private ownerGetter:() => AbstractNode<any>;
@@ -25,6 +26,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
     private skipCount:number | undefined;
     private limitCount:number | undefined;
     private newRelations:ConnectedNodesCollection<R, N> | undefined;
+    private direction:RelationshipDirection = RelationshipDirection.Outgoing;
 
     constructor(private relClass:Type<R>, private nodeClass:Type<N>) {}
 
@@ -130,12 +132,20 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         return cloned(this, (t) => t.orderStatement = orderStatement);
     }
 
-    skip(count:number):ActiveRelation<R, N> {
-        return cloned(this, a => a.skipCount = count);
+    incoming():ActiveRelation<R, N> {
+        return cloned(this, a => a.direction = RelationshipDirection.Incoming);
+    }
+
+    outgoing(count:number):ActiveRelation<R, N> {
+        return cloned(this, a => a.direction = RelationshipDirection.Outgoing);
     }
 
     limit(count:number):ActiveRelation<R, N> {
         return cloned(this, a => a.limitCount = count);
+    }
+
+    skip(count:number):ActiveRelation<R, N> {
+        return cloned(this, a => a.skipCount = count);
     }
 
     count(_connection?:Connection):Promise<number> {
@@ -247,7 +257,7 @@ export class ActiveRelation<R extends AbstractRelation, N extends AbstractNode<a
         const createPart = (c:CreateBuilder) => {
             return _.flatMap(connections, (connection, idx) => [
                 c.matchedNode('from'),
-                c.relation(connection.relation).as('r' + idx),
+                c.relation(connection.relation).as('r' + idx).direction(this.direction),
                 c.matchedNode('to' + idx)
             ])
         };
