@@ -10,6 +10,7 @@ export interface AttributeAnnotationParams {
     beforeSaveTransform?:(val:any, context:'create' | 'update') => any;
 }
 
+//TODO: add dirty tracking - marking class dirty for if value was set
 export function attribute({toRowMapper = _.identity, fromRowMapper = _.identity, beforeSaveTransform = _.identity}:AttributeAnnotationParams = {}):PropertyDecorator {
     return (target:Object, propertyKey:string) => {
         let nodeMetadata:AttributesMetadata = AttributesMetadata.getOrCreateForClass(target.constructor);

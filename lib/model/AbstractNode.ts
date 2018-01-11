@@ -17,6 +17,8 @@ export abstract class AbstractNode<T = any, RD extends object = any> extends Abs
     private _entityType:'Node';
     private _relations:RD;
 
+    private _relationsCache:{ [propertyName:string]:ActiveRelation<any, any> } = {};
+
     get relations():RD {
         return this._relations;
     }

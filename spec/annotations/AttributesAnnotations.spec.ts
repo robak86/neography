@@ -1,6 +1,11 @@
 import {attribute} from "../../lib/annotations";
 import {AttributesMetadata} from "../../lib/metadata/AttributesMetadata";
 import {expect} from 'chai';
+import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
+import {DummyCarNode} from "../fixtures/DummyCarNode";
+import {relationship} from "../../lib/annotations/RelationshipAnnotations";
+import {AbstractNode} from "../../lib/model";
+import {ActiveRelation} from "../../lib/model/ActiveRelation";
 
 describe("Attributes annotations", () => {
 
@@ -32,6 +37,31 @@ describe("Attributes annotations", () => {
                 expect((AttributesMetadata.getForInstance(new SomeOtherClass())).getAttributesNames())
                     .to.eql(['someProperty', 'someOtherProperty', "someExtraProperty"]);
             });
+        });
+    });
+
+
+    describe.only(`@relationship`, () => {
+        class SomeClass extends AbstractNode{
+            @relationship(DummyGraphRelation, DummyCarNode)
+            someRel:any;
+        }
+
+        let s1:SomeClass;
+        beforeEach(() => {
+            s1 = new SomeClass();
+        });
+
+        it(`decorates getter and returns instance of ActiveRelation`, async () => {
+            expect(s1.someRel).to.be.instanceOf(ActiveRelation);
+        });
+
+        it(`caches relation`, async () => {
+            expect(s1.someRel).to.eq(s1.someRel);
+        });
+
+        it(`binds relation to node instance`, async () => {
+            expect(s1.someRel.boundNode).to.eq(s1);
         });
     });
 });
