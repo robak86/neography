@@ -7,7 +7,7 @@ export class NodeNotFoundError extends Error {
         let labels = NodeMetadata.getOrCreateForClass(nodeClass).getLabels().join(':');
         let message = `Node ${labels} not found`;
         if (id){
-            message += ' with id=${id} not found'
+            message +=  ` with id=${id} not found`;
         }
         super(message)
 
