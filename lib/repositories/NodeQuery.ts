@@ -33,7 +33,21 @@ export class NodeQuery<N extends NodeEntity<any>> {
         return nodes[0];
     }
 
-    async findById(id):Promise<N> {
+    async findFirst():Promise<N | never> {
+        let items = await this.all();
+        if (items.length === 0) {
+            throw new NodeNotFoundError(this.nodeClass);
+        }
+
+        return items[0];
+    }
+
+    async exists(id):Promise<boolean> {
+        let count = await this.unwhere().where(w => w.attribute('id').equal(id)).count();
+        return count === 1;
+    }
+
+    async findById(id:string | undefined):Promise<N> {
         invariant(!this.whereStatement, 'findById cannot be used with where()');
         let node = await this
             .unwhere()

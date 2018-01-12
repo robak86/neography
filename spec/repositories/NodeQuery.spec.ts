@@ -27,6 +27,31 @@ describe(`NodeQuery`, () => {
     });
 
 
+    describe(`.findFirst`, () => {
+        it(`return first element if found`, async () => {
+            let user = await activeNodeQuery.where(w => w.attribute('experience').equal(0)).findFirst();
+            expect(user.attributes).to.eql(users[0].attributes);
+        });
+
+        it(`throws is no element found`, async () => {
+            let findFirstPromise = activeNodeQuery.where(w => w.attribute('experience').equal(-1)).findFirst();
+            await expect(findFirstPromise).to.be.eventually.rejected;
+        });
+    });
+
+    describe(`.exists`, () => {
+        it(`returns true if node with given id exists`, async () => {
+            let exists = await activeNodeQuery.exists(users[0].id);
+            expect(exists).to.eq(true);
+        });
+
+        it(`returns false if node with given id does not exist`, async () => {
+            let exists = await activeNodeQuery.exists('non existing id');
+            expect(exists).to.eq(false);
+        });
+    });
+
+
     describe(`.all`, () => {
         it('returns all nodes', async () => {
             let fetchedUsers = await activeNodeQuery.all();
