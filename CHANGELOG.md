@@ -22,3 +22,17 @@
  - add automatic conversion of Integer to javascript number type during read.
  Integers greater that ```Number.MAX_SAFE_INTEGER``` won't be converted and Integer will be returned.
  
+ ## 0.2.0
+  - Rename
+     * AbstractNode -> NodeEntity
+     * @node -> @nodeEntity    
+     * AbstractRelation -> RelationshipEntity
+     * @relation -> @relationshipEntity
+  - Remove all existing repositories in favor of record pattern
+     * Add ```.save()```, ```.remove()``` on NodeEntity  
+     * Add ```Relationship``` with ```@relationship``` decorator for managing node's relationships
+     * Create ```NodeQuery``` for doing most frequently used queries
+  - Create repository for batch actions ```connection.nodeBatchRepository(SomeNodeType)```
+  - Write more specs
+  - Add basic query builders for ```WHERE``` and ```ORDER BY``` statements
+ 
