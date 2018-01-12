@@ -218,7 +218,7 @@ export class Relationship<R extends RelationshipEntity, N extends NodeEntity<any
 
         await this.detachNodes(connectionsForDetach.map(c => c.node), removeConnectedNodes, connection);
 
-        await Promise.all(connectionsForAttach.map(c => c.node.save()));
+        await Promise.all(connectionsForAttach.map(c => c.node.save(connection)));
 
         await this.connectToMany(connectionsForAttach, connection);
 

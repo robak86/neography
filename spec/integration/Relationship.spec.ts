@@ -6,6 +6,9 @@ import {expect} from 'chai';
 import {sleep} from "../../lib/utils/promise";
 import {Relationship} from "../../lib/model/Relationship";
 import {relationship, relationshipThunk} from "../../lib/annotations/RelationshipAnnotations";
+import * as sinon from "sinon";
+import {connectionEvents} from "../../lib/connection/ConnectionEvents";
+import {SinonSpy} from "sinon";
 
 describe(`Relationship`, () => {
     @relationshipEntity('__IS_TAGGED')
@@ -152,6 +155,17 @@ describe(`Relationship`, () => {
                 expect(await item.categories.all()).to.have.deep.members(categories);
                 let all = await item.tags.all();
                 expect(all.map((e) => e.id)).to.have.deep.members(tags.map(e => e.id));
+            });
+
+            it(`uses single transaction`, async () => {
+                let onTransactionOpenSpy:SinonSpy = sinon.spy();
+                connectionEvents.onTransactionBegin.addListener(onTransactionOpenSpy);
+
+                item.categories.set(categories);
+                item.tags.set(tags);
+                await item.save();
+
+                expect(onTransactionOpenSpy.callCount).to.eq(1);
             });
 
             it(`adds id property for each category`, async () => {
