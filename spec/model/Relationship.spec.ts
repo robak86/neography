@@ -150,7 +150,7 @@ describe(`Relationship`, () => {
 
                 describe('.first', async () => {
                     it('returns first element', async () => {
-                        let car:DummyCarNode | null = await filtered.first();
+                        let car:DummyCarNode | undefined = await filtered.first();
                         expect(car).to.eql(graph.vw);
                     });
                 });
@@ -211,7 +211,7 @@ describe(`Relationship`, () => {
 
             describe(`.first`, () => {
                 it('returns first element', async () => {
-                    let car:DummyCarNode | null = await filtered.first();
+                    let car:DummyCarNode | undefined = await filtered.first();
                     expect(car).to.eql(graph.porsche);
                 });
             });

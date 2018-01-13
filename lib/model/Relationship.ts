@@ -44,7 +44,7 @@ export class Relationship<R extends RelationshipEntity, N extends NodeEntity<any
         this.newRelations.setConnectedNodes(_.castArray(nodesWithRelations));
     }
 
-    first():Promise<N | null> {
+    first():Promise<N | undefined> {
         let baseQuery = this.buildQuery(b => b.returns('node'));
         baseQuery = baseQuery
             .literal('limit 1');
@@ -67,10 +67,10 @@ export class Relationship<R extends RelationshipEntity, N extends NodeEntity<any
         return found;
     }
 
-    firstWithRelation():Promise<ConnectedNode<R, N> | undefined> {throw new Error("Implement Me")}
+    // firstWithRelation():Promise<ConnectedNode<R, N> | undefined> {throw new Error("Implement Me")}
 
     //throws error if no result found
-    findOneWithRelation():Promise<ConnectedNode<R, N>> {throw new Error("Implement Me")}
+    // findOneWithRelation():Promise<ConnectedNode<R, N>> {throw new Error("Implement Me")}
 
     //here we don't
     all(_connection?:Connection):Promise<N[]> {
