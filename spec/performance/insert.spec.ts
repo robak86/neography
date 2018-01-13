@@ -109,4 +109,33 @@ describe("Inserting nodes @slow", () => {
             }, Promise.resolve());
         }).timeout(60000);
     });
+
+    describe(`saving node entity with relationship`, () => {
+        it(`inserts 100 nodes, each having 10 connected nodes. All saves done parallel`, async () => {
+            let data = _.times(100).map((idx) => {
+                let node = new DummyGraphNode({attr2: idx});
+                let otherDummies = _.times(10).map(id => new DummyGraphNode({attr2: 1000 + id}));
+                node.childDummies.set(otherDummies);
+                return {dummy: node, otherDummies};
+            });
+
+            await Promise.all(data.map(d => d.dummy.save()));
+
+            let allDummies = await getSharedConnection()
+                .nodeQuery(DummyGraphNode)
+                .where(w => w.attribute('attr2').lessThan(1000))
+                .orderBy(by => by.attribute('attr2').asc()).all();
+
+            expect(data.map(d => d.dummy.attributes)).to.eql(allDummies.map(n => n.attributes));
+
+            await Promise.all(data.map(async (d) => {
+                let fetchedChildDummies = await d.dummy.childDummies
+                    .orderByNode(by => by.attribute('attr2').asc())
+                    .all();
+
+                expect(d.otherDummies.map(d=> d.attributes)).to.eql(fetchedChildDummies.map(f => f.attributes));
+            }))
+
+        }).timeout(60000)
+    });
 });

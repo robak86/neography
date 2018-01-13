@@ -1,5 +1,7 @@
 import {attribute, nodeEntity, timestamp} from "../../lib/annotations";
-import {NodeEntity} from "../../lib/model";
+import {NodeEntity, Relationship} from "../../lib/model";
+import {relationship} from "../../lib/annotations/RelationshipAnnotations";
+import {DummyGraphRelation} from "./DummyGraphRelation";
 
 
 @nodeEntity('DummyGraphNode')
@@ -9,4 +11,7 @@ export class DummyGraphNode<P = any> extends NodeEntity<P> {
 
     @attribute() attr1?:string;
     @attribute() attr2?:number;
+
+    @relationship(DummyGraphRelation, DummyGraphNode)
+    childDummies:Relationship<DummyGraphRelation, DummyGraphNode>
 }
