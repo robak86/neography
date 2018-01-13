@@ -11,12 +11,19 @@ import {GraphResponseFactory} from "../response/GraphResponseFactory";
 import {QueryRunner} from "./QueryRunner";
 
 import {NodeQuery} from "../repositories/NodeQuery";
+import {connectionEvents} from "./ConnectionEvents";
+
+let counter = 0;
+const genId = () => `c_${counter += 1}`;
 
 export class Connection {
+    private connectionId:string = genId();
+
 
     constructor(private queryRunner:QueryRunner,
                 private transactionRunner:TransactionRunner,
                 private responseFactory:GraphResponseFactory) {
+        connectionEvents.onConnectionCreate.emit({connectionId: this.connectionId});
     }
 
     runQuery(queryBuilder:QueryBuilder | ((builder:QueryBuilder) => QueryBuilder)):GraphResponse {
