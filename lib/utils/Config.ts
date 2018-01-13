@@ -28,7 +28,7 @@ export class Config {
         _.merge(this, {
             objectTransform: [],
             uidGenerator: genId,
-            poolSize: 10,
+            sessionsPoolSize: 10,
             logger: new MutedLogger(),
             debug: false
         }, params);
