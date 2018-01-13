@@ -3,10 +3,14 @@
 [![Build Status](https://travis-ci.org/robak86/neography.svg?branch=master)](https://travis-ci.org/robak86/neography)
 [![Coverage Status](https://coveralls.io/repos/github/robak86/neography/badge.svg?branch=master&service=github)](https://coveralls.io/github/robak86/neography?branch=simplify_types)
 
-Object mapper and queries builder for official neo4j driver. (https://github.com/neo4j/neo4j-javascript-driver)
+Neography is object-graph mapping library for Neo4j written using TypeScript. It internally uses official neo4j driver
+Neography supports Active Record pattern. It's goal is to provide simple and convenient API for most common operations.
+It also provides DSL for constructing more advanced cypher queries.
+
 
 ## Warning 
 This library is at early stage of development. The API most likely will change over time.
+In many areas library requires optimizations.
 **All suggestion, opinions and ideas are gladly welcome.**
 
 
@@ -15,7 +19,6 @@ This library is at early stage of development. The API most likely will change o
 ```bash
 npm install neography
 ```
-
 
 ## Configuring Neography Instance
 ```typescript
@@ -27,113 +30,104 @@ const neography = new Neography({host: 'localhost', username: 'neo4j', password:
 //register extensions for managing createdAt and updatedAt properties. 
 //Timestamps are stored as integer values
 neography.registerExtension(TimestampsExtension.getDefault()); 
-
 ```
 
-## Defining Model Classes
+## Defining Model
 
-Neography provides mapping layer over persisted neo4j data. In order to create mappable class 
-you have to decorate it with ```@node('NodeLabel')``` or ```@relation('RELATION_TYPE')``` decorators. Additionally each 
-entity class have to inherit consequently from ```NodeEntity``` or ```RelationshipEntity``` class. ```NodeEntity``` class
-provides auto generated unique ```id``` property.
+Neography provides three types of model types.
 
- 
+1. NodeEntity
+
 ```typescript
-import {NodeEntity, RelationshipEntity} from 'neography/model';
-import {node, relation, timestamp} from 'neography/annotations';
+import {NodeEntity} from 'neography/model';
+import {nodeEntity, attribute} from 'neography/annotations';
 
-//Nodes definitions
+@nodeEntity('User')
+class UserNode extends NodeEntity { 
+    @attribute() firstName:string;
+    @attribute() lastName:string;
+}
+```
 
-@node('User') nodeEntity
+```UserNode``` class will be directly mapped to neo4j's node using ```:User``` label. The label for node is set
+by ```@nodeEntity``` decorator. Node Entity takes optional generic type in order to enable type safe constructor
+taking object with node's properties. Additionally all unknown properties passed to node's constructor are filtered out.
+
+```typescript
+@nodeEntity('User')
 class UserNode extends NodeEntity<UserNode> { 
     @attribute() firstName:string;
     @attribute() lastName:string;
 }
 
-@node('Address')
-class AddressNode extends NodeEntity<AddressNode> {
-    @attribute() street:string;
-    @attribute() city:string;
+let user1 = new UserNode({firstName: 'John'}); //OK
+
+//compile time error
+let user2 = new UserNode({unknownProperty: 'John'}); 
+
+//object passed to constructor was marked as 'any' in order to pass unknown attribute and make it compilable
+let user3 = new UserNode({firstName: 'John', unknownProperty: 'John'} as any); 
+console.log(user3.attributes) // {firstName: 'John'}  - 'unknownProperty' wasn't assigned
+```
+
+```NodeEntity``` implements active record pattern and provides ```save()``` method. It creates new node in the database for 
+newly created node instance (adding auto generated, unique, url friendly id property) or updates existing node matched by id.
+
+
+2. RelationshipEntity
+
+```typescript
+import {RelationshipEntity} from 'neography/model';
+import {relationshipEntity, attribute} from 'neography/annotations';
+
+@relationshipEntity('HAS_REVISION')
+class HasRevision extends RelationshipEntity<HasRevision> {
+    @attribute() isApproved:boolean = false;
 }
-
-//Relations definitions
-
-@relation('KNOWS') relationshipEntity
-class KnowsRelation extends RelationshipEntity<KnowsRelation> {
-    @timestamp() since:Date;
-}
-
-@relation('HAS_HOME_ADDRESS')
-class HasHomeAddressRelation extends RelationshipEntity<HasHomeAddressRelation>{}
-
 ```
 
-Passing generic types for ```RelationshipEntity``` and ```NodeEntity``` is optional (starting from typescript ^2.3).
-Generic types were introduced in order to enable type safety for constructors.
+```HasRevision``` represents ```-[:HAS_REVISION]-``` relation.
+
+3. Relationship 
 
 ```typescript
-new User({firstName: 'John', lastName: 'Doe'}); //OK
-new User({firstName: 'John', someUnknownAttribute: 'Doe'}) //generates compile time error
+import {attribute, nodeEntity, relationshipEntity, relationship} from "neography/annotations";
+import {NodeEntity, RelationshipEntity, Relationship} from "neography/model";
 
+    @relationshipEntity('HAS_REVISION')
+    class HasRevision extends RelationshipEntity<HasRevision> {
+        @attribute() isApproved:boolean = false;
+    }
+
+    @nodeEntity('BlogPost')
+    class BlogPostNode extends NodeEntity<BlogPostNode> {
+        @attribute() title:string;
+
+        @relationship(HasRevision, BlogPostNode, rel => rel.outgoing())
+        nextRevision:Relationship<HasRevision, BlogPostNode>;
+
+        @relationship(HasRevision, BlogPostNode, rel => rel.incoming())
+        prevRevision:Relationship<HasRevision, BlogPostNode>
+    }
 ```
 
-## Repositories
-
-Neography provides repositories for basic operations.
+It defines relationships between nodes and also supports active record pattern.
 
 ```typescript
-import {Neography} from 'neography';
+let postVer1 = new BlogPostNode({title: "Neo4j"});
+let postVer2 = new BlogPostNode({title: "Neo4j is fine"});
+let postVer3 = new BlogPostNode({title: "Graphs are cool"}); 
 
-const neography = new Neography({host: 'localhost', username: 'neo4j', password: 'password'});
-const connection = neography.checkoutConnection();
-
-//Create repository for given nodes types
-const usersRepository = connection.nodeBatchRepository(UserNode);
-const addressesRepository = connection.nodeBatchRepository(AddressNode);
-
-//Create repository for given relations types
-const knowsRelationsRepository = connection.relationType(KnowsRelation);
-const hasHomeAddressRelationsRepository = connection.relationType(HasHomeAddressRelation);
-```
-
-### Managing Nodes 
-
-```typescript
-let user1: UserNode = await usersRepository.save(new User({firstName: 'Jane', lastName: 'Doe'}));
-// User { id: 'BJ-_f8-Al', createdAt: Sat Dec 30 2017 20:51:51 GMT+0100 (CET), updatedAt: ..., firstName: 'Jane', lastName: 'Doe'}
-
-user1.firstName = 'John';
-user1 = await usersRepository.update(user1);
-//  User { id: 'BJ-_f8-Al', createdAt: Sat Dec 30 2017 20:51:51 GMT+0100 (CET), updatedAt: ..., firstName: 'John', lastName: 'Doe'}
-
-let user2:User[] = await usersRepository.where({id: user1.id})
-// user2[0] and user1 points to the same persisted entity
-
-await usersRepository.remove(user1.id);
-```
-
-### Managing Relations
-
-```typescript
-let user1:User = await usersRepository.save(new User({firstName: 'Jane', lastName: 'Doe'}));
-let user2:User = await usersRepository.save(new User({firstName: 'John', lastName: 'Smith'}));
-
-let relation:KnowsRelation = await knowsRelationsRepository.nodes(user1, user2).connectWith(new KnowsRelation({since: new Date()}));
-
-//alternatively
-let relation:KnowsRelation = await knowsRelationsRepository.node(user1).connectTo(user2, new KnowsRelation({since: new Date()}));
-// Relation {id: 'SfXi-89', since: Sat Dec 30 2017 20:51:51 GMT+0100 (CET)}
-
-relation.since = new Date();
-relation = await knowsRelationsRepository.nodes(user1, user2).update(relation);
-// Relation {id: 'SfXi-89', since: Sat Dec 30 2017 20:51:52 GMT+0100 (CET)}
-await knowsRelationsRepository.nodes(user1, user2)
-```
+postVer1.nextRevision.set(postVer2);
+postVer2.nextRevision.setWithRelations({relation: new HasRevision({isApproved: true}), node: postVer3});
+await postVer1.save(); // .save() creates following nodes and relationships 
+// (:BlogPost {title: "Neo4j})-[:HAS_REVISION {isApproved: false}]-> / 
+// (:BlogPost {title: "Neo4j is fine"})-[:HAS_REVISION {isApproved: true}]->(:BlogPost {title: Graphs are cool})
+``` 
 
 ## Query Builder
 Query builder provides simple DSL for building cypher queries.
 It tries to reflect cypher syntax without introducing any additional abstractions.  
-
 
 ```typescript 
 import {neography} from 'neography';
@@ -182,6 +176,26 @@ let users:UserNode[] = await connection.runQuery(matchQuery).pluck('user').toArr
 ```
 
 ### Matching Nodes Using Where
+
+```typescript
+let matchQuery = neography.query()
+    .match(m => m.node(UserNode).as('user'))
+    .where(w => w.attribute('firstName').equal('Jane'))
+    .returns('user');
+
+let users:UserNode[] = await connection.runQuery(matchQuery).pluck('user').toArray();
+```
+
+```typescript
+let matchQuery = neography.query()
+    .match(m => m.node(UserNode).as('user'))
+    .where(w => w.attribute('id').in(['Xfcs3-2', 'YgfUop89']))
+    .returns('user');
+
+let users:UserNode[] = await connection.runQuery(matchQuery).pluck('user').toArray();
+```
+
+### Matching Nodes Using Where Literal
 
 ```typescript
 let matchWhere = neography.query()
