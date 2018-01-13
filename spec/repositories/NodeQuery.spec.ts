@@ -39,6 +39,18 @@ describe(`NodeQuery`, () => {
         });
     });
 
+    describe(`.firstById`, () => {
+        it(`returns element with given id if found`, async () => {
+            let user = await activeNodeQuery.firstById(users[0].id);
+            expect(user!.attributes).to.eql(users[0].attributes);
+        });
+
+        it(`returns undefined if node with given id is missing`, async () => {
+            let user = await activeNodeQuery.firstById('non existing id');
+            expect(user).to.be.undefined;
+        });
+    });
+
     describe(`.exists`, () => {
         it(`returns true if node with given id exists`, async () => {
             let exists = await activeNodeQuery.exists(users[0].id);

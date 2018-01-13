@@ -47,6 +47,14 @@ export class NodeQuery<N extends NodeEntity<any>> {
         return count === 1;
     }
 
+    async firstById(id:string | undefined):Promise<N|undefined> {
+        invariant(!this.whereStatement, 'findById cannot be used with where()');
+        return await this
+            .unwhere()
+            .where(w => w.attribute('id').equal(id))
+            .first();
+    }
+
     async findById(id:string | undefined):Promise<N> {
         invariant(!this.whereStatement, 'findById cannot be used with where()');
         let node = await this
