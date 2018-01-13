@@ -36,7 +36,7 @@ neography.registerExtension(TimestampsExtension.getDefault());
 
 Neography provides three types of model types.
 
-1. NodeEntity
+### 1. ```NodeEntity```
 
 ```typescript
 import {NodeEntity} from 'neography/model';
@@ -49,7 +49,7 @@ class UserNode extends NodeEntity {
 }
 ```
 
-```UserNode``` class will be directly mapped to neo4j's node using ```:User``` label. The label for node is set
+```UserNode``` class will be directly mapped to Neo4j's node using ```:User``` label. The label for node is set
 by ```@nodeEntity``` decorator. Node Entity takes optional generic type in order to enable type safe constructor
 taking object with node's properties. Additionally all unknown properties passed to node's constructor are filtered out.
 
@@ -71,10 +71,10 @@ console.log(user3.attributes) // {firstName: 'John'}  - 'unknownProperty' wasn't
 ```
 
 ```NodeEntity``` implements active record pattern and provides ```save()``` method. It creates new node in the database for 
-newly created node instance (adding auto generated, unique, url friendly id property) or updates existing node matched by id.
+newly created ```NodeEntity``` instance (adding auto generated, unique, url friendly id property) or updates existing node matched by id.
 
 
-2. RelationshipEntity
+### 2. ```RelationshipEntity```
 
 ```typescript
 import {RelationshipEntity} from 'neography/model';
@@ -88,7 +88,7 @@ class HasRevision extends RelationshipEntity<HasRevision> {
 
 ```HasRevision``` represents ```-[:HAS_REVISION]-``` relation.
 
-3. Relationship 
+### 3. ```Relationship``` 
 
 ```typescript
 import {attribute, nodeEntity, relationshipEntity, relationship} from "neography/annotations";
@@ -119,7 +119,7 @@ let postVer2 = new BlogPostNode({title: "Neo4j is fine"});
 let postVer3 = new BlogPostNode({title: "Graphs are cool"}); 
 
 postVer1.nextRevision.set(postVer2);
-postVer2.nextRevision.setWithRelations({relation: new HasRevision({isApproved: true}), node: postVer3});
+postVer2.nextRevision.setWithRelation({relation: new HasRevision({isApproved: true}), node: postVer3});
 await postVer1.save(); // .save() creates following nodes and relationships 
 // (:BlogPost {title: "Neo4j})-[:HAS_REVISION {isApproved: false}]-> / 
 // (:BlogPost {title: "Neo4j is fine"})-[:HAS_REVISION {isApproved: true}]->(:BlogPost {title: Graphs are cool})
@@ -195,7 +195,7 @@ let matchQuery = neography.query()
 let users:UserNode[] = await connection.runQuery(matchQuery).pluck('user').toArray();
 ```
 
-### Matching Nodes Using Where Literal
+### Matching Nodes Using Where Literal Statement
 
 ```typescript
 let matchWhere = neography.query()
@@ -206,7 +206,7 @@ let matchWhere = neography.query()
 let users:UserNode[] = await connection.runQuery(matchWhere).pluck('user').toArray();
 ```
 
-### Matching Nodes Connected by Relation
+### Matching Nodes Connected by Relationship
 
 ```typescript
 let matchWhere = neography.query()
