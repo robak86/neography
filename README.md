@@ -145,6 +145,8 @@ result = await connection.nodeQuery(CarNode).findById('someID'); //it throws err
 
 //find car by id or get undefined
 result = await connection.nodeQuery(CarNode).firstById('someID'); //it returns undefined if node not found
+//it is shortcut for
+result = await connection.nodeQuery(CarNode).where(w => w.attribute('id').equal('someID')).first()
 
 //get car with greatest horsePower
 result = await connection.nodeQuery(CarNode).orderBy(by => by.attribute('horsePower').desc()).limit(1).first();
