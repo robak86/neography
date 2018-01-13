@@ -28,6 +28,27 @@ export class WhereAttributeQueryPart implements IQueryPart {
     }
 }
 
+export class AttributeNotNullQueryPart implements IQueryPart {
+    constructor(private propertyName:string,
+                private alias:string) {}
+
+    toCypher(ctx:QueryContext):IBoundQueryPart {
+        let cypher = '';
+
+        if (isPresent(this.alias)) {
+            cypher += `${this.alias}.`
+        }
+
+        cypher += this.propertyName;
+        cypher += ` IS NOT NULL`;
+
+
+        return {
+            cypherString: cypher
+        }
+    }
+}
+
 export class WhereAttributeBuilder<T> {
     constructor(private propertyName:string, private _alias:string) {}
 
@@ -37,6 +58,10 @@ export class WhereAttributeBuilder<T> {
 
     equal(val:T):WhereAttributeQueryPart {
         return new WhereAttributeQueryPart(this.propertyName, this._alias, '=', val);
+    }
+
+    notNull(): AttributeNotNullQueryPart {
+        return new AttributeNotNullQueryPart(this.propertyName,this._alias);
     }
 
     greaterThan(val:T):WhereAttributeQueryPart {

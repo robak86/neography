@@ -1,10 +1,10 @@
 import {WhereLiteralQueryPart} from "../match/WhereLiteralQueryPart";
-import {WhereAttributeBuilder, WhereAttributeQueryPart} from "./WhereAttributeBuilder";
+import {AttributeNotNullQueryPart, WhereAttributeBuilder, WhereAttributeQueryPart} from "./WhereAttributeBuilder";
 import {MatchBuilderCallback} from "./QueryBuilder";
 import {cloned} from "../../utils/core";
 
 
-export type WhereStatementPart = WhereLiteralQueryPart | WhereAttributeQueryPart;
+export type WhereStatementPart = WhereLiteralQueryPart | WhereAttributeQueryPart | AttributeNotNullQueryPart;
 
 
 export class WhereBuilder<T = any> {

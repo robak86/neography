@@ -72,4 +72,16 @@ describe(`WhereAttributeBuilder`, () => {
             expect(cypher.params).to.eql({__node_someProperty_prop1: ['someVal', 'someOtherVal']})
         });
     });
+
+    describe(`.notNull`, () => {
+        it('returns correct cypher statement', () => {
+            let cypher = builder.notNull().toCypher(ctx);
+            expect(cypher.cypherString).to.eq(`node.someProperty IS NOT NULL`)
+        });
+
+        it('returns correct params object', () => {
+            let cypher = builder.notNull().toCypher(ctx);
+            expect(cypher.params).to.be.undefined;
+        });
+    });
 });
