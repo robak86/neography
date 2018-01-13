@@ -17,7 +17,8 @@ export const getDefaultNeography = _.memoize(():Neography => {
         host: 'localhost',
         username: 'neo4j',
         password: 'password',
-        debug: DEBUG_ENABLED
+        debug: DEBUG_ENABLED,
+        sessionsPoolSize: 10
     });
     connectionsFactory.registerExtension(TimestampsExtension.getDefault());
     return neography;
