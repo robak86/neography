@@ -4,14 +4,13 @@ import {Config, NeographyConfigParams} from "./utils/Config";
 import {setDebugLogger, setLogger} from "./utils/logger";
 import {SimpleDebugLogger} from "./utils/SimpleDebugLogger";
 import {connectionsFactory} from "./connection/ConnectionFactory";
+import {IExtension} from "./extensions/IExtension";
 
 
 export * from './connection/Connection';
 export * from './utils/SimpleDebugLogger';
 
-
 export const buildQuery = () => new QueryBuilder();
-
 
 export class Neography {
     private config:Config;
@@ -32,6 +31,10 @@ export class Neography {
 
     checkoutConnection():Connection {
         return connectionsFactory.checkoutConnection();
+    }
+
+    registerExtension(extension:IExtension) {
+        connectionsFactory.registerExtension(extension);
     }
 
     query():QueryBuilder {
