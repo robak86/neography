@@ -3,9 +3,9 @@
 [![Build Status](https://travis-ci.org/robak86/neography.svg?branch=master)](https://travis-ci.org/robak86/neography)
 [![Coverage Status](https://coveralls.io/repos/github/robak86/neography/badge.svg?branch=master&service=github)](https://coveralls.io/github/robak86/neography?branch=simplify_types)
 
-Neography is object-graph mapping library for Neo4j written using TypeScript. It internally uses official neo4j driver
+Neography is object-graph mapping library for Neo4j written in TypeScript. It internally uses official neo4j driver.
 Neography supports Active Record pattern. It's goal is to provide simple and convenient API for most common operations.
-It also provides DSL for constructing more advanced cypher queries.
+It also provides DSL for constructing advanced cypher queries.
 
 
 ## Warning 
@@ -51,7 +51,7 @@ class UserNode extends NodeEntity {
 
 ```UserNode``` class will be directly mapped to Neo4j's node using ```:User``` label. The label for node is set
 by ```@nodeEntity``` decorator. Node Entity takes optional generic type in order to enable type safe constructor
-taking object with node's properties. Additionally all unknown properties passed to node's constructor are filtered out.
+taking object with node's properties.
 
 ```typescript
 @nodeEntity('User')
@@ -60,18 +60,12 @@ class UserNode extends NodeEntity<UserNode> {
     @attribute() lastName:string;
 }
 
-let user1 = new UserNode({firstName: 'John'}); //OK
-
-//compile time error
-let user2 = new UserNode({unknownProperty: 'John'}); 
-
-//object passed to constructor was marked as 'any' in order to pass unknown attribute and make it compilable
-let user3 = new UserNode({firstName: 'John', unknownProperty: 'John'} as any); 
-console.log(user3.attributes) // {firstName: 'John'}  - 'unknownProperty' wasn't assigned
+let user1 = new UserNode({firstName: 'John'}); // OK
+let user2 = new UserNode({unknownProperty: 'John'}); // Compile time error 
 ```
 
 ```NodeEntity``` implements active record pattern and provides ```save()``` method. It creates new node in the database for 
-newly created ```NodeEntity``` instance (adding auto generated, unique, url friendly id property) or updates existing node matched by id.
+not already persisted ```NodeEntity``` instance (adding auto generated, unique, url friendly id property) or updates existing node matched by id.
 
 
 ### 2. ```RelationshipEntity```
@@ -125,7 +119,44 @@ await postVer1.save(); // .save() creates following nodes and relationships
 // (:BlogPost {title: "Neo4j is fine"})-[:HAS_REVISION {isApproved: true}]->(:BlogPost {title: Graphs are cool})
 ``` 
 
-## Query Builder
+It also provides many convenient methods for fetching connected nodes. (TODO: docs required)
+
+### Querying Nodes 
+Neography provides convenient query builder for fetching nodes.
+
+```typescript
+    @nodeEntity('Car')
+    class CarNode extends NodeEntity<CarNode> {
+        @attribute() manufacturer:string;
+        @attribute() horsePower:number;
+    }
+
+
+let result = await connection.nodeQuery(CarNode).all();
+
+//count all cars
+result = await connection.nodeQuery(CarNode).count();
+
+//get first car
+result = await connection.nodeQuery(CarNode).first();
+
+//find car by id
+result = await connection.nodeQuery(CarNode).findById('someID'); //it throws error if record not found
+
+//find car by id or get undefined
+result = await connection.nodeQuery(CarNode).firstById('someID'); //it returns undefined if node not found
+
+//get car with greatest horsePower
+result = await connection.nodeQuery(CarNode).orderBy(by => by.attribute('horsePower').desc()).limit(1).first();
+
+// get all cars with horsePower greater than 200
+result = await connection.nodeQuery(CarNode).where(w => w.attribute('horsePower').greaterThan(200)).all();
+
+// get all cars made by Porsche and Fiat (case sensitive search)  
+result = await connection.nodeQuery(CarNode).where(w => w.attribute('manufacturer').in(['Porsche', 'Fiat'])).all();
+```
+
+## Query Builder for Cypher
 Query builder provides simple DSL for building cypher queries.
 It tries to reflect cypher syntax without introducing any additional abstractions.  
 
