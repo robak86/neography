@@ -39,7 +39,7 @@ export class Relationship<R extends RelationshipEntity, N extends NodeEntity<any
         this.newRelations.setNodes(_.castArray(nodes));
     }
 
-    setWithRelations(nodesWithRelations:ConnectedNode<R, N>[] | ConnectedNode<R, N>) {
+    setWithRelation(nodesWithRelations:ConnectedNode<R, N>[] | ConnectedNode<R, N>) {
         this.newRelations = new ConnectedNodesCollection<R, N>(this.relClass);
         this.newRelations.setConnectedNodes(_.castArray(nodesWithRelations));
     }

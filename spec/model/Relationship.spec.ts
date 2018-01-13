@@ -283,7 +283,7 @@ describe(`Relationship`, () => {
                 let car = new DummyCarNode({name: 'Subaru', horsePower: 290});
                 let hasVehicleRelation = new HasVehicleRelation({isRented: true});
 
-                graph.owner.vehicles.setWithRelations({node: car, relation: hasVehicleRelation});
+                graph.owner.vehicles.setWithRelation({node: car, relation: hasVehicleRelation});
                 await graph.owner.vehicles.save();
 
                 let relations = await graph.owner.vehicles.allWithRelations();
