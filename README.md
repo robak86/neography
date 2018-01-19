@@ -3,13 +3,13 @@
 [![Build Status](https://travis-ci.org/robak86/neography.svg?branch=master)](https://travis-ci.org/robak86/neography)
 [![Coverage Status](https://coveralls.io/repos/github/robak86/neography/badge.svg?branch=master&service=github)](https://coveralls.io/github/robak86/neography?branch=simplify_types)
 
-Neography is object-graph mapping library for Neo4j written in TypeScript. It internally uses official neo4j driver.
+Neography is object-graph mapping library for Neo4j written in TypeScript. It internally uses official neo4j driver with bolt protocol.
 Neography supports Active Record pattern. It's goal is to provide simple and convenient API for most common operations.
 It also provides DSL for constructing advanced cypher queries.
 
 
 ## Warning 
-This library is at early stage of development. The API most likely will change over time.
+This library is at early stage of development. Some parts of API most likely will be changed over time.
 In many areas library requires optimizations.
 **All suggestion, opinions and ideas are gladly welcome.**
 
