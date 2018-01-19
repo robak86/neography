@@ -59,7 +59,7 @@ export class Relationship<R extends RelationshipEntity, N extends NodeEntity<any
         let baseQuery = this.buildQuery(b => b.returns('node'));
         baseQuery = baseQuery.literal('limit 1');
 
-        let found = connectionsFactory.checkoutConnection().runQuery(baseQuery).pluck('node').first();
+        let found = await connectionsFactory.checkoutConnection().runQuery(baseQuery).pluck('node').first();
 
         if (!found) {
             throw new NodeNotFoundError(this.nodeClass);
