@@ -122,19 +122,13 @@ export class NodeQuery<N extends NodeEntity<any>> {
     }
 
     skip(count:number):NodeQuery<N> {
+        invariant(_.isInteger(count), `Given skip count has to be integer number. Passed ${count} instead`);
         return cloned(this, a => a.skipCount = count);
     }
 
     limit(count:number):NodeQuery<N> {
+        invariant(_.isInteger(count), `Given limit count has to be integer number. Passed ${count} instead`);
         return cloned(this, a => a.limitCount = count);
-    }
-
-    //or just use keyof
-    withRelations(eagerToLoad:(e:N) => Relationship<any, any>[]):NodeQuery<N> {
-        throw new Error("Eager loading is not yet implemented");
-        //TODO: ....in order to build query for eagerly fetch associated data we need instance of relations definition
-        //HOW to instantiate it ?
-        // return cloned(this, (a) => a.relationsToLoad = eagerToLoad({}))
     }
 
     private buildQuery(appendReturn:(b:QueryBuilder) => QueryBuilder, skipLimits:boolean = false, skipOrder:boolean = false):QueryBuilder {
