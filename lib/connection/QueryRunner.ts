@@ -1,6 +1,7 @@
 import * as PQueue from "p-queue";
 import {StatementResult} from "neo4j-driver/types/v1/result";
 import {DriverProxy} from "../driver/DriverProxy";
+import {getLogger} from "../utils/logger";
 
 
 export class QueryRunner {
@@ -8,6 +9,7 @@ export class QueryRunner {
 
     constructor(private driver:DriverProxy,
                 private concurrency = 100) {
+        getLogger().info(`Using sessions pool with concurrency set to ${concurrency}`);
         this.queue = new PQueue({concurrency});
     }
 

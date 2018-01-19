@@ -5,15 +5,18 @@ import {QueryContext} from "./common/QueryContext";
 import {CreateQueryPart} from "./create/CreateQueryPart";
 import {ReturnQueryPart} from "./common/ReturnQueryPart";
 import {SetQueryPart} from "./update/SetQueryPart";
-import {WhereLiteralQueryPart} from "./match/WhereLiteralQueryPart";
 import {CypherLiteral} from "./common/CypherLiteral";
 import {AttributesMapperFactory} from "../mappers/AttributesMapperFactory";
+import {WhereStatement} from "./where/WhereStatement";
+import {OrderStatement} from "./order/OrderStatement";
 
+//TODO: rename to CypherQueryStatement
 export type CypherQueryElement = MatchQueryPart
     | CreateQueryPart
     | ReturnQueryPart
     | SetQueryPart
-    | WhereLiteralQueryPart
+    | WhereStatement
+    | OrderStatement
     | CypherLiteral
     | string;
 

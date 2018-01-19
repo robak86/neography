@@ -1,12 +1,12 @@
 import {IQueryPart} from "../abstract/IQueryPart";
-import {AbstractRelation} from "../../model";
+import {RelationshipEntity} from "../../model";
 import {RelationMetadata} from "../../metadata/RelationMetadata";
 import {QueryContext} from "../common/QueryContext";
 import {IBoundQueryPart} from "../abstract/IBoundQueryPart";
 import {RelationDirectionType} from "../match/IRelationMatchQueryPart";
 import {cloned} from "../../utils/core";
 
-export class CreateRelationQueryPart<R extends AbstractRelation> implements IQueryPart {
+export class CreateRelationQueryPart<R extends RelationshipEntity> implements IQueryPart {
     protected _alias:string;
     protected _direction:RelationDirectionType = '<->';
 

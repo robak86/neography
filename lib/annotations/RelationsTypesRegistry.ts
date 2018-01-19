@@ -3,7 +3,7 @@ import {RelationMetadata} from "../metadata/RelationMetadata";
 
 
 //TODO: merge with nodes types register. This registry's purpose is only fetch AttributesMapper(class is common for nodes and relations as well)
-//TODO: ... the only difference are the properties we fetch mappers by (lables vs relation type)
+//TODO: ... the only difference are the properties we fetch mappers by (lables vs relationshipEntity type)
 export type RelationsTypesRegistryEntry = {klass:Function, metadata:RelationMetadata};
 
 export class RelationsTypesRegistry {

@@ -17,6 +17,7 @@ export type MatchableElement = MatchNodeQueryPart<any>
 
 export class MatchQueryPart implements IQueryPart {
 
+
     constructor(private elements:MatchableElement[], private isOptionalMatch:boolean) {}
 
     toCypher(ctx:QueryContext):IBoundQueryPart {

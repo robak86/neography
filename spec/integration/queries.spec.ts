@@ -74,7 +74,7 @@ describe("Queries", () => {
                 });
 
                 it("equals to matched node", () => {
-                    expect(savedNode).to.eql(matchedNode);
+                    expect(savedNode.attributes).to.deep.eq(matchedNode.attributes);
                 });
             });
         });
@@ -106,7 +106,7 @@ describe("Queries", () => {
             newNode2 = new DummyGraphNode({attr1: 'n2Attr'});
 
         beforeEach(async () => {
-            //create nodes which will be connected by relation
+            //create nodes which will be connected by relationshipEntity
             let nodes = await connection.runQuery(q => q
                 .create(c => c.node(newNode1).as('n1'))
                 .create(c => c.node(newNode2).as('n2'))
@@ -116,7 +116,7 @@ describe("Queries", () => {
             node2 = nodes.n2;
         });
 
-        describe("adding relation to nodes", () => {
+        describe("adding relationshipEntity to nodes", () => {
             let newRelation:DummyGraphRelation,
                 createRelationQuery:QueryBuilder;
 
@@ -132,7 +132,7 @@ describe("Queries", () => {
                     .returns('n1', 'rel1', 'n2');
             });
 
-            it("saves new relation into database", async () => {
+            it("saves new relationshipEntity into database", async () => {
                 const getRelationsCount = () => connection
                     .runQuery(q => q.literal('MATCH(n1)-[rel]->(n2) RETURN count(rel) as relationsCount'))
                     .pluck('relationsCount')
@@ -158,11 +158,11 @@ describe("Queries", () => {
                     matchedRelation = await connection.runQuery(matchRelationQuery).pluck('rel').first();
                 });
 
-                it("maps relation data to proper class", () => {
+                it("maps relationshipEntity data to proper class", () => {
                     expect(matchedRelation).to.be.instanceof(DummyGraphRelation);
                 });
 
-                it("stores relation attributes", () => {
+                it("stores relationshipEntity attributes", () => {
                     expect(matchedRelation.attr1).to.eq(newRelation.attr1);
                 });
 
@@ -229,7 +229,7 @@ describe("Queries", () => {
                     let matchQuery = neography.query().match(m => m.node(DummyGraphNode).params({attr1: 'a'}).as('n')).returns('n');
                     let matchedNodes:DummyGraphNode[] = await connection.runQuery(matchQuery).pluck('n').toArray();
                     expect(matchedNodes.length).to.eq(1);
-                    expect(matchedNodes[0]).to.eql(node1);
+                    expect(matchedNodes[0].attributes).to.deep.eq(node1.attributes);
                 });
             });
 
@@ -242,8 +242,8 @@ describe("Queries", () => {
 
                     let matchedNodes:DummyGraphNode[] = await connection.runQuery(matchQuery).pluck('n').toArray();
                     expect(matchedNodes.length).to.eq(2);
-                    expect(matchedNodes[0]).to.eql(node2);
-                    expect(matchedNodes[1]).to.eql(node3);
+                    expect(matchedNodes[0].attributes).to.deep.eq(node2.attributes);
+                    expect(matchedNodes[1].attributes).to.deep.eq(node3.attributes);
                 });
             });
 
@@ -309,7 +309,7 @@ describe("Queries", () => {
                 a_rel_c = await saveRelation(a, new DummyGraphRelation({attr2: 1}), c);
             });
 
-            it("all nodes connected by given relation typ", async () => {
+            it("all nodes connected by given relationshipEntity typ", async () => {
                 let matchQuery = neography.query()
                     .match(m => [
                         m.node(DummyGraphNode).as('from'),
@@ -320,8 +320,13 @@ describe("Queries", () => {
                     .literal('ORDER BY rel.attr2');
 
                 let rows:CreatedRelation[] = await connection.runQuery(matchQuery).toArray();
-                expect(rows[0]).to.eql(a_rel_c);
-                expect(rows[1]).to.eql(a_rel_b);
+
+                expect(rows[0].to.attributes).to.eql(a_rel_c.to.attributes);
+                expect(rows[0].from.attributes).to.eql(a_rel_c.from.attributes);
+                expect(rows[0].rel).to.eql(a_rel_c.rel);
+                expect(rows[1].to.attributes).to.eql(a_rel_b.to.attributes);
+                expect(rows[1].from.attributes).to.eql(a_rel_b.from.attributes);
+                expect(rows[1].rel).to.eql(a_rel_b.rel);
             });
         });
     });

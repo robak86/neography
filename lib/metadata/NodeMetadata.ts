@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import * as _ from 'lodash';
-import {AbstractNode} from "../model";
+import {NodeEntity} from "../model";
 import {getSuperClass} from "../utils/core";
 import {Type} from "../utils/types";
 
@@ -8,11 +8,11 @@ export class NodeMetadata {
 
     private static NODE_METADATA_KEY:string = 'NODE_METADATA';
 
-    static getForClass(klass:Type<AbstractNode>):NodeMetadata|void {
+    static getForClass(klass:Type<NodeEntity>):NodeMetadata|void {
         return Reflect.getMetadata(NodeMetadata.NODE_METADATA_KEY, klass);
     }
 
-    static getOrCreateForClass(klass:Type<AbstractNode>):NodeMetadata {
+    static getOrCreateForClass(klass:Type<NodeEntity>):NodeMetadata {
         let nodeMetadata = Reflect.getOwnMetadata(NodeMetadata.NODE_METADATA_KEY, klass);
 
         if (!nodeMetadata) {
@@ -28,8 +28,8 @@ export class NodeMetadata {
         return nodeMetadata;
     }
 
-    static getForInstance(instance:AbstractNode):NodeMetadata {
-        return this.getOrCreateForClass(instance.constructor as Type<AbstractNode>);
+    static getForInstance(instance:NodeEntity):NodeMetadata {
+        return this.getOrCreateForClass(instance.constructor as Type<NodeEntity>);
     }
 
     public parent:NodeMetadata;

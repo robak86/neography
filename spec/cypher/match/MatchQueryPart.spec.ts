@@ -78,7 +78,7 @@ describe('MatchQueryPart', () => {
         });
     });
 
-    describe("match two nodes connected with relation", () => {
+    describe("match two nodes connected with relationshipEntity", () => {
         beforeEach(() => {
             matchQueryElement = new MatchQueryPart([nodeQuery1, relationQuery1, nodeQuery2], false);
         });
@@ -98,7 +98,7 @@ describe('MatchQueryPart', () => {
         });
     });
 
-    describe("match nodes connected with relation and additional node", () => {
+    describe("match nodes connected with relationshipEntity and additional node", () => {
         beforeEach(() => {
             matchQueryElement = new MatchQueryPart([nodeQuery1, relationQuery1, nodeQuery2, nodeQuery3], false);
         });

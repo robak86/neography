@@ -47,6 +47,7 @@
     "@types/mocha": "^2.2.40",
     "@types/node": "^7.0.12",
     "@types/p-queue": "^1.1.0",
+    "@types/sinon": "^4.1.3",
     "chai": "^3.5.0",
     "chai-as-promised": "^7.1.1",
     "chai-string": "^1.4.0",
@@ -57,7 +58,7 @@
     "reflect-metadata": "^0.1.10",
     "sinon": "^2.1.0",
     "source-map-support": "^0.4.14",
-    "typescript": "^2.4.2"
+    "typescript": "^2.6.2"
   },
   "dependencies": {
     "lodash": "^4.17.4",
@@ -67,5 +68,10 @@
   },
   "peerDependencies": {
     "reflect-metadata": "^0.1.10"
+  },
+  "nyc": {
+    "exclude": [
+      "dist/spec/**/*.js"
+    ]
   }
 }

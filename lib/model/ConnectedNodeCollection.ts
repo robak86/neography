@@ -1,12 +1,24 @@
 import {ConnectedNode, isConnectedNode} from "./ConnectedNode";
-import {AbstractNode} from "./index";
+import {NodeEntity} from "./index";
 import {Type} from "../utils/types";
-import {AbstractRelation} from "./AbstractRelation";
+import {RelationshipEntity} from "./RelationshipEntity";
 import {assertAllPersisted} from "./GraphEntity";
 
-export class ConnectedNodesCollection<R extends AbstractRelation, TO extends AbstractNode> {
-    constructor(private relationClass:Type<R>, private connectedNodes:(ConnectedNode<R, TO> | TO)[]) {
+export class ConnectedNodesCollection<R extends RelationshipEntity, TO extends NodeEntity> {
+    private connectedNodes:ConnectedNode<R, TO>[] = [];
 
+    constructor(private relationClass:Type<R>) {
+
+    }
+
+    setNodes(n:TO[]) {
+        this.connectedNodes = n.map(node => {
+            return {node, relation: new this.relationClass()}
+        })
+    }
+
+    setConnectedNodes(n:ConnectedNode<R, TO>[]) {
+        this.connectedNodes = n.concat([]);
     }
 
     getConnectedNodes():ConnectedNode<R, TO>[] {

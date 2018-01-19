@@ -4,18 +4,26 @@ import {GraphResponse} from "../response/GraphResponse";
 import {BoundCypherQuery} from "../cypher/CypherQuery";
 import {QueryBuilder} from "../cypher/builders/QueryBuilder";
 import {TransactionRunner} from "./TransactionRunner";
-import {AbstractNode, AbstractRelation} from "../model";
+import {NodeEntity} from "../model";
 import {Type} from "../utils/types";
-import {NodeRepository} from "../repositories/NodeRepository";
+import {NodeBatchRepository} from "../repositories/NodeBatchRepository";
 import {GraphResponseFactory} from "../response/GraphResponseFactory";
 import {QueryRunner} from "./QueryRunner";
-import {UnboundRelationRepository} from "../repositories/UnboundRelationRepository";
+
+import {NodeQuery} from "../repositories/NodeQuery";
+import {connectionEvents} from "./ConnectionEvents";
+
+let counter = 0;
+const genId = () => `c_${counter += 1}`;
 
 export class Connection {
+    private connectionId:string = genId();
+
 
     constructor(private queryRunner:QueryRunner,
                 private transactionRunner:TransactionRunner,
                 private responseFactory:GraphResponseFactory) {
+        connectionEvents.onConnectionCreate.emit({connectionId: this.connectionId});
     }
 
     runQuery(queryBuilder:QueryBuilder | ((builder:QueryBuilder) => QueryBuilder)):GraphResponse {
@@ -32,14 +40,13 @@ export class Connection {
         return this.transactionRunner.withTransaction(fn)
     }
 
-    nodeType<T extends AbstractNode>(nodeClass:Type<T>):NodeRepository<T> {
-        return new NodeRepository(nodeClass, this);
+    nodeBatchRepository<T extends NodeEntity>(nodeClass:Type<T>):NodeBatchRepository<T> {
+        return new NodeBatchRepository(nodeClass, this);
     }
 
-    relationType<REL extends AbstractRelation>(relationClass:Type<REL>):UnboundRelationRepository<REL> {
-        return new UnboundRelationRepository(relationClass, this);
+    nodeQuery<N extends NodeEntity>(nodeClass:Type<N>):NodeQuery<N> {
+        return new NodeQuery(nodeClass);
     }
-
 
     private execQuery(cypherQuery:string, params?:any):GraphResponse {
         let resultStatementQuery = this.transactionRunner.isTransactionOpened() ?

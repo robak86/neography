@@ -3,11 +3,11 @@ import {QueryContext} from "../common/QueryContext";
 import {generateMatchAssignments} from "../utils/QueryHelpers";
 import {IRelationMatchQueryPart, RelationDirectionType} from "./IRelationMatchQueryPart";
 import {IQueryPart} from "../abstract/IQueryPart";
-import {AbstractRelation} from "../../model";
+import {RelationshipEntity} from "../../model";
 import {cloned} from "../../utils/core";
 
 
-export class MatchUntypedRelationQueryPart<R extends AbstractRelation> implements IRelationMatchQueryPart<R>, IQueryPart {
+export class MatchUntypedRelationQueryPart<R extends RelationshipEntity> implements IRelationMatchQueryPart<R>, IQueryPart {
     protected _params:any;
     protected _alias:string;
     protected _direction:RelationDirectionType = '<->';

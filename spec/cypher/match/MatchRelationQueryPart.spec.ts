@@ -1,6 +1,6 @@
 import {expect} from 'chai';
-import {attribute, relation} from "../../../lib/annotations";
-import {AbstractRelation} from "../../../lib/model";
+import {attribute, relationshipEntity} from "../../../lib/annotations";
+import {RelationshipEntity} from "../../../lib/model";
 import {MatchRelationQueryPart} from "../../../lib/cypher/match/MatchRelationQueryPart";
 import {QueryContext} from "../../../lib/cypher/common/QueryContext";
 import {getDefaultContext} from "../../helpers/ConnectionHelpers";
@@ -9,8 +9,8 @@ import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 describe("MatchRelationQueryPart", () => {
     const relationType:string = '_RelationTypeForSpec';
 
-    @relation(relationType)
-    class SomeDummyRelation extends AbstractRelation<SomeDummyRelation> {
+    @relationshipEntity(relationType)
+    class SomeDummyRelation extends RelationshipEntity<SomeDummyRelation> {
         @attribute() attr1:string;
         @attribute() attr2:number;
     }

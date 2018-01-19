@@ -1,4 +1,4 @@
-import {AbstractNode, AbstractRelation} from "../../model";
+import {NodeEntity, RelationshipEntity} from "../../model";
 import {MatchNodeQueryPart} from "../match/MatchNodeQueryPart";
 import {MatchRelationQueryPart} from "../match/MatchRelationQueryPart";
 import {MatchUntypedNodeQueryPart} from "../match/MatchUntypedNodeQueryPart";
@@ -12,9 +12,9 @@ import * as _ from 'lodash';
 
 export class MatchBuilder {
 
-    node<N extends AbstractNode>(klass:Type<N>):INodeMatchQueryPart<N>
-    node<N extends AbstractNode>(klass?):INodeMatchQueryPart<any>
-    node<N extends AbstractNode>(klass?):any {
+    node<N extends NodeEntity>(klass:Type<N>):INodeMatchQueryPart<N>
+    node<N extends NodeEntity>(klass?):INodeMatchQueryPart<any>
+    node<N extends NodeEntity>(klass?):any {
         if (isPresent(klass) && !_.isFunction(klass)){
             throw new Error(`Wrong class ${JSON.stringify(klass)}`);
         }
@@ -30,7 +30,7 @@ export class MatchBuilder {
         return new MatchedNodeQueryPart().as(alias);
     }
 
-    relation<R extends AbstractRelation>(klass?:Type<R>):IRelationMatchQueryPart<R> {
+    relation<R extends RelationshipEntity>(klass?:Type<R>):IRelationMatchQueryPart<R> {
         if (klass) {
             return new MatchRelationQueryPart(klass);
         } else {

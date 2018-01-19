@@ -1,11 +1,11 @@
 import {expect} from 'chai';
-import {AbstractNode} from "../../lib/model/AbstractNode";
+import {NodeEntity} from "../../lib/model/NodeEntity";
 import {NodeMetadata} from "../../lib/metadata/NodeMetadata";
 
 describe("NodeMetadata", () => {
 
     describe("getForClass", () => {
-        class SomeClass extends AbstractNode {}
+        class SomeClass extends NodeEntity {}
 
         it("returns undefined if metadata is attached", () => {
             expect(NodeMetadata.getForClass(SomeClass)).to.eq(undefined);
@@ -19,7 +19,7 @@ describe("NodeMetadata", () => {
     });
 
     describe("inheritance", () => {
-        class A extends AbstractNode {}
+        class A extends NodeEntity {}
         class B extends A {}
 
         before(() => {
@@ -34,7 +34,7 @@ describe("NodeMetadata", () => {
 
 
     describe(".getLabels", () => {
-        class A extends AbstractNode {}
+        class A extends NodeEntity {}
         class B extends A {}
 
         before(() => {
@@ -49,7 +49,7 @@ describe("NodeMetadata", () => {
     });
 
     describe(".getId", () => {
-        class A extends AbstractNode {}
+        class A extends NodeEntity {}
         class B extends A {}
 
         before(() => {

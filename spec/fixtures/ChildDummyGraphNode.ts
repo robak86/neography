@@ -1,7 +1,7 @@
-import {attribute, node} from "../../lib/annotations";
+import {attribute, nodeEntity} from "../../lib/annotations";
 import {DummyGraphNode} from "./DummyGraphNode";
 
-@node('ChildDummyGraphNode')
+@nodeEntity('ChildDummyGraphNode')
 export class ChildDummyGraphNode extends DummyGraphNode<ChildDummyGraphNode> {
     @attribute() attr3:string;
 }

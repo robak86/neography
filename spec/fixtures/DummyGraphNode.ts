@@ -1,13 +1,17 @@
-import {node} from "../../lib/annotations";
-import {AbstractNode} from "../../lib/model";
-import {attribute, timestamp} from "../../lib/annotations";
+import {attribute, nodeEntity, timestamp} from "../../lib/annotations";
+import {NodeEntity, Relationship} from "../../lib/model";
+import {relationship} from "../../lib/annotations/RelationshipAnnotations";
+import {DummyGraphRelation} from "./DummyGraphRelation";
 
 
-@node('DummyGraphNode')
-export class DummyGraphNode<P = undefined> extends AbstractNode<DummyGraphNode & P> {
+@nodeEntity('DummyGraphNode')
+export class DummyGraphNode<P = any> extends NodeEntity<P> {
     @timestamp() createdAt?:Date;
     @timestamp() updatedAt?:Date;
 
     @attribute() attr1?:string;
     @attribute() attr2?:number;
+
+    @relationship(DummyGraphRelation, DummyGraphNode)
+    childDummies:Relationship<DummyGraphRelation, DummyGraphNode>
 }

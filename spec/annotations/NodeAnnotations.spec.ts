@@ -1,18 +1,18 @@
-import {node} from "../../lib/annotations";
+import {nodeEntity} from "../../lib/annotations";
 import {expect} from 'chai';
 import {NodeMetadata} from "../../lib/metadata/NodeMetadata";
-import {AbstractNode} from "../../lib/model";
+import {NodeEntity} from "../../lib/model";
 
 describe("NodeAnnotations", () => {
-    @node('DummyVehicle')
-    class DummyVehicle extends AbstractNode {
+    @nodeEntity('DummyVehicle')
+    class DummyVehicle extends NodeEntity {
     }
 
-    @node('DummyCar')
+    @nodeEntity('DummyCar')
     class DummyCar extends DummyVehicle {
     }
 
-    describe("@node", () => {
+    describe("@nodeEntity", () => {
         it("attaches instance of NodeMetadata to annotated class", () => {
             let nodeMetadata = NodeMetadata.getForClass(DummyVehicle);
             expect(nodeMetadata).to.be.instanceof(NodeMetadata);

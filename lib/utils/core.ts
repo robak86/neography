@@ -16,32 +16,6 @@ export function someOrThrow<T>(fn:(() => Maybe<T>) | Maybe<T>, errorMsg:string):
     }
 }
 
-export function either<T>(fn:(() => T) | T, defaultVal:T):T {
-    try {
-        let val:T = (_.isFunction(fn) ? (<any>fn)() : fn) as T;
-
-        if (_.isUndefined(val) || val === null || (_.isNumber(val) && isNaN(<any>val))) {
-            return defaultVal;
-        } else {
-            return val as any;
-        }
-    } catch (e) {
-        return defaultVal;
-    }
-}
-
-export function getClassAncestors(klass):Type<any>[] {
-    let ancestors:any[] = [];
-    let parentClass = Object.getPrototypeOf(klass);
-
-    while (parentClass && parentClass.name) {
-        ancestors.push(parentClass);
-        parentClass = Object.getPrototypeOf(parentClass);
-    }
-
-    return ancestors;
-}
-
 export function invariant(condition:boolean, message:string) {
     if (!condition) {
         throw new Error(message);

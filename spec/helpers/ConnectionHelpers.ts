@@ -1,11 +1,14 @@
+/* istanbul ignore file */
+
 import {Connection, Neography} from "../../lib";
 import * as _ from 'lodash';
 import {someOrThrow} from "../../lib/utils/core";
 import {QueryContext} from "../../lib/cypher/common/QueryContext";
-import {AbstractRelation} from "../../lib/model";
+import {RelationshipEntity} from "../../lib/model";
 import {Type} from "../../lib/utils/types";
 import {buildQuery} from "../../lib/cypher";
-import {TimestampsExtension} from "../../lib/extensions/TimestampsExtension";
+import {TimestampsExtension} from "../../lib/extensions";
+import {connectionsFactory} from "../../lib/connection/ConnectionFactory";
 
 const DEBUG_ENABLED = false;
 
@@ -14,9 +17,10 @@ export const getDefaultNeography = _.memoize(():Neography => {
         host: 'localhost',
         username: 'neo4j',
         password: 'password',
-        debug: DEBUG_ENABLED
+        debug: DEBUG_ENABLED,
+        sessionsPoolSize: 10
     });
-    neography.registerExtension(TimestampsExtension.getDefault());
+    connectionsFactory.registerExtension(TimestampsExtension.getDefault());
     return neography;
 });
 
@@ -30,14 +34,14 @@ export const checkoutConnection = ():Connection => {
 
 export const getDefaultContext = () => {
     let neography = getDefaultNeography();
-    return new QueryContext(neography.attributesMapperFactory);
+    return new QueryContext(connectionsFactory.attributesMapperFactory);
 };
 
 export const cleanDatabase = ():Promise<any> => {
     return getSharedConnection().runQuery(q => q.literal(`MATCH (n) DETACH DELETE n`)).toArray();
 };
 
-export const countRelations = (rel:Type<AbstractRelation>):Promise<number> => {
+export const countRelations = (rel:Type<RelationshipEntity>):Promise<number> => {
     let query = buildQuery()
         .match(m => [
             m.node(),
