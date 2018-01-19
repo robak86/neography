@@ -72,6 +72,14 @@ describe(`Relationship`, () => {
                     .limit(1).all();
                 expect(fetchedCars).to.have.deep.members([graph.vw]);
             });
+
+            it(`throws if passed argument is not an integer`, async () => {
+                const wrongParam = () => aRel
+                    .orderByNode(by => by.attribute('horsePower').asc())
+                    .limit(1.2);
+
+                expect(wrongParam).to.throw;
+            });
         });
 
         describe(`skip`, () => {
@@ -81,6 +89,14 @@ describe(`Relationship`, () => {
                     .skip(1)
                     .all();
                 expect(fetchedCars).to.have.deep.members([graph.porsche]);
+            });
+
+            it(`throws if passed argument is not an integer`, async () => {
+                const wrongParam = () => aRel
+                    .orderByNode(by => by.attribute('horsePower').asc())
+                    .skip(1.2);
+
+                expect(wrongParam).to.throw;
             });
         });
 

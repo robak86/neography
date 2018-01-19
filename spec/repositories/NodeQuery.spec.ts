@@ -125,7 +125,7 @@ describe(`NodeQuery`, () => {
             let usersToBeFound = [users[4], users[0], users[3]];
             let fetched = await activeNodeQuery.findByIds(usersToBeFound.map(u => u.id));
             expect(fetched.length).to.eq(3);
-            expect(fetched.map(u => u.attributes)).to.eql(usersToBeFound.map(u => u .attributes));
+            expect(fetched.map(u => u.attributes)).to.eql(usersToBeFound.map(u => u.attributes));
         });
     });
 
@@ -156,14 +156,13 @@ describe(`NodeQuery`, () => {
                     .all();
                 expect(fetchedUsers.map(u => u.id)).to.eql([users[0].id]);
             });
-        });
-    });
 
-    describe(`.withRelations`, () => {
-        it.skip('eager loads relations', () => {
-            activeNodeQuery.withRelations(r => [r.vehicles])
-        });
+            it(`throws if passed argument is not an integer`, async () => {
+                const wrongParam = () => activeNodeQuery
+                    .skip(1.2);
 
-        it('hits database only once');
+                expect(wrongParam).to.throw;
+            });
+        });
     });
 });

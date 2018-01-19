@@ -3,7 +3,7 @@ import {NodeEntity} from "./NodeEntity";
 import {Type} from "../utils/types";
 import {ConnectedNode} from "./ConnectedNode";
 import {OrderBuilderCallback, QueryBuilder, WhereBuilderCallback} from "../cypher/builders/QueryBuilder";
-import {cloned, getClassFromInstance, isPresent} from "../utils/core";
+import {cloned, getClassFromInstance, invariant, isPresent} from "../utils/core";
 import {buildQuery} from "../cypher";
 import {connectionsFactory} from "../connection/ConnectionFactory";
 import {Connection} from "../";
@@ -141,10 +141,12 @@ export class Relationship<R extends RelationshipEntity, N extends NodeEntity<any
     }
 
     limit(count:number):Relationship<R, N> {
+        invariant(_.isInteger(count), `Given limit count has to be integer number. Passed ${count} instead`);
         return cloned(this, a => a.limitCount = count);
     }
 
     skip(count:number):Relationship<R, N> {
+        invariant(_.isInteger(count), `Given skip count has to be integer number. Passed ${count} instead`);
         return cloned(this, a => a.skipCount = count);
     }
 
