@@ -1,7 +1,7 @@
 {
   "name": "neography",
   "version": "0.2.0",
-  "description": "Object mapper and queries builder for official neo4j driver.",
+  "description": "Object-graph mapping library for Neo4j.",
   "main": "index.js",
   "types": "index.d.ts",
   "engines": {
