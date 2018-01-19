@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import {AttributesMetadata} from "../metadata/AttributesMetadata";
 import {Relationship} from "./Relationship";
 import {assertPersisted} from "./GraphEntity";
+import {Required} from "../utils/types";
 
 
 export abstract class NodeEntity<T = any> extends AbstractEntity<T> {
@@ -16,14 +17,14 @@ export abstract class NodeEntity<T = any> extends AbstractEntity<T> {
     private _entityType:'Node';
     private _relationsCache:{ [propertyName:string]:Relationship<any, any> } = {};
 
-    get attributes():Partial<this> {
+    get attributes():Required<this> {
         let attributes = {};
         let meta = AttributesMetadata.getForInstance(this);
         meta.forEachAttribute((attribute, name) => {
             attributes[name] = this[name];
         });
 
-        return attributes;
+        return attributes as any;
     }
 
     isEqual(other:this):boolean {
