@@ -321,14 +321,15 @@ describe("Queries", () => {
                     .literal('ORDER BY rel.attr2');
 
                 let rows:CreatedRelation[] = await connection.runQuery(matchQuery).toArray();
-                rows = _.sortBy(rows,(r) => r.from.attributes.attr1);
 
-                expect(rows[0].to.attributes).to.eql(a_rel_c.to.attributes);
-                expect(rows[0].from.attributes).to.eql(a_rel_c.from.attributes);
-                expect(rows[0].rel).to.eql(a_rel_c.rel);
-                expect(rows[1].to.attributes).to.eql(a_rel_b.to.attributes);
-                expect(rows[1].from.attributes).to.eql(a_rel_b.from.attributes);
-                expect(rows[1].rel).to.eql(a_rel_b.rel);
+                expect( rows.map(r => r.from.attributes))
+                    .to.have.deep.members([a_rel_b.from.attributes, a_rel_c.from.attributes]);
+
+                expect( rows.map(r => r.to.attributes))
+                    .to.have.deep.members([a_rel_b.to.attributes, a_rel_c.to.attributes]);
+
+                expect( rows.map(r => r.rel))
+                    .to.have.deep.members([a_rel_b.rel, a_rel_c.rel]);
             });
         });
     });
