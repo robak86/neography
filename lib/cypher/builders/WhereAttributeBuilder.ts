@@ -53,7 +53,7 @@ export class WhereAttributeBuilder<T> {
     constructor(private propertyName:string, private _alias:string) {}
 
     notEqual(val:T):WhereAttributeQueryPart {
-        return new WhereAttributeQueryPart(this.propertyName, this._alias, '!=', val);
+        return new WhereAttributeQueryPart(this.propertyName, this._alias, '<>', val);
     }
 
     equal(val:T):WhereAttributeQueryPart {
