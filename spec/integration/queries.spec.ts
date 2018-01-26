@@ -8,6 +8,7 @@ import {int} from "../../lib/driver/Integer";
 import {expectIsNowDate} from "../helpers/assertions";
 import {ChildDummyGraphNode} from "../fixtures/ChildDummyGraphNode";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
+import * as _ from 'lodash';
 
 describe("Queries", () => {
     let neography:Neography,
@@ -320,6 +321,7 @@ describe("Queries", () => {
                     .literal('ORDER BY rel.attr2');
 
                 let rows:CreatedRelation[] = await connection.runQuery(matchQuery).toArray();
+                rows = _.sortBy(rows,(r) => r.from.attributes.attr1);
 
                 expect(rows[0].to.attributes).to.eql(a_rel_c.to.attributes);
                 expect(rows[0].from.attributes).to.eql(a_rel_c.from.attributes);
