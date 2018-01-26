@@ -28,7 +28,7 @@ describe(`WhereAttributeBuilder`, () => {
     describe(`.notEqual`, () => {
         it('returns correct cypher statement', () => {
             let cypher = builder.notEqual('someVal').toCypher(ctx);
-            expect(cypher.cypherString).to.eq(`node.someProperty != { __node_someProperty_prop1 }`)
+            expect(cypher.cypherString).to.eq(`node.someProperty <> { __node_someProperty_prop1 }`)
         });
 
         it('returns correct params object', () => {
