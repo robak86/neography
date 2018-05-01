@@ -1135,11 +1135,12 @@ native-promise-only@^0.8.1:
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/native-promise-only/-/native-promise-only-0.8.1.tgz#20a318c30cb45f71fe7adfbf7b21c99c1472ef11"
 
-neo4j-driver@^1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/neo4j-driver/-/neo4j-driver-1.5.1.tgz#54679dc467fde957fb7c8f0553cd5f8cc98e0531"
+neo4j-driver@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/neo4j-driver/-/neo4j-driver-1.6.0.tgz#1010824ccc77472731003b202290a2187ee3672b"
   dependencies:
     babel-runtime "^6.18.0"
+    uri-js "^4.2.1"
 
 normalize-package-data@^2.3.2:
   version "2.4.0"
@@ -1312,6 +1313,10 @@ pseudomap@^1.0.2:
 punycode@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
+
+punycode@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.0.tgz#5f863edc89b96db09074bad7947bf09056ca4e7d"
 
 qs@~6.5.1:
   version "6.5.1"
@@ -1626,9 +1631,9 @@ type-detect@^4.0.0:
   version "4.0.5"
   resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-4.0.5.tgz#d70e5bc81db6de2a381bcaca0c6e0cbdc7635de2"
 
-typescript@^2.6.2:
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.6.2.tgz#3c5b6fd7f6de0914269027f03c0946758f7673a4"
+typescript@^2.8.3:
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.8.3.tgz#5d817f9b6f31bb871835f4edf0089f21abe6c170"
 
 uglify-js@^2.6:
   version "2.8.29"
@@ -1642,6 +1647,12 @@ uglify-js@^2.6:
 uglify-to-browserify@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/uglify-to-browserify/-/uglify-to-browserify-1.0.2.tgz#6e0924d6bda6b5afe349e39a6d632850a0f882b7"
+
+uri-js@^4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/uri-js/-/uri-js-4.2.1.tgz#4595a80a51f356164e22970df64c7abd6ade9850"
+  dependencies:
+    punycode "^2.1.0"
 
 uuid@^3.1.0:
   version "3.1.0"
