@@ -58,11 +58,11 @@
     "reflect-metadata": "^0.1.10",
     "sinon": "^2.1.0",
     "source-map-support": "^0.4.14",
-    "typescript": "^2.6.2"
+    "typescript": "^2.8.3"
   },
   "dependencies": {
     "lodash": "^4.17.4",
-    "neo4j-driver": "^1.5.1",
+    "neo4j-driver": "^1.6.0",
     "p-queue": "^1.1.0",
     "shortid": "^2.2.8"
   },
