@@ -9,6 +9,9 @@ import {MatchUntypedRelationQueryPart} from "./MatchUntypedRelationQueryPart";
 import {MatchedNodeQueryPart} from "../common/MatchedNodeQueryPart";
 import {INodeMatchQueryPart} from "./INodeMatchQueryPart";
 import {IRelationMatchQueryPart} from "./IRelationMatchQueryPart";
+import {MatchBuilderCallback} from "../builders/QueryBuilder";
+import {MatchBuilder} from "../builders/MatchBuilder";
+import * as _ from 'lodash';
 
 export type MatchableElement = MatchNodeQueryPart<any>
     | MatchedNodeQueryPart
@@ -16,7 +19,19 @@ export type MatchableElement = MatchNodeQueryPart<any>
     | IRelationMatchQueryPart<any>;
 
 export class MatchQueryPart implements IQueryPart {
+    static build(isOptional:boolean, ...builderOrElements:(MatchBuilderCallback | MatchableElement)[]):MatchQueryPart {
+        let matchableElements:MatchableElement[] = [];
 
+        builderOrElements.forEach((el) => {
+            if (_.isFunction(el)) {
+                matchableElements = matchableElements.concat(el(new MatchBuilder()));
+            } else {
+                matchableElements.push(el as any);
+            }
+        });
+
+        return new MatchQueryPart(matchableElements, isOptional);
+    }
 
     constructor(private elements:MatchableElement[], private isOptionalMatch:boolean) {}
 
