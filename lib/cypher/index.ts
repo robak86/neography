@@ -1,3 +1,8 @@
 import {QueryBuilder} from "./builders/QueryBuilder";
+import {IQueryPart} from "./abstract/IQueryPart";
 
-export const buildQuery = () => new QueryBuilder();
+export const buildQuery = (...elements:IQueryPart[]) => new QueryBuilder(elements);
+
+export * from './match';
+export * from './create';
+export * from './where';

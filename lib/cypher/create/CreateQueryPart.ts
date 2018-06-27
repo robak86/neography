@@ -5,7 +5,9 @@ import {CreateNodeQueryPart} from "./CreateNodeQueryPart";
 import {CreateRelationQueryPart} from "./CreateRelationQueryPart";
 import {NodeRelationConcatenator} from "../utils/NodeRelationConcatenator";
 import {MatchedNodeQueryPart} from "../common/MatchedNodeQueryPart";
-
+import {CreateBuilderCallback} from "../builders/QueryBuilder";
+import {CreateBuilder} from "../builders/CreateBuilder";
+import * as _ from 'lodash';
 
 export type PersistableElement = CreateNodeQueryPart<any>
     | CreateRelationQueryPart<any>
@@ -13,6 +15,20 @@ export type PersistableElement = CreateNodeQueryPart<any>
 
 
 export class CreateQueryPart implements IQueryPart {
+
+    static build(...builderOrElements:(CreateBuilderCallback | PersistableElement)[]):IQueryPart {
+        let persistableQueryElements:PersistableElement[] = [];
+
+        builderOrElements.forEach((el) => {
+            if (_.isFunction(el)) {
+                persistableQueryElements = persistableQueryElements.concat(el(new CreateBuilder()));
+            } else {
+                persistableQueryElements.push(el as any);
+            }
+        });
+
+        return new CreateQueryPart(persistableQueryElements);
+    }
 
     constructor(private elements:PersistableElement[]) {}
 

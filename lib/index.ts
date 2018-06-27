@@ -5,6 +5,8 @@ import {setDebugLogger, setLogger} from "./utils/logger";
 import {SimpleDebugLogger} from "./utils/SimpleDebugLogger";
 import {connectionsFactory} from "./connection/ConnectionFactory";
 import {IExtension} from "./extensions/IExtension";
+import {CypherQueryElement} from "./cypher/CypherQuery";
+import {IQueryPart} from "./cypher/abstract/IQueryPart";
 
 
 export * from './connection/Connection';
@@ -37,7 +39,7 @@ export class Neography {
         connectionsFactory.registerExtension(extension);
     }
 
-    query():QueryBuilder {
-        return new QueryBuilder();
+    query(...elements:IQueryPart[]):QueryBuilder {
+        return new QueryBuilder(elements);
     }
 }

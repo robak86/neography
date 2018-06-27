@@ -1,6 +1,6 @@
 import {MatchableElement, MatchQueryPart} from "../match/MatchQueryPart";
 import {CreateQueryPart, PersistableElement} from "../create/CreateQueryPart";
-import {CypherQuery, CypherQueryElement} from "../CypherQuery";
+import {CypherQuery} from "../CypherQuery";
 import * as _ from 'lodash';
 import {ReturnQueryPart} from "../common/ReturnQueryPart";
 import {MatchBuilder} from "./MatchBuilder";
@@ -8,14 +8,14 @@ import {CreateBuilder} from "./CreateBuilder";
 import {SetQueryBuilder} from "./SetQueryBuilder";
 import {SetQueryPart, SetQueryPartChildren} from "../update/SetQueryPart";
 import {WhereBuilder, WhereStatementPart} from "./WhereBuilder";
-import {WhereLiteralQueryPart} from "../match/WhereLiteralQueryPart";
 import {CypherLiteral} from "../common/CypherLiteral";
 import {AttributesMapperFactory} from "../../mappers/AttributesMapperFactory";
 import {WhereStatement} from "../where/WhereStatement";
-
 import {OrderStatementPart} from "../order/OrderStatementPart";
 import {OrderStatement} from "../order/OrderStatement";
 import {OrderBuilder} from "./OrderBuilder";
+import {IQueryPart} from "../abstract/IQueryPart";
+import {literal} from "../common";
 
 
 export type MatchBuilderCallback = (q:MatchBuilder) => MatchableElement[] | MatchableElement;
@@ -24,7 +24,12 @@ export type WhereBuilderCallback<T> = (q:WhereBuilder<T>) => WhereStatementPart[
 export type OrderBuilderCallback<T> = (q:OrderBuilder<T>) => OrderStatementPart[] | OrderStatementPart;
 
 export class QueryBuilder {
-    constructor(private elements:CypherQueryElement[] = []) {}
+    constructor(private elements:IQueryPart[] = []) {}
+
+    pipe(...cypherQueryElement:IQueryPart[]):QueryBuilder {
+        let elements = _.clone(this.elements);
+        return new QueryBuilder([...elements, ...cypherQueryElement])
+    }
 
     match(...builderOrElements:(MatchBuilderCallback | MatchableElement)[]):QueryBuilder {
         const matchQueryPart:MatchQueryPart = MatchQueryPart.build(false, ...builderOrElements);
@@ -46,20 +51,11 @@ export class QueryBuilder {
     }
 
     //TODO: we should provide builder for where, but currently we only support literals
-    where(literal:string | WhereBuilderCallback<any> | WhereStatement) {
-        if (literal instanceof WhereStatement) {
-            let elements = _.clone(this.elements);
-            elements.push(literal);
-            return new QueryBuilder(elements)
-        } else {
-            let whereElement:WhereStatementPart[] | WhereStatementPart = _.isFunction(literal) ?
-                literal(new WhereBuilder()) :
-                new WhereLiteralQueryPart(literal);
-
-            let elements = _.clone(this.elements);
-            elements.push(new WhereStatement(_.castArray(whereElement) as any) as any);
-            return new QueryBuilder(elements)
-        }
+    where(literal:string | WhereBuilderCallback<any>) {
+        const whereStatement = WhereStatement.build(literal);
+        let elements = _.clone(this.elements);
+        elements.push(whereStatement);
+        return new QueryBuilder(elements)
     }
 
     set(build:(setBuilder:SetQueryBuilder) => SetQueryPartChildren[] | SetQueryPartChildren):QueryBuilder {
@@ -89,18 +85,10 @@ export class QueryBuilder {
     }
 
     create(...builderOrElements:(CreateBuilderCallback | PersistableElement)[]):QueryBuilder {
-        let persistableQueryElements:PersistableElement[] = [];
-
-        builderOrElements.forEach((el) => {
-            if (_.isFunction(el)) {
-                persistableQueryElements = persistableQueryElements.concat(el(new CreateBuilder()));
-            } else {
-                persistableQueryElements.push(el as any);
-            }
-        });
+        const createQueryPart = CreateQueryPart.build(...builderOrElements);
 
         let elements = _.clone(this.elements);
-        elements.push(new CreateQueryPart(persistableQueryElements));
+        elements.push(createQueryPart);
 
         return new QueryBuilder(elements)
     }
@@ -112,9 +100,9 @@ export class QueryBuilder {
         return new QueryBuilder(elements);
     }
 
-    append(literal:string):QueryBuilder {
+    append(literalContent:string):QueryBuilder {
         let elements = _.clone(this.elements);
-        elements.push(literal);
+        elements.push(literal(literalContent));
         return new QueryBuilder(elements)
     }
 
@@ -122,7 +110,7 @@ export class QueryBuilder {
         return new CypherQuery(this.elements, attributesMapperFactory);
     }
 
-    private cloneAndAppend(queryElement:CypherQueryElement[]):QueryBuilder {
+    private cloneAndAppend(queryElement:IQueryPart[]):QueryBuilder {
         let elements = _.clone(this.elements).concat(queryElement);
         return new QueryBuilder(elements)
     }
