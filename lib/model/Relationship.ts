@@ -88,7 +88,7 @@ export class Relationship<R extends RelationshipEntity, N extends NodeEntity<any
 
     whereRelation(paramsOrCallback:Partial<R> | WhereBuilderCallback<R>):Relationship<R, N> {
         if (_.isFunction(paramsOrCallback)) {
-            let result:WhereStatementPart[] | WhereStatementPart = paramsOrCallback(new WhereBuilder<N>().aliased('relation'));
+            let result:WhereStatementPart[] | WhereStatementPart = paramsOrCallback(new WhereBuilder<R>().aliased('relation'));
             let whereStatement = this.whereStatement ?
                 this.whereStatement.mergeWithAnd(new WhereStatement(_.castArray(result))) :
                 new WhereStatement(_.castArray(result));
