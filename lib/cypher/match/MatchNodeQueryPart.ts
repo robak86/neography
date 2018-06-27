@@ -36,9 +36,11 @@ export class MatchNodeQueryPart<N extends NodeEntity> implements INodeMatchQuery
             ` {${generateMatchAssignments(paramsId, this._params)}}` :
             '';
 
+        const params = this._params ? {[paramsId]: this._params} : {};
+
         return {
             cypherString: `(${alias}:${this.nodeLabels}${cypherParams})`,
-            params: {[paramsId]: this._params}
+            params
         };
     }
 }

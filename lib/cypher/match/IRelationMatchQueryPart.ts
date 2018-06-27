@@ -7,4 +7,5 @@ export interface IRelationMatchQueryPart<R extends RelationshipEntity> extends I
     direction(direction:RelationDirectionType):IRelationMatchQueryPart<R>
     params(params:Partial<R>):IRelationMatchQueryPart<R>
     as(alias:string):IRelationMatchQueryPart<R>
+    length(minOrExactLength:number, max?:number):IRelationMatchQueryPart<R>
 }

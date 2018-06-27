@@ -144,7 +144,7 @@ export class NodeQuery<N extends NodeEntity<any>> {
         baseQuery = appendReturn(baseQuery);
 
         if (this.orderStatement && !skipOrder) {
-            baseQuery = baseQuery.order(this.orderStatement);
+            baseQuery = baseQuery.pipe(this.orderStatement);
         }
 
         if (isPresent(this.skipCount) && !skipLimits) {

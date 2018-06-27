@@ -10,7 +10,7 @@ import {buildQuery} from "../../lib/cypher";
 import {TimestampsExtension} from "../../lib/extensions";
 import {connectionsFactory} from "../../lib/connection/ConnectionFactory";
 
-const DEBUG_ENABLED = false;
+const DEBUG_ENABLED = true;
 
 export const getDefaultNeography = _.memoize(():Neography => {
     let neography = new Neography({
@@ -37,8 +37,8 @@ export const getDefaultContext = () => {
     return new QueryContext(connectionsFactory.attributesMapperFactory);
 };
 
-export const cleanDatabase = ():Promise<any> => {
-    return getSharedConnection().runQuery(q => q.literal(`MATCH (n) DETACH DELETE n`)).toArray();
+export const cleanDatabase = (connection:Connection = getSharedConnection()):Promise<any> => {
+    return connection.runQuery(q => q.literal(`MATCH (n) DETACH DELETE n`)).toArray();
 };
 
 export const countRelations = (rel:Type<RelationshipEntity>):Promise<number> => {

@@ -1,73 +1,30 @@
-import {MatchNodeQueryPart} from "./MatchNodeQueryPart";
-import {MatchRelationQueryPart} from "./MatchRelationQueryPart";
 import {IQueryPart} from "../abstract/IQueryPart";
 import {QueryContext} from "../common/QueryContext";
 import {IBoundQueryPart} from "../abstract/IBoundQueryPart";
-import {NodeRelationConcatenator} from "../utils/NodeRelationConcatenator";
-import {MatchUntypedNodeQueryPart} from "./MatchUntypedNodeQueryPart";
-import {MatchUntypedRelationQueryPart} from "./MatchUntypedRelationQueryPart";
-import {MatchedNodeQueryPart} from "../common/MatchedNodeQueryPart";
-import {INodeMatchQueryPart} from "./INodeMatchQueryPart";
-import {IRelationMatchQueryPart} from "./IRelationMatchQueryPart";
 import {MatchBuilderCallback} from "../builders/QueryBuilder";
-import {MatchBuilder} from "../builders/MatchBuilder";
-import * as _ from 'lodash';
+import {MatchableElement, MatchableQueryPart} from "./MatchableQueryPart";
+import {PathQueryPart} from "./PathQueryPart";
 
-export type MatchableElement = MatchNodeQueryPart<any>
-    | MatchedNodeQueryPart
-    | INodeMatchQueryPart<any>
-    | IRelationMatchQueryPart<any>;
+export type MatchQueryPartChild =
+    | PathQueryPart
+    | MatchableQueryPart;
 
 export class MatchQueryPart implements IQueryPart {
     static build(isOptional:boolean, ...builderOrElements:(MatchBuilderCallback | MatchableElement)[]):MatchQueryPart {
-        let matchableElements:MatchableElement[] = [];
+        const matchableQueryPart = MatchableQueryPart.build(...builderOrElements);
 
-        builderOrElements.forEach((el) => {
-            if (_.isFunction(el)) {
-                matchableElements = matchableElements.concat(el(new MatchBuilder()));
-            } else {
-                matchableElements.push(el as any);
-            }
-        });
 
-        return new MatchQueryPart(matchableElements, isOptional);
+        return new MatchQueryPart(matchableQueryPart, isOptional);
     }
 
-    constructor(private elements:MatchableElement[], private isOptionalMatch:boolean) {}
+    constructor(private matchableQueryParts:MatchQueryPartChild,
+                private isOptionalMatch:boolean) {
+    }
 
     toCypher(ctx:QueryContext):IBoundQueryPart {
-        let cypherPart:IBoundQueryPart = {cypherString: '', params: {}};
-        let concatenator:NodeRelationConcatenator = new NodeRelationConcatenator();
-
-        this.elements.forEach((el:MatchableElement) => {
-            if (el instanceof MatchNodeQueryPart
-                || el instanceof MatchUntypedNodeQueryPart
-                || el instanceof MatchedNodeQueryPart) {
-
-                let nodeQueryCypherPart = el.toCypher(ctx);
-                concatenator.push({cypherString: nodeQueryCypherPart.cypherString, isRelation: false});
-
-                //TODO: check if there is no collisions! Ideally params should be registered in context!!! We could implement this behaviour there
-                cypherPart.params = {
-                    ...cypherPart.params,
-                    ...nodeQueryCypherPart.params
-                }
-            }
-
-            if (el instanceof MatchRelationQueryPart || el instanceof MatchUntypedRelationQueryPart) {
-                let relationQueryCypherPart = el.toCypher(ctx);
-                concatenator.push({cypherString: relationQueryCypherPart.cypherString, isRelation: true});
-
-                //TODO: check if there is no collisions! Ideally params should be registered in context!!! We could implement this behaviour there
-                cypherPart.params = {
-                    ...cypherPart.params,
-                    ...relationQueryCypherPart.params
-                }
-            }
-        });
-
+        const cypherPart = this.matchableQueryParts.toCypher(ctx);
         let matchKeyword = this.isOptionalMatch ? 'OPTIONAL MATCH' : 'MATCH';
-        cypherPart.cypherString = `${matchKeyword} ${concatenator.toString()}`;
+        cypherPart.cypherString = `${matchKeyword} ${cypherPart.cypherString}`;
         return cypherPart;
     }
 }
