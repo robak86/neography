@@ -27,19 +27,9 @@ export class QueryBuilder {
     constructor(private elements:CypherQueryElement[] = []) {}
 
     match(...builderOrElements:(MatchBuilderCallback | MatchableElement)[]):QueryBuilder {
-        let matchableElements:MatchableElement[] = [];
-
-        builderOrElements.forEach((el) => {
-            if (_.isFunction(el)) {
-                matchableElements = matchableElements.concat(el(new MatchBuilder()));
-            } else {
-                matchableElements.push(el as any);
-            }
-        });
-
+        const matchQueryPart:MatchQueryPart = MatchQueryPart.build(false, ...builderOrElements);
         let elements = _.clone(this.elements);
-        elements.push(new MatchQueryPart(matchableElements, false));
-
+        elements.push(matchQueryPart);
         return new QueryBuilder(elements)
     }
 
@@ -49,19 +39,9 @@ export class QueryBuilder {
 
     //TODO: make it DRY with match method
     optionalMatch(...builderOrElements:(MatchBuilderCallback | MatchableElement)[]):QueryBuilder {
-        let matchableElements:MatchableElement[] = [];
-
-        builderOrElements.forEach((el) => {
-            if (_.isFunction(el)) {
-                matchableElements = matchableElements.concat(el(new MatchBuilder()));
-            } else {
-                matchableElements.push(el as any);
-            }
-        });
-
+        const matchQueryPart:MatchQueryPart = MatchQueryPart.build(true, ...builderOrElements);
         let elements = _.clone(this.elements);
-        elements.push(new MatchQueryPart(matchableElements, true));
-
+        elements.push(matchQueryPart);
         return new QueryBuilder(elements)
     }
 
