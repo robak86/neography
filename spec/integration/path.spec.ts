@@ -10,8 +10,6 @@ describe(`queries using path`, () => {
     let connection:Connection;
     let n1, n2, n3, rel1, rel2;
 
-
-
     beforeEach(async () => {
         const neography = getDefaultNeography();
         connection = neography.checkoutConnection();
@@ -34,7 +32,7 @@ describe(`queries using path`, () => {
             returns('*')
         );
 
-        await connection.runQuery(query);
+        await connection.withTransaction(() => connection.runQuery(query).first())
     });
 
     describe(`matching path`, () => {
@@ -47,17 +45,13 @@ describe(`queries using path`, () => {
                 ])
             );
 
-            const sleep = (val) => new Promise(resolve => setTimeout(resolve, val));
-
-            await sleep(1000);
-
             const query = buildQuery(
                 matchStatement,
                 returns('n3')
             );
 
-            const result:DummyGraphNode[] = await connection.runQuery(query).toArray();
-            // expect(result[0].attr1).to.eq(n3.attr1);
+            const result:DummyGraphNode[] = await connection.runQuery(query).pluck('n3').toArray();
+            expect(result[0].attr1).to.eq(n3.attr1);
             expect(result.length).to.eq(1);
         });
     });
