@@ -9,6 +9,7 @@ import {CypherLiteral} from "./common/CypherLiteral";
 import {AttributesMapperFactory} from "../mappers/AttributesMapperFactory";
 import {WhereStatement} from "./where/WhereStatement";
 import {OrderStatement} from "./order/OrderStatement";
+import {IQueryPart} from "./abstract/IQueryPart";
 
 //TODO: rename to CypherQueryStatement
 export type CypherQueryElement = MatchQueryPart
@@ -28,7 +29,7 @@ export interface BoundCypherQuery {
 
 export class CypherQuery {
 
-    constructor(private elements:CypherQueryElement[],
+    constructor(private elements:IQueryPart[],
                 private attributesMapperFactory:AttributesMapperFactory) {
 
     }
@@ -39,7 +40,7 @@ export class CypherQuery {
         let out:IBoundQueryPart = {cypherString: '', params: {}};
         let ctx = new QueryContext(this.attributesMapperFactory);
 
-        this.elements.forEach((element:CypherQueryElement) => {
+        this.elements.forEach((element:IQueryPart) => {
             if (_.isString(element)) {
                 out.cypherString += (' ' + element + ' ');
             } else {

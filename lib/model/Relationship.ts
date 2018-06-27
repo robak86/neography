@@ -172,7 +172,7 @@ export class Relationship<R extends RelationshipEntity, N extends NodeEntity<any
             ]);
 
         if (this.whereStatement) {
-            baseQuery = baseQuery.where(this.whereStatement)
+            baseQuery = baseQuery.pipe(this.whereStatement)
         }
 
         baseQuery = appendReturn(baseQuery);

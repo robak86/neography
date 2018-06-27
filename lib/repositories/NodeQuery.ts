@@ -138,7 +138,7 @@ export class NodeQuery<N extends NodeEntity<any>> {
             ]);
 
         if (this.whereStatement) {
-            baseQuery = baseQuery.where(this.whereStatement)
+            baseQuery = baseQuery.pipe(this.whereStatement)
         }
 
         baseQuery = appendReturn(baseQuery);
