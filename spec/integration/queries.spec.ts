@@ -8,6 +8,10 @@ import {int} from "../../lib/driver/Integer";
 import {expectIsNowDate} from "../helpers/assertions";
 import {ChildDummyGraphNode} from "../fixtures/ChildDummyGraphNode";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
+import {where} from "../../lib/cypher/where";
+import {orderBy} from "../../lib/cypher";
+import {returns} from "../../lib/cypher/common";
+import {match} from "../../lib/cypher/match";
 
 describe("Queries", () => {
     let neography:Neography,
@@ -235,10 +239,12 @@ describe("Queries", () => {
 
             describe("matching using where clause", () => {
                 it("returns nodes matched by where literal expression", async () => {
-                    let matchQuery = neography.query()
-                        .match(m => m.node(DummyGraphNode).as('n'))
-                        .where(w => w.literal('n.attr2 >= {val1}').params({val1: 1}))
-                        .returns('n');
+                    let matchQuery = neography.query(
+                        match(m => m.node(DummyGraphNode).as('n')),
+                        where(w => w.literal('n.attr2 >= {val1}').params({val1: 1})),
+                        returns('n'),
+                        orderBy(o => o.aliased('n').attribute('attr2').asc())
+                    );
 
                     let matchedNodes:DummyGraphNode[] = await connection.runQuery(matchQuery).pluck('n').toArray();
                     expect(matchedNodes.length).to.eq(2);

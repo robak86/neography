@@ -250,6 +250,7 @@ describe("Queries using pipeable api", () => {
                         match(m => m.node(DummyGraphNode).as('n')),
                         where(w => w.literal('n.attr2 >= {val1}').params({val1: 1})),
                         returns('n'),
+                        orderBy(o => o.aliased('n').attribute('attr2').asc())
                     );
 
                     let matchedNodes:DummyGraphNode[] = await connection.runQuery(matchQuery).pluck('n').toArray();
