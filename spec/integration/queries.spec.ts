@@ -8,7 +8,6 @@ import {int} from "../../lib/driver/Integer";
 import {expectIsNowDate} from "../helpers/assertions";
 import {ChildDummyGraphNode} from "../fixtures/ChildDummyGraphNode";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
-import * as _ from 'lodash';
 
 describe("Queries", () => {
     let neography:Neography,
@@ -265,15 +264,16 @@ describe("Queries", () => {
         describe("Matching node with multiple labels(inheritance)", () => {
             //TODO: split expectations in more granular test cases. Add test cases where nodes using inheritance are created using query builder
             beforeEach(async () => {
-                await connection.runQuery(q => q.literal(`CREATE (n:DummyGraphNode {attr1: "abc"}) return n`)).toArray();
-                await connection.runQuery(q => q.literal(`CREATE (n:ChildDummyGraphNode:DummyGraphNode {attr1: "abc" }) return n`)).toArray();
-                await connection.runQuery(q => q.literal(`CREATE (n:DummyGraphNode:ChildDummyGraphNode {attr1: "abc" }) return n`)).toArray();
+                await connection.runQuery(q => q.literal(`CREATE (n:DummyGraphNode {attr1: "abc", attr2: 1}) return n`)).toArray();
+                await connection.runQuery(q => q.literal(`CREATE (n:ChildDummyGraphNode:DummyGraphNode {attr1: "abc", attr2: 3}) return n`)).toArray();
+                await connection.runQuery(q => q.literal(`CREATE (n:DummyGraphNode:ChildDummyGraphNode {attr1: "abc", attr2: 2}) return n`)).toArray();
             });
 
             it("matches also subclasses", async () => {
                 let rows:any[] = await connection.runQuery(q => q
                     .match(m => m.node(DummyGraphNode).as('n').params({attr1: "abc"}))
                     .returns('n')
+                    .order(w => w.aliased('n').attribute('attr2').asc())
                 ).toArray();
 
                 expect(rows.length).to.eq(3);

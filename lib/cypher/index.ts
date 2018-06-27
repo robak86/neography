@@ -6,3 +6,4 @@ export const buildQuery = (...elements:IQueryPart[]) => new QueryBuilder(element
 export * from './match';
 export * from './create';
 export * from './where';
+export * from './order';

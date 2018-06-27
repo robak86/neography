@@ -9,9 +9,10 @@ import {expectIsNowDate} from "../helpers/assertions";
 import {ChildDummyGraphNode} from "../fixtures/ChildDummyGraphNode";
 import {DummyGraphRelation} from "../fixtures/DummyGraphRelation";
 import {create} from "../../lib/cypher/create";
-import {returns} from "../../lib/cypher/common";
+import {literal, returns} from "../../lib/cypher/common";
 import {match} from "../../lib/cypher/match";
 import {where} from "../../lib/cypher/where";
+import {buildQuery, orderBy} from "../../lib/cypher";
 
 
 describe("Queries using pipeable api", () => {
@@ -113,12 +114,13 @@ describe("Queries using pipeable api", () => {
             newNode2 = new DummyGraphNode({attr1: 'n2Attr'});
 
         beforeEach(async () => {
-            //create nodes which will be connected by relationshipEntity
-            let nodes = await connection.runQuery(q => q
-                .create(c => c.node(newNode1).as('n1'))
-                .create(c => c.node(newNode2).as('n2'))
-                .returns('n1', 'n2')
-            ).first();
+            const query = buildQuery(
+                create(c => c.node(newNode1).as('n1')),
+                create(c => c.node(newNode2).as('n2')),
+                returns('n1', 'n2')
+            );
+
+            let nodes = await connection.runQuery(query).first();
             node1 = nodes.n1;
             node2 = nodes.n2;
         });
@@ -274,16 +276,19 @@ describe("Queries using pipeable api", () => {
         describe("Matching node with multiple labels(inheritance)", () => {
             //TODO: split expectations in more granular test cases. Add test cases where nodes using inheritance are created using query builder
             beforeEach(async () => {
-                await connection.runQuery(q => q.literal(`CREATE (n:DummyGraphNode {attr1: "abc"}) return n`)).toArray();
-                await connection.runQuery(q => q.literal(`CREATE (n:ChildDummyGraphNode:DummyGraphNode {attr1: "abc" }) return n`)).toArray();
-                await connection.runQuery(q => q.literal(`CREATE (n:DummyGraphNode:ChildDummyGraphNode {attr1: "abc" }) return n`)).toArray();
+                await connection.runQuery(q => q.literal(`CREATE (n:DummyGraphNode {attr1: "abc", attr2: 1}) return n`)).toArray();
+                await connection.runQuery(q => q.literal(`CREATE (n:ChildDummyGraphNode:DummyGraphNode {attr1: "abc", attr2: 3}) return n`)).toArray();
+                await connection.runQuery(q => q.literal(`CREATE (n:DummyGraphNode:ChildDummyGraphNode {attr1: "abc", attr2: 2}) return n`)).toArray();
             });
 
             it("matches also subclasses", async () => {
-                let rows:any[] = await connection.runQuery(q => q
-                    .match(m => m.node(DummyGraphNode).as('n').params({attr1: "abc"}))
-                    .returns('n')
-                ).toArray();
+                const query = buildQuery(
+                    match(m => m.node(DummyGraphNode).as('n').params({attr1: "abc"})),
+                    returns('n'),
+                    orderBy(w => w.aliased('n').attribute('attr2').asc())
+                );
+
+                let rows:any[] = await connection.runQuery(query).toArray();
 
                 expect(rows.length).to.eq(3);
                 expect(rows[0].n).to.be.instanceOf(DummyGraphNode);
@@ -292,10 +297,12 @@ describe("Queries using pipeable api", () => {
             });
 
             it("does not returns parent classes", async () => {
-                let rows:any[] = await connection.runQuery(q => q
-                    .match(m => m.node(ChildDummyGraphNode).as('n').params({attr1: "abc"}))
-                    .returns('n')
-                ).toArray();
+                const query = buildQuery(
+                    match(m => m.node(ChildDummyGraphNode).as('n').params({attr1: "abc"})),
+                    returns('n')
+                );
+
+                let rows:any[] = await connection.runQuery(query).toArray();
 
                 expect(rows.length).to.eq(2);
                 expect(rows[0].n).to.be.instanceOf(ChildDummyGraphNode);
@@ -320,14 +327,15 @@ describe("Queries using pipeable api", () => {
             });
 
             it("all nodes connected by given relationshipEntity typ", async () => {
-                let matchQuery = neography.query()
-                    .match(m => [
+                let matchQuery = neography.query(
+                    match(m => [
                         m.node(DummyGraphNode).as('from'),
                         m.relation(DummyGraphRelation).direction('->').as('rel'), //TODO: one cannot add direction call at the end of chain
                         m.node(DummyGraphNode).as('to')
-                    ])
-                    .returns('from', 'rel', 'to')
-                    .literal('ORDER BY rel.attr2');
+                    ]),
+                    returns('from', 'rel', 'to'),
+                    literal('ORDER BY rel.attr2')
+                );
 
                 let rows:CreatedRelation[] = await connection.runQuery(matchQuery).toArray();
 

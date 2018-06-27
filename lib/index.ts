@@ -5,7 +5,6 @@ import {setDebugLogger, setLogger} from "./utils/logger";
 import {SimpleDebugLogger} from "./utils/SimpleDebugLogger";
 import {connectionsFactory} from "./connection/ConnectionFactory";
 import {IExtension} from "./extensions/IExtension";
-import {CypherQueryElement} from "./cypher/CypherQuery";
 import {IQueryPart} from "./cypher/abstract/IQueryPart";
 
 

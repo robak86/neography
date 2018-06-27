@@ -36,5 +36,25 @@ describe("MatchRelationQueryPart", () => {
             expect(cypherPart.cypherString).to.eql('-[u:_RelationTypeForSpec {attr1: {uParams}.attr1, attr2: {uParams}.attr2}]->');
             expect(cypherPart.params).to.eql({uParams: params});
         });
+
+        describe(`path length`, () => {
+            it(`adds fixed path length`, async () => {
+                let nodeQuery = relationQueryElement.as('u').direction('->').length(2);
+                let cypherPart = nodeQuery.toCypher(ctx);
+                expect(cypherPart.cypherString).to.eql('-[u:_RelationTypeForSpec*2]->');
+            });
+
+            it(`adds fixed path length`, async () => {
+                let nodeQuery = relationQueryElement.as('u').direction('->').length(1, 5);
+                let cypherPart = nodeQuery.toCypher(ctx);
+                expect(cypherPart.cypherString).to.eql('-[u:_RelationTypeForSpec*1..5]->');
+            });
+
+            it(`minimum to infinity`, async () => {
+                let nodeQuery = relationQueryElement.as('u').direction('->').length(1, Infinity);
+                let cypherPart = nodeQuery.toCypher(ctx);
+                expect(cypherPart.cypherString).to.eql('-[u:_RelationTypeForSpec*1..]->');
+            });
+        });
     });
 });

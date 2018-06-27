@@ -9,7 +9,7 @@ import {ChildDummyGraphNode} from "../../fixtures/ChildDummyGraphNode";
 import {getDefaultContext} from "../../helpers/ConnectionHelpers";
 
 
-describe('MatchQueryPart', () => {
+describe('MatchableQueryPart', () => {
     let nodeQuery1:MatchNodeQueryPart<DummyGraphNode>,
         nodeQuery2:MatchNodeQueryPart<DummyGraphNode>,
         nodeQuery3:MatchNodeQueryPart<DummyGraphNode>,
@@ -29,7 +29,7 @@ describe('MatchQueryPart', () => {
 
     describe("Matching single node", () => {
         beforeEach(() => {
-            matchQueryElement = new MatchQueryPart([nodeQuery1], false);
+            matchQueryElement = MatchQueryPart.build(false, nodeQuery1);
         });
 
         it("returns query part for matching single node", () => {
@@ -45,7 +45,7 @@ describe('MatchQueryPart', () => {
 
     describe("matching single node inheriting from other node class", () => {
         beforeEach(() => {
-            matchQueryElement = new MatchQueryPart([nodeQuery4], false);
+            matchQueryElement = MatchQueryPart.build(false, nodeQuery4);
         });
 
         it("returns query part for matching single node", () => {
@@ -55,13 +55,13 @@ describe('MatchQueryPart', () => {
 
         it("aggregates params", () => {
             expect(matchQueryElement.toCypher(ctx).params)
-                .to.eql({n4Params: undefined});
+                .to.eql({});
         });
     });
 
     describe("match two nodes", () => {
         beforeEach(() => {
-            matchQueryElement = new MatchQueryPart([nodeQuery1, nodeQuery2], false);
+            matchQueryElement = MatchQueryPart.build(false, nodeQuery1, nodeQuery2);
         });
 
         it("returns query part for matching single node", () => {
@@ -80,7 +80,7 @@ describe('MatchQueryPart', () => {
 
     describe("match two nodes connected with relationshipEntity", () => {
         beforeEach(() => {
-            matchQueryElement = new MatchQueryPart([nodeQuery1, relationQuery1, nodeQuery2], false);
+            matchQueryElement = MatchQueryPart.build(false, nodeQuery1, relationQuery1, nodeQuery2);
         });
 
         it("returns query part for matching single node", () => {
@@ -100,7 +100,7 @@ describe('MatchQueryPart', () => {
 
     describe("match nodes connected with relationshipEntity and additional node", () => {
         beforeEach(() => {
-            matchQueryElement = new MatchQueryPart([nodeQuery1, relationQuery1, nodeQuery2, nodeQuery3], false);
+            matchQueryElement = MatchQueryPart.build(false, nodeQuery1, relationQuery1, nodeQuery2, nodeQuery3);
         });
 
         it("returns query part for matching single node", () => {

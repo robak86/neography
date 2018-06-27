@@ -1,4 +1,4 @@
-import {MatchableElement, MatchQueryPart} from "../match/MatchQueryPart";
+import {MatchQueryPart} from "../match/MatchQueryPart";
 import {CreateQueryPart, PersistableElement} from "../create/CreateQueryPart";
 import {CypherQuery} from "../CypherQuery";
 import * as _ from 'lodash';
@@ -16,6 +16,7 @@ import {OrderStatement} from "../order/OrderStatement";
 import {OrderBuilder} from "./OrderBuilder";
 import {IQueryPart} from "../abstract/IQueryPart";
 import {literal} from "../common";
+import {MatchableElement} from "../match/MatchableQueryPart";
 
 
 export type MatchBuilderCallback = (q:MatchBuilder) => MatchableElement[] | MatchableElement;
@@ -67,21 +68,11 @@ export class QueryBuilder {
         return new QueryBuilder(elements);
     }
 
-    order(literal:OrderBuilderCallback<any> | OrderStatement) {
-        if (literal instanceof OrderStatement) {
-            let elements = _.clone(this.elements);
-            elements.push(literal);
-            return new QueryBuilder(elements)
-        } else {
-            if (_.isFunction(literal)) {
-                let whereElement:OrderStatementPart[] | OrderStatementPart = literal(new OrderBuilder());
-                let elements = _.clone(this.elements);
-                elements.push(new OrderStatement(_.castArray(whereElement) as any) as any);
-                return new QueryBuilder(elements)
-            } else {
-                throw new Error("Wrong type of parameter for .order()")
-            }
-        }
+    order(literal:OrderBuilderCallback<any>) {
+        const orderStatement = OrderStatement.build(literal);
+        let elements = _.clone(this.elements);
+        elements.push(orderStatement);
+        return new QueryBuilder(elements)
     }
 
     create(...builderOrElements:(CreateBuilderCallback | PersistableElement)[]):QueryBuilder {

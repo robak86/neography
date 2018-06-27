@@ -35,4 +35,20 @@
   - Create repository for batch actions ```connection.nodeBatchRepository(SomeNodeType)```
   - Write more specs
   - Add basic query builders for ```WHERE``` and ```ORDER BY``` statements
- 
+  
+
+## 0.3.0
+   - Add support for more composable way of build queries
+```typescript
+import {buildQuery, match, returns, where, orderBy} from 'neography/cypher'
+
+const query = buildQuery(
+    match(m => m.node(DummyGraphNode).as('n')),
+    where(w => w.literal('n.attr2 >= {val1}').params({val1: 1})),
+    orderBy(w => w.aliased('n').attribute('attr2').asc()),
+    returns('n'),
+);
+```
+
+   - Add support for variable length relationships
+   - Add support for path variables

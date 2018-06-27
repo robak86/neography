@@ -5,12 +5,15 @@ import {IRelationMatchQueryPart, RelationDirectionType} from "./IRelationMatchQu
 import {IQueryPart} from "../abstract/IQueryPart";
 import {RelationshipEntity} from "../../model";
 import {cloned} from "../../utils/core";
+import * as _ from 'lodash';
 
 
 export class MatchUntypedRelationQueryPart<R extends RelationshipEntity> implements IRelationMatchQueryPart<R>, IQueryPart {
     protected _params:any;
     protected _alias:string;
     protected _direction:RelationDirectionType = '<->';
+    protected _minLength:number | undefined;
+    protected _maxLength:number | undefined;
 
     constructor() {}
 
@@ -26,6 +29,14 @@ export class MatchUntypedRelationQueryPart<R extends RelationshipEntity> impleme
         return cloned(this, (el:MatchUntypedRelationQueryPart<R>) => el._alias = alias);
     }
 
+    length(minOrExactLength:number, max?:number) {
+        return cloned(this, (el:MatchUntypedRelationQueryPart<R>) => {
+            el._minLength = minOrExactLength;
+            el._maxLength = max;
+        });
+    }
+
+    // TODO: toCypher is almost identical to MatchRelationQueryPart's toCypher
     toCypher(context:QueryContext):IBoundQueryPart {
         let alias = this._alias || context.checkoutRelationAlias();
 
@@ -34,8 +45,24 @@ export class MatchUntypedRelationQueryPart<R extends RelationshipEntity> impleme
             ` {${generateMatchAssignments(paramsId, this._params)}}` :
             '';
 
+        const lengthFragment = () => {
+            const lengthToString = (l:number | undefined):string => l === Infinity ? '' : l!.toString();
+
+
+            if (_.isUndefined(this._minLength) && _.isUndefined(this._maxLength)) {
+                return '';
+            }
+
+            if (!_.isUndefined(this._minLength) && _.isUndefined(this._maxLength)) {
+                return `*${lengthToString(this._minLength)}`
+            }
+
+            return `*${lengthToString(this._minLength)}..${lengthToString(this._maxLength)}`
+        };
+
+
         return {
-            cypherString: `${this.arrowPreSign}[${alias} ${cypherParams}]${this.arrowPostSign}`,
+            cypherString: `${this.arrowPreSign}[${alias}${lengthFragment()} ${cypherParams}]${this.arrowPostSign}`,
             params: {[paramsId]: this._params}
         };
     }

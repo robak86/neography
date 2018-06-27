@@ -7,12 +7,14 @@ import {generateMatchAssignments} from "../utils/QueryHelpers";
 import {IRelationMatchQueryPart, RelationDirectionType} from "./IRelationMatchQueryPart";
 import {IQueryPart} from "../abstract/IQueryPart";
 import {cloned} from "../../utils/core";
-
+import * as _ from 'lodash';
 
 export class MatchRelationQueryPart<G extends RelationshipEntity> implements IRelationMatchQueryPart<G>, IQueryPart {
     protected _params:any;
     protected _alias:string;
     protected _direction:RelationDirectionType = '<->';
+    protected _minLength:number | undefined;
+    protected _maxLength:number | undefined;
 
     constructor(private klass:Type<G>) {}
 
@@ -28,8 +30,11 @@ export class MatchRelationQueryPart<G extends RelationshipEntity> implements IRe
         return cloned(this, (el:MatchRelationQueryPart<G>) => el._alias = alias);
     }
 
-    private get relationType():string {
-        return RelationMetadata.getOrCreateForClass(this.klass).getType();
+    length(minOrExactLength:number, max?:number) {
+        return cloned(this, (el:MatchRelationQueryPart<G>) => {
+            el._minLength = minOrExactLength;
+            el._maxLength = max;
+        });
     }
 
     toCypher(context:QueryContext):IBoundQueryPart {
@@ -39,10 +44,31 @@ export class MatchRelationQueryPart<G extends RelationshipEntity> implements IRe
             ` {${generateMatchAssignments(paramsId, this._params)}}` :
             '';
 
-        return {
-            cypherString: `${this.arrowPreSign}[${alias}:${this.relationType}${cypherParams}]${this.arrowPostSign}`,
-            params: {[paramsId]: this._params}
+        const lengthFragment = () => {
+            const lengthToString = (l:number | undefined):string => l === Infinity ? '' : l!.toString();
+
+
+            if (_.isUndefined(this._minLength) && _.isUndefined(this._maxLength)) {
+                return '';
+            }
+
+            if (!_.isUndefined(this._minLength) && _.isUndefined(this._maxLength)) {
+                return `*${lengthToString(this._minLength)}`
+            }
+
+            return `*${lengthToString(this._minLength)}..${lengthToString(this._maxLength)}`
         };
+
+        const params = this._params ? {[paramsId]: this._params} : {};
+
+        return {
+            cypherString: `${this.arrowPreSign}[${alias}:${this.relationType}${lengthFragment()}${cypherParams}]${this.arrowPostSign}`,
+            params
+        };
+    }
+
+    private get relationType():string {
+        return RelationMetadata.getOrCreateForClass(this.klass).getType();
     }
 
     private get arrowPreSign():string {
