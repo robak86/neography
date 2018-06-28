@@ -80,7 +80,7 @@ export class NodeQuery<N extends NodeEntity<any>> {
 
         let nodes:N[] = await connection.runQuery(query).pluck('n').toArray();
 
-        let nodesByIds = _.keyBy(nodes, n => n.id);
+        let nodesByIds:{[id:string]: N} = _.keyBy(nodes, n => n.id) as any;
         let result:N[] = [];
 
         ids.forEach((id:string) => nodesByIds[id] && result.push(nodesByIds[id]));

@@ -12,8 +12,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "noImplicitReturns": true,
-    "strictNullChecks": true,
-    "keyofStringsOnly": true
+    "strictNullChecks": true
   },
   "typeRoots": [
     "./node_modules/@types",
