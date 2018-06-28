@@ -18,6 +18,7 @@ import {invariant} from "../../utils/core";
 export type MatchableElement = MatchNodeQueryPart<any>
     | PathQueryPart
     | MatchableQueryPart
+    | MatchedNodeQueryPart
     | INodeMatchQueryPart<any>
     | IRelationMatchQueryPart<any>;
 

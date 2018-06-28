@@ -1,6 +1,8 @@
 # ROADMAP
 
+* add support for ```SKIP``` and ```LIMIT```
 * add support for ```WITH```
+* add support for using patterns in Where statement
 * add support for functions like ```shortestPath```
 * add support for DateTime introduced in neo4j 3.4
 * create alternative api which doesn't use @decorators
