@@ -84,4 +84,40 @@ describe(`WhereAttributeBuilder`, () => {
             expect(cypher.params).to.be.undefined;
         });
     });
+
+    describe(`.contains`, () => {
+        it('returns correct cypher statement', () => {
+            let cypher = builder.contains("abc").toCypher(ctx);
+            expect(cypher.cypherString).to.eq(`node.someProperty CONTAINS { __node_someProperty_prop1 }`)
+        });
+
+        it('returns correct params object', () => {
+            let cypher = builder.contains('abc').toCypher(ctx);
+            expect(cypher.params).to.eql({__node_someProperty_prop1: 'abc'})
+        });
+    });
+
+    describe(`.startsWith`, () => {
+        it('returns correct cypher statement', () => {
+            let cypher = builder.startsWith("abc").toCypher(ctx);
+            expect(cypher.cypherString).to.eq(`node.someProperty STARTS WITH { __node_someProperty_prop1 }`)
+        });
+
+        it('returns correct params object', () => {
+            let cypher = builder.startsWith('abc').toCypher(ctx);
+            expect(cypher.params).to.eql({__node_someProperty_prop1: 'abc'})
+        });
+    });
+
+    describe(`.endsWith`, () => {
+        it('returns correct cypher statement', () => {
+            let cypher = builder.endsWith("abc").toCypher(ctx);
+            expect(cypher.cypherString).to.eq(`node.someProperty ENDS WITH { __node_someProperty_prop1 }`)
+        });
+
+        it('returns correct params object', () => {
+            let cypher = builder.endsWith('abc').toCypher(ctx);
+            expect(cypher.params).to.eql({__node_someProperty_prop1: 'abc'})
+        });
+    });
 });

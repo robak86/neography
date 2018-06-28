@@ -11,7 +11,7 @@ import {IQueryPart} from "./cypher/abstract/IQueryPart";
 export * from './connection/Connection';
 export * from './utils/SimpleDebugLogger';
 
-export const buildQuery = () => new QueryBuilder();
+export const buildQuery = (...elements:IQueryPart[]) => new QueryBuilder(elements);
 
 export class Neography {
     private config:Config;
