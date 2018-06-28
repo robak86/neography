@@ -18,8 +18,8 @@ export class WhereBuilder<T = any> {
         return new WhereAttributeBuilder(prop, this._alias);
     }
 
-    //TODO: investigate matching for queries like WHERE NOT (n)-[:SOME_REL]-(b)
-    path(m:MatchBuilderCallback){}
+    // //TODO: investigate matching for queries like WHERE NOT (n)-[:SOME_REL]-(b)
+    // path(m:MatchBuilderCallback){}
 
     aliased(alias:string):WhereBuilder<T>{
         return cloned(this, w => w._alias = alias);

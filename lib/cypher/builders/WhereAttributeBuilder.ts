@@ -75,4 +75,16 @@ export class WhereAttributeBuilder<T> {
     in(values:T[]):WhereAttributeQueryPart {
         return new WhereAttributeQueryPart(this.propertyName, this._alias, 'in', values);
     }
+
+    contains(value:string):WhereAttributeQueryPart {
+        return new WhereAttributeQueryPart(this.propertyName, this._alias, 'CONTAINS', value);
+    }
+
+    startsWith(value:string):WhereAttributeQueryPart {
+        return new WhereAttributeQueryPart(this.propertyName, this._alias, 'STARTS WITH', value);
+    }
+
+    endsWith(value:string):WhereAttributeQueryPart {
+        return new WhereAttributeQueryPart(this.propertyName, this._alias, 'ENDS WITH', value);
+    }
 }

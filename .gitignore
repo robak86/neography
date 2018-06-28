@@ -9,3 +9,4 @@ examples/node_modules
 examples/**/*.js
 .DS_Store
 neography
+drafts.md
